@@ -138,7 +138,204 @@ namespace StackVM
             this->lhsOperandType = leftType;
             this->lhsDataType = Type::Pointer;
             this->numOperands = 1;
-        }        
+        }
+
+        Instruction(OpCode opcode, byte* leftValue, Type lhsDataType, OperandType leftType)
+        {
+            this->opcode = opcode;
+
+            switch(lhsDataType)
+            {
+                case Type::Int8:
+                {
+                    memcpy(&lhs[0], &leftValue[0], sizeof(char));
+                    break;
+                }
+                case Type::Int16:
+                {
+                    memcpy(&lhs[0], &leftValue[0], sizeof(int16_t));
+                    break;
+                }
+                case Type::Int32:
+                {
+                    memcpy(&lhs[0], &leftValue[0], sizeof(int32_t));
+                    break;
+                }
+                case Type::Int64:
+                {
+                    memcpy(&lhs[0], &leftValue[0], sizeof(int64_t));
+                    break;
+                }
+                case Type::UInt8:
+                {
+                    memcpy(&lhs[0], &leftValue[0], sizeof(unsigned char));
+                    break;
+                }
+                case Type::UInt16:
+                {
+                    memcpy(&lhs[0], &leftValue[0], sizeof(uint16_t));
+                    break;
+                }
+                case Type::UInt32:
+                {
+                    memcpy(&lhs[0], &leftValue[0], sizeof(uint32_t));
+                    break;
+                }
+                case Type::UInt64:
+                {
+                    memcpy(&lhs[0], &leftValue[0], sizeof(uint64_t));
+                    break;
+                }
+                case Type::Double:
+                {
+                    memcpy(&lhs[0], &leftValue[0], sizeof(double));
+                    break;
+                }
+                case Type::Single:
+                {
+                    memcpy(&lhs[0], &leftValue[0], sizeof(float));
+                    break;
+                }
+                case Type::Pointer                :
+                {
+                    memcpy(&lhs[0], &leftValue[0], sizeof(void*));
+                    break;
+                }
+            }
+
+            this->lhsOperandType = leftType;
+            this->lhsDataType = lhsDataType;
+            this->numOperands = 1;
+        }         
+
+        Instruction(OpCode opcode, byte* leftValue, Type lhsDataType, OperandType leftType, byte* rightValue, Type rhsDataType, OperandType rightType)
+        {
+            this->opcode = opcode;
+
+            switch(lhsDataType)
+            {
+                case Type::Int8:
+                {
+                    memcpy(&lhs[0], &leftValue[0], sizeof(char));
+                    break;
+                }
+                case Type::Int16:
+                {
+                    memcpy(&lhs[0], &leftValue[0], sizeof(int16_t));
+                    break;
+                }
+                case Type::Int32:
+                {
+                    memcpy(&lhs[0], &leftValue[0], sizeof(int32_t));
+                    break;
+                }
+                case Type::Int64:
+                {
+                    memcpy(&lhs[0], &leftValue[0], sizeof(int64_t));
+                    break;
+                }
+                case Type::UInt8:
+                {
+                    memcpy(&lhs[0], &leftValue[0], sizeof(unsigned char));
+                    break;
+                }
+                case Type::UInt16:
+                {
+                    memcpy(&lhs[0], &leftValue[0], sizeof(uint16_t));
+                    break;
+                }
+                case Type::UInt32:
+                {
+                    memcpy(&lhs[0], &leftValue[0], sizeof(uint32_t));
+                    break;
+                }
+                case Type::UInt64:
+                {
+                    memcpy(&lhs[0], &leftValue[0], sizeof(uint64_t));
+                    break;
+                }
+                case Type::Double:
+                {
+                    memcpy(&lhs[0], &leftValue[0], sizeof(double));
+                    break;
+                }
+                case Type::Single:
+                {
+                    memcpy(&lhs[0], &leftValue[0], sizeof(float));
+                    break;
+                }
+                case Type::Pointer                :
+                {
+                    memcpy(&lhs[0], &leftValue[0], sizeof(void*));
+                    break;
+                }
+            }
+
+            switch(rhsDataType)
+            {
+                case Type::Int8:
+                {
+                    memcpy(&rhs[0], &rightValue[0], sizeof(char));
+                    break;
+                }
+                case Type::Int16:
+                {
+                    memcpy(&rhs[0], &rightValue[0], sizeof(int16_t));
+                    break;
+                }
+                case Type::Int32:
+                {
+                    memcpy(&rhs[0], &rightValue[0], sizeof(int32_t));
+                    break;
+                }
+                case Type::Int64:
+                {
+                    memcpy(&rhs[0], &rightValue[0], sizeof(int64_t));
+                    break;
+                }
+                case Type::UInt8:
+                {
+                    memcpy(&rhs[0], &rightValue[0], sizeof(unsigned char));
+                    break;
+                }
+                case Type::UInt16:
+                {
+                    memcpy(&rhs[0], &rightValue[0], sizeof(uint16_t));
+                    break;
+                }
+                case Type::UInt32:
+                {
+                    memcpy(&rhs[0], &rightValue[0], sizeof(uint32_t));
+                    break;
+                }
+                case Type::UInt64:
+                {
+                    memcpy(&rhs[0], &rightValue[0], sizeof(uint64_t));
+                    break;
+                }
+                case Type::Double:
+                {
+                    memcpy(&rhs[0], &rightValue[0], sizeof(double));
+                    break;
+                }
+                case Type::Single:
+                {
+                    memcpy(&rhs[0], &rightValue[0], sizeof(float));
+                    break;
+                }
+                case Type::Pointer                :
+                {
+                    memcpy(&rhs[0], &rightValue[0], sizeof(void*));
+                    break;
+                }
+            }
+
+            this->lhsOperandType = leftType;
+            this->rhsOperandType = rightType;
+            this->lhsDataType = lhsDataType;
+            this->rhsDataType = rhsDataType;
+            this->numOperands = 2;
+        }              
 
         Instruction(OpCode opcode, unsigned char leftValue, OperandType leftType, unsigned char rightValue, OperandType rightType)
         {

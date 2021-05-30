@@ -1,15 +1,35 @@
 #include <iostream>
+#include <string>
 #include "Stack.hpp"
 #include "Specification.hpp"
 #include "Assembly.hpp"
 #include "Instruction.hpp"
 #include "VirtualMachine.hpp"
+#include "Compiler.hpp"
+#include "IO.hpp"
 
 using namespace StackVM;
 
 int main()
 {
     Assembly assembly;
+    std::string filepath = "main.asm";
+
+    if(IO::FileExists(filepath))
+    {
+        std::string source = IO::ReadAllText(filepath);
+
+        Compiler compiler;
+
+        if(compiler.Compile(source, assembly))
+        {
+            std::cout << "Compile ok" << std::endl;
+        }
+    }
+
+    return 0;
+
+    
     assembly.instructions.push_back(Instruction(OpCode::MOV, EAX, OperandType::Register, 0, OperandType::IntegerLiteral));
     assembly.instructions.push_back(Instruction(OpCode::MOV, EBX, OperandType::Register, 10, OperandType::IntegerLiteral));
     assembly.instructions.push_back(Instruction(OpCode::INC, EAX, OperandType::Register));

@@ -13,6 +13,7 @@ namespace StackVM
 	public:
 		std::vector<Instruction> instructions;
 		std::vector<byte> data;
+		std::vector<Type> types;
 
         Assembly()
         {

@@ -73,6 +73,31 @@ namespace StackVM
         Register = 0,
         Variable = 1,
         IntegerLiteral
+    };   
+
+    enum class OperandInfo : uint8_t
+    {
+        None,
+        Optional,
+        One,
+        Two
+    };
+
+    class OpCodeInfo
+    {
+    public:
+        OpCode code;
+        OperandInfo operandInfo;
+        OperandType leftType;
+        OperandType rightType;
+
+        OpCodeInfo() {}
+
+        OpCodeInfo(OpCode code, OperandInfo operandInfo)
+        {
+            this->code = code;
+            this->operandInfo = operandInfo;
+        }
     };    
 
     enum Register : uint8_t
