@@ -37,18 +37,45 @@ namespace StackVM
 
         for(size_t i = 0; i < tokens.size(); i++)
         {
-            if(tokens[i].type == TokenType::VARIABLE_LABEL || tokens[i].type == TokenType::OPCODE)
+            if(tokens[i].type == TokenType::VARIABLE_LABEL || 
+               tokens[i].type == TokenType::FUNCTION_LABEL ||
+               tokens[i].type == TokenType::OPCODE)
             {
                 index = i;
-                ProcessToken(tokens, index);
+                if(!ProcessToken(tokens, index))
+                {
+                    return false;
+                }
             }
         }
+
+        std::cout << "Compilation done" << std::endl;
+
+        // std::cout << "Assembly data:" << std::endl;
+        // for (auto const& x : dataMap)
+        // {
+        //     std::cout   << x.first  // string (key)
+        //                 << " offset: " 
+        //                 << x.second // string's value 
+        //                 << std::endl;
+        // }   
+        // std::cout << std::endl;
+        // std::cout << "Assembly function labels:" << std::endl;
+        // for (auto const& x : labelMap)
+        // {
+        //     std::cout   << x.first  // string (key)
+        //                 << " offset: "
+        //                 << x.second // string's value 
+        //                 << std::endl;
+        // }             
 
         return true;
     }
 
     bool CompilerTest::ProcessToken(std::vector<Token>& tokens, size_t index)
     {        
+        
+
         switch(tokens[index].type)
         {
             case TokenType::VARIABLE_LABEL:
@@ -59,8 +86,9 @@ namespace StackVM
                     return false;
                 }
 
-                Token& directiveToken = tokens[index+1];
-                Token& valueToken     = tokens[index+2];
+                Token& identifierToken = tokens[index];
+                Token& directiveToken  = tokens[index+1];
+                Token& valueToken      = tokens[index+2];
 
                 if(directiveToken.type == TokenType::DIRECTIVE_SPECIFIER)
                 {
@@ -109,8 +137,6 @@ namespace StackVM
                             break;                                
                         }
                     }
-
-                    assembly->types.push_back(type);
                     
                     byte data[8];
                     memset(data, 0, 8);
@@ -118,8 +144,14 @@ namespace StackVM
 
                     if(bytesWritten > 0)
                     {
+                        assembly->types.push_back(type);
+
+                        uint32_t index = assembly->data.size();
+
                         for(size_t i = 0; i < bytesWritten; i++)
                             assembly->data.push_back(data[i]);
+                        
+                        dataMap[identifierToken.text] = index;
                     }
                     else
                     {
@@ -129,8 +161,111 @@ namespace StackVM
                 }
                 break;
             }
-            case TokenType::OPCODE:
+            case TokenType::FUNCTION_LABEL:
             {
+                Token& identifierToken = tokens[index];
+                labelMap[identifierToken.text] = 0;
+                break;
+            }
+            case TokenType::OPCODE:
+            {                
+                Token& identifierToken = tokens[index];                
+                OpCodeInfo opcodeInfo = CompilerUtility::opcodeInfoMap[identifierToken.text];
+                OpCode opcode = opcodeInfo.code;
+
+                switch(opcodeInfo.operandInfo)
+                {
+                    case OperandInfo::None:
+                    {                     
+                        assembly->instructions.push_back(Instruction(opcode));
+                        break;
+                    }
+                    case OperandInfo::Optional:
+                    {                        
+                        if((index + 1) < tokens.size())
+                        {
+                            Token& leftOperandToken = tokens[index+1];
+                            if(leftOperandToken.type == TokenType::OPERAND)
+                            {
+                                if(CompilerUtility::IsDirectiveToken(leftOperandToken.text))
+                                {
+                                    WriteError(leftOperandToken.lineNumber, "Invalid operand value. The value '" + leftOperandToken.text + "' is reserved for define directives");
+                                    return false;
+                                }
+                                
+                                switch(opcodeInfo.leftTypeOption)
+                                {
+                                    case OperandTypeOption::All:
+                                    {
+                                        if(CompilerUtility::registerMap.count(leftOperandToken.text) > 0)
+                                        {
+                                            uint32_t value = CompilerUtility::registerMap[leftOperandToken.text];
+                                            assembly->instructions.push_back(Instruction(opcode, value, OperandType::Register));
+                                        }
+                                        else if(dataMap.count(leftOperandToken.text) > 0)
+                                        {
+                                            uint32_t value = dataMap[leftOperandToken.text];                                            
+                                            assembly->instructions.push_back(Instruction(opcode, value, OperandType::Variable));
+                                        }                                        
+                                        else if(labelMap.count(leftOperandToken.text) > 0)
+                                        {
+                                            uint32_t value = labelMap[leftOperandToken.text];                                            
+                                            assembly->instructions.push_back(Instruction(opcode, value, OperandType::IntegerLiteral));
+                                        }
+                                        else
+                                        {
+                                            uint64_t temp = 0;
+                                            if(StringUtility::ParseNumberLexical<uint64_t>(leftOperandToken.text, temp))
+                                            {
+                                                Type type = CompilerUtility::GetNumberTypeFromText(leftOperandToken.text);
+                                                byte leftValue[8];
+                                                memset(leftValue, 0, 8);
+                                                int bytesWritten = CompilerUtility::WriteStringValueToBuffer(leftOperandToken.text, leftValue, type);
+
+                                                if(bytesWritten > 0)
+                                                {
+                                                    assembly->instructions.push_back(Instruction(opcode, leftValue, type, OperandType::IntegerLiteral));
+                                                }
+                                                else
+                                                {
+                                                    WriteError(leftOperandToken.lineNumber, "Failed to write value '" + leftOperandToken.text + "' to instruction");
+                                                    return false;
+                                                }
+                                            }
+                                            else
+                                            {
+                                                WriteError(leftOperandToken.lineNumber, "Failed to convert '" + leftOperandToken.text + "' to a number");
+                                                return false;
+                                            }
+                                        }
+                                        break;
+                                    }
+                                    case OperandTypeOption::RegisterOrVariable:
+                                    {
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                        else
+                        {
+                            assembly->instructions.push_back(Instruction(opcode));
+                        }
+                        
+                        break;
+                    }
+                    case OperandInfo::One:
+                    {
+
+                        break;
+                    }
+                    case OperandInfo::Two:
+                    {
+
+                        break;
+                    }
+                }
+
                 break;
             }
             default:

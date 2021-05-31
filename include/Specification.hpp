@@ -73,7 +73,13 @@ namespace StackVM
         Register = 0,
         Variable = 1,
         IntegerLiteral
-    };   
+    };
+
+    enum class OperandTypeOption : uint8_t
+    {
+        All = 0,     
+        RegisterOrVariable = 1
+    };
 
     enum class OperandInfo : uint8_t
     {
@@ -88,8 +94,8 @@ namespace StackVM
     public:
         OpCode code;
         OperandInfo operandInfo;
-        OperandType leftType;
-        OperandType rightType;
+        OperandTypeOption leftTypeOption;
+        OperandTypeOption rightTypeOption;
 
         OpCodeInfo() {}
 
@@ -98,6 +104,21 @@ namespace StackVM
             this->code = code;
             this->operandInfo = operandInfo;
         }
+
+        OpCodeInfo(OpCode code, OperandInfo operandInfo, OperandTypeOption leftTypeOption)
+        {
+            this->code = code;
+            this->operandInfo = operandInfo;
+            this->leftTypeOption = leftTypeOption;
+        } 
+
+        OpCodeInfo(OpCode code, OperandInfo operandInfo, OperandTypeOption leftTypeOption, OperandTypeOption rightTypeOption)
+        {
+            this->code = code;
+            this->operandInfo = operandInfo;
+            this->leftTypeOption = leftTypeOption;
+            this->rightTypeOption = rightTypeOption;
+        }                
     };    
 
     enum Register : uint8_t
