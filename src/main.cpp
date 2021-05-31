@@ -1,36 +1,30 @@
 #include <iostream>
 #include <string>
-#include "Stack.hpp"
-#include "Specification.hpp"
-#include "Assembly.hpp"
-#include "Instruction.hpp"
 #include "VirtualMachine.hpp"
-//#include "Compiler.hpp"
+#include "Compiler.hpp"
 #include "IO.hpp"
-#include "CompilerTest.hpp"
 
 using namespace StackVM;
 
-//Compiler is not yet functioning
-void CompileTest();
+Compiler compiler;
+VirtualMachine machine;
+
+void CompileProgram();
+void RunExampleProgram();
 
 int main()
 {
-    if(IO::FileExists("main.asm"))
-    {
-        std::string source = IO::ReadAllText("main.asm");
-
-        CompilerTest compiler;
-        Assembly assembly;
-        compiler.Compile(source, assembly);
-    }
-
+    CompileProgram();
+    RunExampleProgram();
     return 0;
+}
 
+void RunExampleProgram()
+{
     Assembly assembly;
     
     assembly.instructions.push_back(Instruction(OpCode::MOV, EAX, OperandType::Register, 0, OperandType::IntegerLiteral));
-    assembly.instructions.push_back(Instruction(OpCode::MOV, EBX, OperandType::Register, 1000000, OperandType::IntegerLiteral));
+    assembly.instructions.push_back(Instruction(OpCode::MOV, EBX, OperandType::Register, 10, OperandType::IntegerLiteral));
     assembly.instructions.push_back(Instruction(OpCode::INC, EAX, OperandType::Register));
     assembly.instructions.push_back(Instruction(OpCode::PUSHI8, '\n', OperandType::IntegerLiteral));
     assembly.instructions.push_back(Instruction(OpCode::PUSHI8, 'o', OperandType::IntegerLiteral));
@@ -44,8 +38,6 @@ int main()
     assembly.instructions.push_back(Instruction(OpCode::JNE, 2, OperandType::IntegerLiteral));    
     assembly.instructions.push_back(Instruction(OpCode::HLT));
 
-    VirtualMachine machine;
-
     if(machine.LoadProgram(&assembly))
     {
         bool execute = true;
@@ -55,24 +47,26 @@ int main()
             execute = machine.Execute();
         }
     }
-
-    return 0;
 }
 
-// void CompileTest()
-// {
-//     Assembly assembly;
-//     std::string filepath = "main.asm";
+void CompileProgram()
+{
+    std::string filename = "demo.asm";
 
-//     if(IO::FileExists(filepath))
-//     {
-//         std::string source = IO::ReadAllText(filepath);
+    if(IO::FileExists(filename))
+    {
+        std::string source = IO::ReadAllText(filename);
 
-//         Compiler compiler;
+        Assembly assembly;
 
-//         if(compiler.Compile(source, assembly))
-//         {
-//             std::cout << "Compile ok" << std::endl;
-//         }
-//     }
-// }
+        //Compiler isn't fully implemented yet so output shouldn't be loaded into virtual machine
+        if(compiler.Compile(source, assembly)) 
+        {
+            std::cout << "Compile ok" << std::endl;            
+        }
+    }
+    else
+    {
+        std::cout << "The file " << filename << " does not exist" << std::endl;
+    }
+}

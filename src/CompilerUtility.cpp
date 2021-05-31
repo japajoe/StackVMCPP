@@ -88,10 +88,11 @@ namespace StackVM
             lines.push_back(LineInfo(sourceLines[i], i + 1));
         }
 
+        RemoveTrailingComments(lines);
         RemoveWhiteSpace(lines);
         RemoveEmptyLines(lines);
         RemoveCommentLines(lines);
-        RemoveTrailingComments(lines);
+        
 
         return lines;
     }
@@ -210,6 +211,8 @@ namespace StackVM
                             return false;
                         }
                     }
+
+                    components[0] = StringUtility::ToLowerCase(components[0]);
 
                     if(!CompilerUtility::IsOpCodeToken(components[0]))
                     {
