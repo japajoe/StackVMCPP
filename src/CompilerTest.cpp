@@ -11,22 +11,9 @@ namespace StackVM
     {
         this->assembly = &assembly;
         assembly.instructions.clear();
-        assembly.data.clear();
-        
-        auto sourceLines = StringUtility::Split(source, '\n');
+        assembly.data.clear();        
 
-        std::vector<LineInfo> lines;
-
-        for(size_t i = 0; i < sourceLines.size(); i++)
-        {
-            lines.push_back(LineInfo(sourceLines[i], i + 1));
-        }
-
-        CompilerUtility::RemoveWhiteSpace(lines);
-        CompilerUtility::RemoveEmptyLines(lines);
-        CompilerUtility::RemoveCommentLines(lines);
-        CompilerUtility::RemoveTrailingComments(lines);
-
+        std::vector<LineInfo> lines = CompilerUtility::PreProcess(source);
         std::vector<Token> tokens;
 
         if(!CompilerUtility::Tokenize(lines, tokens))
@@ -34,6 +21,10 @@ namespace StackVM
 
         size_t tokenCount = tokens.size();
         size_t index = 0;
+
+        size_t numVariables = CompilerUtility::CountTokens(tokens, TokenType::VARIABLE_LABEL);
+        size_t numFunctions = CompilerUtility::CountTokens(tokens, TokenType::FUNCTION_LABEL);
+        size_t numOpcodes = CompilerUtility::CountTokens(tokens, TokenType::OPCODE);
 
         for(size_t i = 0; i < tokens.size(); i++)
         {
@@ -73,9 +64,7 @@ namespace StackVM
     }
 
     bool CompilerTest::ProcessToken(std::vector<Token>& tokens, size_t index)
-    {        
-        
-
+    {
         switch(tokens[index].type)
         {
             case TokenType::VARIABLE_LABEL:

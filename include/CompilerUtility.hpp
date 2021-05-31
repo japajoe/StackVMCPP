@@ -95,6 +95,7 @@ namespace StackVM
         static std::map<std::string, uint32_t> registerMap;
         static std::map<std::string, DefineDirective> directivesMap;
         static void Initialize();
+        static std::vector<LineInfo> PreProcess(const std::string& source);
         static bool Tokenize(const std::vector<LineInfo>& lines, std::vector<Token>& tokens);
         static void RemoveWhiteSpace(std::vector<LineInfo>& lines);
         static void RemoveEmptyLines(std::vector<LineInfo>& lines);
@@ -111,6 +112,7 @@ namespace StackVM
         static bool LineHasFunctionDeclaration(const std::string& text);
         static int WriteStringValueToBuffer(const std::string& text, byte* buffer, Type type);
         static bool NumberIsSigned(const std::string& text);
+        static size_t CountTokens(const std::vector<Token>& tokens, TokenType type);
         
     };
 };

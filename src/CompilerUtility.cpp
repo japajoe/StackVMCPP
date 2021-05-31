@@ -77,6 +77,25 @@ namespace StackVM
         isInitialized = true;
     }
 
+    std::vector<LineInfo> CompilerUtility::PreProcess(const std::string& source)
+    {
+        auto sourceLines = StringUtility::Split(source, '\n');
+
+        std::vector<LineInfo> lines;
+
+        for(size_t i = 0; i < sourceLines.size(); i++)
+        {
+            lines.push_back(LineInfo(sourceLines[i], i + 1));
+        }
+
+        RemoveWhiteSpace(lines);
+        RemoveEmptyLines(lines);
+        RemoveCommentLines(lines);
+        RemoveTrailingComments(lines);
+
+        return lines;
+    }
+
     bool CompilerUtility::Tokenize(const std::vector<LineInfo>& lines, std::vector<Token>& tokens)
     {
         enum TokenizationState
@@ -184,6 +203,11 @@ namespace StackVM
                             components[0].pop_back();
                             tokens.push_back(Token(TokenType::FUNCTION_LABEL, components[0], lines[i].lineNumber));
                             break;
+                        }
+                        else
+                        {
+                            WriteError(lines[i].lineNumber, "Invalid label identifier '" + components[0] + "'. Labels can not start with a number");
+                            return false;
                         }
                     }
 
@@ -564,6 +588,18 @@ namespace StackVM
     bool CompilerUtility::NumberIsSigned(const std::string& text)
     {
         return text[0] == '-';
+    }
+
+    size_t CompilerUtility::CountTokens(const std::vector<Token>& tokens, TokenType type)
+    {
+        int count = 0;
+        for(size_t i = 0; i < tokens.size(); i++)
+        {
+            if(tokens[i].type == type)
+                count++;
+        }
+
+        return count;
     }
 
     void CompilerUtility::WriteError(int lineNumber, const std::string& error)
