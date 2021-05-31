@@ -5,8 +5,9 @@
 #include "Assembly.hpp"
 #include "Instruction.hpp"
 #include "VirtualMachine.hpp"
-#include "Compiler.hpp"
+//#include "Compiler.hpp"
 #include "IO.hpp"
+#include "CompilerTest.hpp"
 
 using namespace StackVM;
 
@@ -15,10 +16,21 @@ void CompileTest();
 
 int main()
 {
+    if(IO::FileExists("main.asm"))
+    {
+        std::string source = IO::ReadAllText("main.asm");
+
+        CompilerTest compiler;
+        Assembly assembly;
+        compiler.Compile(source, assembly);
+    }
+
+    return 0;
+
     Assembly assembly;
     
     assembly.instructions.push_back(Instruction(OpCode::MOV, EAX, OperandType::Register, 0, OperandType::IntegerLiteral));
-    assembly.instructions.push_back(Instruction(OpCode::MOV, EBX, OperandType::Register, 10, OperandType::IntegerLiteral));
+    assembly.instructions.push_back(Instruction(OpCode::MOV, EBX, OperandType::Register, 1000000, OperandType::IntegerLiteral));
     assembly.instructions.push_back(Instruction(OpCode::INC, EAX, OperandType::Register));
     assembly.instructions.push_back(Instruction(OpCode::PUSHI8, '\n', OperandType::IntegerLiteral));
     assembly.instructions.push_back(Instruction(OpCode::PUSHI8, 'o', OperandType::IntegerLiteral));
@@ -47,20 +59,20 @@ int main()
     return 0;
 }
 
-void CompileTest()
-{
-    Assembly assembly;
-    std::string filepath = "main.asm";
+// void CompileTest()
+// {
+//     Assembly assembly;
+//     std::string filepath = "main.asm";
 
-    if(IO::FileExists(filepath))
-    {
-        std::string source = IO::ReadAllText(filepath);
+//     if(IO::FileExists(filepath))
+//     {
+//         std::string source = IO::ReadAllText(filepath);
 
-        Compiler compiler;
+//         Compiler compiler;
 
-        if(compiler.Compile(source, assembly))
-        {
-            std::cout << "Compile ok" << std::endl;
-        }
-    }
-}
+//         if(compiler.Compile(source, assembly))
+//         {
+//             std::cout << "Compile ok" << std::endl;
+//         }
+//     }
+// }

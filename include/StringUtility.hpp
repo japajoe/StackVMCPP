@@ -20,6 +20,7 @@ namespace StackVM
         static std::string GetFileExtension(const std::string& text, bool includePeriod = false);
         static bool StartsWith(const std::string& haystack, const std::string& needle);
         static bool EndsWith(const std::string& haystack, const std::string& needle);
+        static bool StartsWithNumber(const std::string& text);
         static int GetLines(const std::string& text);
         static bool Contains(const std::string& haystack, const std::string& needle);
         static int Count(const std::string& haystack, const std::string& needle);

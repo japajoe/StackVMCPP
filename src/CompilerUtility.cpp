@@ -1,0 +1,573 @@
+#include "CompilerUtility.hpp"
+
+namespace StackVM
+{
+    bool CompilerUtility::isInitialized = false;
+    std::map<std::string, OpCodeInfo> CompilerUtility::opcodeInfoMap;
+    std::map<std::string, uint32_t> CompilerUtility::registerMap;
+    std::map<std::string, DefineDirective> CompilerUtility::directivesMap;
+
+    void CompilerUtility::Initialize()
+    {
+        if(isInitialized)
+            return;
+
+        opcodeInfoMap["mov"]       = OpCodeInfo(OpCode::MOV,       OperandInfo::Two);
+        opcodeInfoMap["inc"]       = OpCodeInfo(OpCode::INC,       OperandInfo::One);
+        opcodeInfoMap["dec"]       = OpCodeInfo(OpCode::DEC,       OperandInfo::One);
+        opcodeInfoMap["add"]       = OpCodeInfo(OpCode::ADD,       OperandInfo::None);
+        opcodeInfoMap["sub"]       = OpCodeInfo(OpCode::SUB,       OperandInfo::None);
+        opcodeInfoMap["mul"]       = OpCodeInfo(OpCode::MUL,       OperandInfo::None);
+        opcodeInfoMap["div"]       = OpCodeInfo(OpCode::DIV,       OperandInfo::None);
+        opcodeInfoMap["push"]      = OpCodeInfo(OpCode::PUSH,      OperandInfo::One);
+        opcodeInfoMap["pushi8"]    = OpCodeInfo(OpCode::PUSHI8,    OperandInfo::One);
+        opcodeInfoMap["pushu8"]    = OpCodeInfo(OpCode::PUSHU8,    OperandInfo::One);
+        opcodeInfoMap["pushf"]     = OpCodeInfo(OpCode::PUSHF,     OperandInfo::One);
+        opcodeInfoMap["pushd"]     = OpCodeInfo(OpCode::PUSHD,     OperandInfo::One);
+        opcodeInfoMap["pushi32"]   = OpCodeInfo(OpCode::PUSHI32,   OperandInfo::One);
+        opcodeInfoMap["pushu32"]   = OpCodeInfo(OpCode::PUSHU32,   OperandInfo::One);
+        opcodeInfoMap["pushi16"]   = OpCodeInfo(OpCode::PUSHI16,   OperandInfo::One);
+        opcodeInfoMap["pushu16"]   = OpCodeInfo(OpCode::PUSHU16,   OperandInfo::One);
+        opcodeInfoMap["pushi64"]   = OpCodeInfo(OpCode::PUSHI64,   OperandInfo::One);
+        opcodeInfoMap["pushu64"]   = OpCodeInfo(OpCode::PUSHU64,   OperandInfo::One);
+        opcodeInfoMap["pop"]       = OpCodeInfo(OpCode::POP,       OperandInfo::Optional);
+        opcodeInfoMap["popi8"]     = OpCodeInfo(OpCode::POPI8,     OperandInfo::Optional);
+        opcodeInfoMap["popu8"]     = OpCodeInfo(OpCode::POPU8,     OperandInfo::Optional);
+        opcodeInfoMap["popf"]      = OpCodeInfo(OpCode::POPF,      OperandInfo::Optional);
+        opcodeInfoMap["popd"]      = OpCodeInfo(OpCode::POPD,      OperandInfo::Optional);
+        opcodeInfoMap["popi32"]    = OpCodeInfo(OpCode::POPI32,    OperandInfo::Optional);
+        opcodeInfoMap["popu32"]    = OpCodeInfo(OpCode::POPU32,    OperandInfo::Optional);
+        opcodeInfoMap["popi16"]    = OpCodeInfo(OpCode::POPI16,    OperandInfo::Optional);
+        opcodeInfoMap["popu16"]    = OpCodeInfo(OpCode::POPU16,    OperandInfo::Optional);
+        opcodeInfoMap["popi64"]    = OpCodeInfo(OpCode::POPI64,    OperandInfo::Optional);
+        opcodeInfoMap["popu64"]    = OpCodeInfo(OpCode::POPU64,    OperandInfo::Optional);
+        opcodeInfoMap["print"]     = OpCodeInfo(OpCode::PRINT,     OperandInfo::None);
+        opcodeInfoMap["cmp"]       = OpCodeInfo(OpCode::CMP,       OperandInfo::Two);
+        opcodeInfoMap["jmp"]       = OpCodeInfo(OpCode::JMP,       OperandInfo::One);
+        opcodeInfoMap["je"]        = OpCodeInfo(OpCode::JE,        OperandInfo::One);
+        opcodeInfoMap["jne"]       = OpCodeInfo(OpCode::JNE,       OperandInfo::One);
+        opcodeInfoMap["jg"]        = OpCodeInfo(OpCode::JG,        OperandInfo::One);
+        opcodeInfoMap["jge"]       = OpCodeInfo(OpCode::JGE,       OperandInfo::One);
+        opcodeInfoMap["jl"]        = OpCodeInfo(OpCode::JL,        OperandInfo::One);
+        opcodeInfoMap["jle"]       = OpCodeInfo(OpCode::JLE,       OperandInfo::One);
+        opcodeInfoMap["jz"]        = OpCodeInfo(OpCode::JZ,        OperandInfo::One);
+        opcodeInfoMap["jnz"]       = OpCodeInfo(OpCode::JNZ,       OperandInfo::One);
+        opcodeInfoMap["nop"]       = OpCodeInfo(OpCode::NOP,       OperandInfo::None);
+        opcodeInfoMap["hlt"]       = OpCodeInfo(OpCode::HLT,       OperandInfo::None);
+        
+        registerMap["eax"] = 0;
+        registerMap["ebx"] = 1;
+        registerMap["ecx"] = 2;
+        registerMap["edx"] = 3;
+        registerMap["ebp"] = 4;
+        registerMap["esp"] = 5;
+        registerMap["edi"] = 6;
+        registerMap["eip"] = 7;
+        registerMap["esi"] = 8;
+        registerMap["rax"] = 9;
+        registerMap["rbx"] = 10;
+        registerMap["rcx"] = 11;
+        registerMap["rdx"] = 12;
+
+        directivesMap["db"] = DefineDirective::DB;
+        directivesMap["dw"] = DefineDirective::DW;
+        directivesMap["dd"] = DefineDirective::DD;
+        directivesMap["dq"] = DefineDirective::DQ;
+
+        isInitialized = true;
+    }
+
+    bool CompilerUtility::Tokenize(const std::vector<LineInfo>& lines, std::vector<Token>& tokens)
+    {
+        enum TokenizationState
+        {
+            DoData,
+            DoInstructions
+        };
+
+        TokenizationState tokenizationState = TokenizationState::DoData;
+
+        for(size_t i = 0; i < lines.size(); i++)
+        {
+            std::vector<std::string> components = StringUtility::Split(lines[i].text, ' ');
+
+            if(components.size() == 0)
+                components.push_back(lines[i].text);
+
+            for(size_t j = 0; j < components.size(); j++)
+            {
+                if(StringUtility::EndsWith(components[j], ","))
+                    components[j].pop_back();
+            }
+
+            if(lines[i].text == "section .data")
+            {
+                tokenizationState = TokenizationState::DoData;
+                continue;
+            }
+            else if(lines[i].text == "section .text")
+            {
+                tokenizationState = TokenizationState::DoInstructions;
+                continue;
+            }
+
+            switch(tokenizationState)
+            {
+                case TokenizationState::DoData:
+                {
+                    if(components.size() != 4)
+                    {
+                        WriteError(lines[i].lineNumber, "Malformed instruction");                        
+                        return false;
+                    }
+                    else if(StringUtility::StartsWithNumber(components[0]))
+                    {
+                        WriteError(lines[i].lineNumber, "Variable names can not start with a number");
+                        return false;
+                    }
+                    else if(CompilerUtility::IsDirectiveToken(components[0]))
+                    {
+                        WriteError(lines[i].lineNumber, "Variables can not have the same name as a define directive");
+                        return false;
+                    }
+                    else if(CompilerUtility::IsRegisterLabelToken(components[0]))
+                    {
+                        WriteError(lines[i].lineNumber, "Variables can not have the same name as a register");
+                        return false;
+                    }
+
+                    tokens.push_back(Token(TokenType::VARIABLE_LABEL, components[0], lines[i].lineNumber));
+
+                    if(!CompilerUtility::IsDirectiveToken(components[1]))
+                    {
+                        WriteError(lines[i].lineNumber, "Unknown define directive '" + components[1] + "'");
+                        return false;
+                    }
+
+                    tokens.push_back(Token(TokenType::DIRECTIVE_SPECIFIER, StringUtility::ToLowerCase(components[1]), lines[i].lineNumber));
+
+                    uint64_t value = 0;
+
+                    if(!StringUtility::ParseNumberLexical<uint64_t>(components[3], value))
+                    {
+                        if(components[3].size() == 3)
+                        {
+                            if(StringUtility::StartsWith(components[3], "'") && StringUtility::EndsWith(components[3], "'"))
+                            {
+                                tokens.push_back(Token(TokenType::CHARACTER_LITERAL, components[3], lines[i].lineNumber));
+                            }
+                            else
+                            {
+                                WriteError(lines[i].lineNumber, "Invalid value '" + components[3] + "'");
+                                return false;
+                            }                            
+                        }
+                        else
+                        {
+                            WriteError(lines[i].lineNumber, "Invalid value '" + components[3] + "'");
+                            return false;
+                        }
+                    }
+                    else
+                    {
+                        tokens.push_back(Token(TokenType::INTEGER_LITERAL, components[3], lines[i].lineNumber));
+                    }
+
+                    break;
+                }
+                case TokenizationState::DoInstructions:
+                {
+                    if(StringUtility::EndsWith(components[0], ":"))
+                    {
+                        if(!StringUtility::StartsWithNumber(components[0]))
+                        {
+                            components[0].pop_back();
+                            tokens.push_back(Token(TokenType::FUNCTION_LABEL, components[0], lines[i].lineNumber));
+                            break;
+                        }
+                    }
+
+                    if(!CompilerUtility::IsOpCodeToken(components[0]))
+                    {
+                        WriteError(lines[i].lineNumber, "Invalid OpCode '" + components[0] + "'");
+                        return false;
+                    }
+
+                    //Find out how many operands opcode takes
+                    OpCodeInfo opcodeInfo = CompilerUtility::opcodeInfoMap[components[0]];
+
+                    switch(opcodeInfo.operandInfo)
+                    {
+                        case OperandInfo::None:
+                        {
+                            if(components.size() != 1)
+                            {
+                                WriteError(lines[i].lineNumber, "Invalid number of operands. Expected 0 but got " + std::to_string(components.size() - 1));
+                                return false;
+                            }
+                            
+                            tokens.push_back(Token(TokenType::OPCODE, components[0], lines[i].lineNumber));                         
+                            
+                            break;
+                        }
+                        case OperandInfo::Optional:
+                        {
+                            if(components.size() == 1)
+                            {
+                                tokens.push_back(Token(TokenType::OPCODE, components[0], lines[i].lineNumber));
+                            }
+                            else if(components.size() == 2)
+                            {
+                                tokens.push_back(Token(TokenType::OPCODE, components[0], lines[i].lineNumber));
+                                tokens.push_back(Token(TokenType::OPERAND, components[1], lines[i].lineNumber));
+                            }
+                            else
+                            {
+                                WriteError(lines[i].lineNumber, "Invalid number of operands. Expected 0 or 1 but got " + std::to_string(components.size() - 1));
+                                return false;
+                            }                            
+
+                            break;
+                        }
+                        case OperandInfo::One:
+                        {
+                            if(components.size() != 2)
+                            {
+                                WriteError(lines[i].lineNumber, "Invalid number of operands. Expected 1 but got " + std::to_string(components.size() - 1));
+                                return false;
+                            }
+
+                            tokens.push_back(Token(TokenType::OPCODE, components[0], lines[i].lineNumber));
+                            tokens.push_back(Token(TokenType::OPERAND, components[1], lines[i].lineNumber));
+
+                            break;
+                        }
+                        case OperandInfo::Two:
+                        {
+                            if(components.size() != 3)
+                            {
+                                WriteError(lines[i].lineNumber, "Invalid number of operands. Expected 2 but got " + std::to_string(components.size() - 1));
+                                return false;
+                            } 
+
+                            tokens.push_back(Token(TokenType::OPCODE, components[0], lines[i].lineNumber));
+                            tokens.push_back(Token(TokenType::OPERAND, components[1], lines[i].lineNumber));
+                            tokens.push_back(Token(TokenType::OPERAND, components[2], lines[i].lineNumber));
+
+                            break;
+                        }
+                    }                    
+
+                    break;
+                }
+            }
+        }
+
+        return true;
+    }
+
+    void CompilerUtility::RemoveWhiteSpace(std::vector<LineInfo>& lines)
+    {
+        for(size_t i = 0; i < lines.size(); i++)
+        {
+            std::string code = StringUtility::TrimWhiteSpace(lines[i].text);
+            lines[i].text = code;
+        }        
+    }
+
+    void CompilerUtility::RemoveEmptyLines(std::vector<LineInfo>& lines)
+    {
+        auto it = lines.begin();
+
+        while(it != lines.end()) 
+        {            
+            if(it->text.size() == 0) 
+            {
+                it = lines.erase(it);
+            }
+            else 
+            {
+                ++it;
+            }
+        }          
+    }
+
+    void CompilerUtility::RemoveCommentLines(std::vector<LineInfo>& lines)
+    {
+        auto it = lines.begin();
+
+        while(it != lines.end()) 
+        {
+            if(StringUtility::StartsWith(it->text, ";"))
+            {
+                it = lines.erase(it);
+            }
+            else 
+            {
+                ++it;
+            }
+        }        
+    }
+
+    void CompilerUtility::RemoveTrailingComments(std::vector<LineInfo>& lines)
+    {
+        for(size_t i = 0; i < lines.size(); i++)
+        {
+            if(StringUtility::Contains(lines[i].text, ";"))
+            {
+                auto components = StringUtility::Split(lines[i].text, ';');
+                
+                if(components.size() > 0)
+                {
+                    lines[i].text = components[0];
+                }
+            }
+        }        
+    }
+
+    Type CompilerUtility::GetNumberTypeFromText(const std::string& text)
+    {
+        bool isSigned = false;
+        std::string t = text;
+        if(StringUtility::StartsWith(t, "-"))
+        {
+            t = t.replace(0, 1, "");
+            isSigned = true;
+        }        
+        
+        uint64_t val = 0;
+        
+        StringUtility::ParseNumber<uint64_t>(t, val);
+
+        if(isSigned)
+        {
+            if(val > 2147483647)
+                return Type::Int64;
+            else if(val > 32767 && val <= 2147483647)
+                return Type::Int32;
+            else if(val > 127 && val <= 32767)
+                return Type::Int16;
+            else            
+                return Type::Int8;            
+        }
+        else
+        {
+            if(val > 4294967295)
+                return Type::UInt64;
+            else if(val > 65535 && val <= 4294967295)
+                return Type::UInt32;
+            else if(val > 255 && val <= 65535)
+                return Type::UInt16;
+            else
+                return Type::UInt8;  
+        }        
+    }
+
+    bool CompilerUtility::IsDirectiveToken(const std::string& text)
+    {
+        return directivesMap.count(StringUtility::ToLowerCase(text)) > 0;
+    }
+
+    bool CompilerUtility::IsRegisterLabelToken(const std::string& text)
+    {
+        return registerMap.count(StringUtility::ToLowerCase(text)) > 0;
+    }
+
+    bool CompilerUtility::IsFunctionLabelToken(const std::string& text)
+    {
+        return false;
+    }
+
+    bool CompilerUtility::IsVariableLabelToken(const std::string& text)
+    {
+        return false;
+    }
+
+    bool CompilerUtility::IsOpCodeToken(const std::string& text)
+    {
+        return opcodeInfoMap.count(StringUtility::ToLowerCase(text)) > 0;
+    }
+
+    bool CompilerUtility::IsIntegerLiteralToken(const std::string& text)
+    {
+        uint64_t value = 0;
+        return StringUtility::ParseNumberLexical<uint64_t>(text, value);
+    }
+
+    bool CompilerUtility::LineHasVariableDeclaration(const std::string& text)
+    {
+        if(StringUtility::Contains(text, ":"))
+        {
+            if(!StringUtility::StartsWith(text, ":") && !StringUtility::EndsWith(text, ":"))
+            {
+                auto components = StringUtility::Split(text, ' ');
+
+                if(components.size() == 4)
+                {
+                    if(directivesMap.count(components[2]) > 0)
+                        return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    bool CompilerUtility::LineHasFunctionDeclaration(const std::string& text)
+    {
+        if(StringUtility::Contains(text, ":"))
+        {
+            if(StringUtility::EndsWith(text, ":"))
+            {
+                if(!StringUtility::StartsWithNumber(text))
+                    return true;
+            }
+        }
+
+        return false;
+    }
+
+    int CompilerUtility::WriteStringValueToBuffer(const std::string& text, byte* buffer, Type type)
+    {
+        int bytesWritten = 0;
+
+        switch(type)
+        {
+            case Type::Int8:
+            {
+                char value = static_cast<char>(text[0]);
+                memcpy(buffer, &value, sizeof(char));
+                bytesWritten = sizeof(char);
+                break;
+            }
+            case Type::Int16:
+            {
+                int16_t value = 0;
+                
+                if(!StringUtility::ParseNumber<int16_t>(text, value))
+                {
+                    return 0;
+                }
+
+                memcpy(buffer, &value, sizeof(int16_t));
+                bytesWritten = sizeof(int16_t);
+                break;
+            }
+            case Type::Int32:
+            {
+                int32_t value = 0;
+                
+                if(!StringUtility::ParseNumber<int32_t>(text, value))
+                {
+                    return 0;
+                }
+
+                memcpy(buffer, &value, sizeof(int32_t));
+                bytesWritten = sizeof(int32_t);
+                break;
+            }
+            case Type::Int64:
+            {
+                int64_t value = 0;
+                
+                if(!StringUtility::ParseNumber<int64_t>(text, value))
+                {
+                    return 0;
+                }
+
+                memcpy(buffer, &value, sizeof(int64_t));
+                bytesWritten = sizeof(int64_t);
+                break;
+            }
+            case Type::UInt8:
+            {
+                unsigned char value = static_cast<unsigned char>(text[0]);
+                memcpy(buffer, &value, sizeof(unsigned char));
+                bytesWritten = sizeof(unsigned char);
+                break;
+            }
+            case Type::UInt16:
+            {
+                uint16_t value = 0;
+                
+                if(!StringUtility::ParseNumber<uint16_t>(text, value))
+                {
+                    return 0;
+                }
+
+                memcpy(buffer, &value, sizeof(uint16_t));
+                bytesWritten = sizeof(uint16_t);
+                break;
+            }
+            case Type::UInt32:
+            {
+                uint32_t value = 0;
+                
+                if(!StringUtility::ParseNumber<uint32_t>(text, value))
+                {
+                    return 0;
+                }
+                
+                memcpy(buffer, &value, sizeof(uint32_t));
+                bytesWritten = sizeof(uint32_t);
+                break;
+            }
+            case Type::UInt64:
+            {
+                uint64_t value = 0;
+                
+                if(!StringUtility::ParseNumber<uint64_t>(text, value))
+                {
+                    return 0;
+                }
+
+                memcpy(buffer, &value, sizeof(uint64_t));
+                bytesWritten = sizeof(uint64_t);
+                break;
+            }
+            case Type::Single:
+            {
+                float value = 0;
+                
+                if(!StringUtility::ParseNumber<float>(text, value))
+                {
+                    return 0;
+                }
+
+                memcpy(buffer, &value, sizeof(float));
+                bytesWritten = sizeof(float);
+                break;
+            }
+            case Type::Double:
+            {
+                double value = 0;
+                
+                if(!StringUtility::ParseNumber<double>(text, value))
+                {
+                    return 0;
+                }
+
+                memcpy(buffer, &value, sizeof(double));
+                bytesWritten = sizeof(double);
+                break;
+            }
+            default:
+            {   
+                bytesWritten = 0;                                         
+                break;
+            }
+        } 
+
+        return bytesWritten;       
+    }
+
+    bool CompilerUtility::NumberIsSigned(const std::string& text)
+    {
+        return text[0] == '-';
+    }
+
+    void CompilerUtility::WriteError(int lineNumber, const std::string& error)
+    {
+        std::cout << "Tokenizer -> Error on line " << lineNumber << ": " << error << std::endl;
+    }    
+}

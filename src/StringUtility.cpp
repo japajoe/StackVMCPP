@@ -90,6 +90,20 @@ namespace StackVM
         return true;
     }
 
+    bool StringUtility::StartsWithNumber(const std::string& text)
+    {
+        char x = '0';
+
+        for(int i = 0; x < 10; x++)
+        {
+            if(text[0] == x)
+                return true;
+            x++;
+        }
+
+        return false;
+    }
+
     int StringUtility::GetLines(const std::string& text)
     {
         int lineCount = std::count(text.begin(), text.end(), '\n');
