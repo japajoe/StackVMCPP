@@ -9,7 +9,6 @@ using namespace StackVM;
 Compiler compiler;
 VirtualMachine machine;
 
-void Tokenize();
 void CompileProgram();
 void RunExampleProgram();
 
@@ -63,8 +62,6 @@ void CompileProgram()
         //Compiler isn't fully implemented yet so output shouldn't be loaded into virtual machine
         if(compiler.Compile(source, assembly)) 
         {
-            //std::cout << assembly.instructions.size() << std::endl;
-            //return;
             if(machine.LoadProgram(&assembly))
             {
                 bool execute = true;

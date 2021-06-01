@@ -34,21 +34,12 @@ _print:
     PUSHI8 'r'
     PUSHI8 'o'
     PUSHI8 'w'
-    PUSHI8 0x20 ;to do: fix bug where a whitespace character literal is wrongly interpreted, so for now use hex representation
-    PUSHI8 'o'           
+    PUSHI8 ' '
+    PUSHI8 'o'
     PUSHI8 'l'           
-    PUSHI8 'l'           
+    PUSHI8 'l'          
     PUSHI8 'e'           
-    PUSHI8 'H'           
+    PUSHI8 'H'
     PUSHI32 13
     PRINT
-    JMP _loop
-
-_loop:
-    CMP iteration, iterations
-    JGE _end
-    INC iteration
-    JMP _print
-
-_end:
     HLT
