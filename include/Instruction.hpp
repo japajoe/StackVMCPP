@@ -131,15 +131,6 @@ namespace StackVM
             this->numOperands = 1;
         }
 
-        Instruction(OpCode opcode, void* leftValue, OperandType leftType)
-        {
-            this->opcode = opcode;
-            memcpy(&lhs[0], leftValue, sizeof(void*));
-            this->lhsOperandType = leftType;
-            this->lhsDataType = Type::Pointer;
-            this->numOperands = 1;
-        }
-
         Instruction(OpCode opcode, byte* leftValue, Type lhsDataType, OperandType leftType)
         {
             this->opcode = opcode;
@@ -194,11 +185,6 @@ namespace StackVM
                 case Type::Single:
                 {
                     memcpy(&lhs[0], &leftValue[0], sizeof(float));
-                    break;
-                }
-                case Type::Pointer                :
-                {
-                    memcpy(&lhs[0], &leftValue[0], sizeof(void*));
                     break;
                 }
             }
@@ -264,11 +250,6 @@ namespace StackVM
                     memcpy(&lhs[0], &leftValue[0], sizeof(float));
                     break;
                 }
-                case Type::Pointer                :
-                {
-                    memcpy(&lhs[0], &leftValue[0], sizeof(void*));
-                    break;
-                }
             }
 
             switch(rhsDataType)
@@ -321,11 +302,6 @@ namespace StackVM
                 case Type::Single:
                 {
                     memcpy(&rhs[0], &rightValue[0], sizeof(float));
-                    break;
-                }
-                case Type::Pointer                :
-                {
-                    memcpy(&rhs[0], &rightValue[0], sizeof(void*));
                     break;
                 }
             }
@@ -457,18 +433,6 @@ namespace StackVM
             this->numOperands = 2;
         }
 
-        Instruction(OpCode opcode, unsigned char leftValue, OperandType leftType, void* rightValue, OperandType rightType)
-        {
-            this->opcode = opcode;
-            memcpy(&lhs[0], &leftValue, sizeof(unsigned char));
-            memcpy(&rhs[0], rightValue, sizeof(void*));
-            this->lhsOperandType = leftType;
-            this->rhsOperandType = rightType;
-            this->lhsDataType = Type::UInt8;
-            this->rhsDataType = Type::Pointer;
-            this->numOperands = 2;
-        }
-
         Instruction(OpCode opcode, char leftValue, OperandType leftType, unsigned char rightValue, OperandType rightType)
         {
             this->opcode = opcode;
@@ -586,18 +550,6 @@ namespace StackVM
             this->rhsOperandType = rightType;
             this->lhsDataType = Type::Int8;
             this->rhsDataType = Type::Double;
-            this->numOperands = 2;
-        }
-
-        Instruction(OpCode opcode, char leftValue, OperandType leftType, void* rightValue, OperandType rightType)
-        {
-            this->opcode = opcode;
-            memcpy(&lhs[0], &leftValue, sizeof(char));
-            memcpy(&rhs[0], rightValue, sizeof(void*));
-            this->lhsOperandType = leftType;
-            this->rhsOperandType = rightType;
-            this->lhsDataType = Type::Int8;
-            this->rhsDataType = Type::Pointer;
             this->numOperands = 2;
         }
 
@@ -721,18 +673,6 @@ namespace StackVM
             this->numOperands = 2;
         }
 
-        Instruction(OpCode opcode, uint16_t leftValue, OperandType leftType, void* rightValue, OperandType rightType)
-        {
-            this->opcode = opcode;
-            memcpy(&lhs[0], &leftValue, sizeof(uint16_t));
-            memcpy(&rhs[0], rightValue, sizeof(void*));
-            this->lhsOperandType = leftType;
-            this->rhsOperandType = rightType;
-            this->lhsDataType = Type::UInt16;
-            this->rhsDataType = Type::Pointer;
-            this->numOperands = 2;
-        }
-
         Instruction(OpCode opcode, int16_t leftValue, OperandType leftType, unsigned char rightValue, OperandType rightType)
         {
             this->opcode = opcode;
@@ -850,18 +790,6 @@ namespace StackVM
             this->rhsOperandType = rightType;
             this->lhsDataType = Type::Int16;
             this->rhsDataType = Type::Double;
-            this->numOperands = 2;
-        }
-
-        Instruction(OpCode opcode, int16_t leftValue, OperandType leftType, void* rightValue, OperandType rightType)
-        {
-            this->opcode = opcode;
-            memcpy(&lhs[0], &leftValue, sizeof(int16_t));
-            memcpy(&rhs[0], rightValue, sizeof(void*));
-            this->lhsOperandType = leftType;
-            this->rhsOperandType = rightType;
-            this->lhsDataType = Type::Int16;
-            this->rhsDataType = Type::Pointer;
             this->numOperands = 2;
         }
 
@@ -985,18 +913,6 @@ namespace StackVM
             this->numOperands = 2;
         }
 
-        Instruction(OpCode opcode, uint32_t leftValue, OperandType leftType, void* rightValue, OperandType rightType)
-        {
-            this->opcode = opcode;
-            memcpy(&lhs[0], &leftValue, sizeof(uint32_t));
-            memcpy(&rhs[0], rightValue, sizeof(void*));
-            this->lhsOperandType = leftType;
-            this->rhsOperandType = rightType;
-            this->lhsDataType = Type::UInt32;
-            this->rhsDataType = Type::Pointer;
-            this->numOperands = 2;
-        }
-
         Instruction(OpCode opcode, int32_t leftValue, OperandType leftType, unsigned char rightValue, OperandType rightType)
         {
             this->opcode = opcode;
@@ -1114,18 +1030,6 @@ namespace StackVM
             this->rhsOperandType = rightType;
             this->lhsDataType = Type::Int32;
             this->rhsDataType = Type::Double;
-            this->numOperands = 2;
-        }
-
-        Instruction(OpCode opcode, int32_t leftValue, OperandType leftType, void* rightValue, OperandType rightType)
-        {
-            this->opcode = opcode;
-            memcpy(&lhs[0], &leftValue, sizeof(int32_t));
-            memcpy(&rhs[0], rightValue, sizeof(void*));
-            this->lhsOperandType = leftType;
-            this->rhsOperandType = rightType;
-            this->lhsDataType = Type::Int32;
-            this->rhsDataType = Type::Pointer;
             this->numOperands = 2;
         }
 
@@ -1249,18 +1153,6 @@ namespace StackVM
             this->numOperands = 2;
         }
 
-        Instruction(OpCode opcode, uint64_t leftValue, OperandType leftType, void* rightValue, OperandType rightType)
-        {
-            this->opcode = opcode;
-            memcpy(&lhs[0], &leftValue, sizeof(uint64_t));
-            memcpy(&rhs[0], rightValue, sizeof(void*));
-            this->lhsOperandType = leftType;
-            this->rhsOperandType = rightType;
-            this->lhsDataType = Type::UInt64;
-            this->rhsDataType = Type::Pointer;
-            this->numOperands = 2;
-        }
-
         Instruction(OpCode opcode, int64_t leftValue, OperandType leftType, unsigned char rightValue, OperandType rightType)
         {
             this->opcode = opcode;
@@ -1378,18 +1270,6 @@ namespace StackVM
             this->rhsOperandType = rightType;
             this->lhsDataType = Type::Int64;
             this->rhsDataType = Type::Double;
-            this->numOperands = 2;
-        }
-
-        Instruction(OpCode opcode, int64_t leftValue, OperandType leftType, void* rightValue, OperandType rightType)
-        {
-            this->opcode = opcode;
-            memcpy(&lhs[0], &leftValue, sizeof(int64_t));
-            memcpy(&rhs[0], rightValue, sizeof(void*));
-            this->lhsOperandType = leftType;
-            this->rhsOperandType = rightType;
-            this->lhsDataType = Type::Int64;
-            this->rhsDataType = Type::Pointer;
             this->numOperands = 2;
         }
 
@@ -1513,18 +1393,6 @@ namespace StackVM
             this->numOperands = 2;
         }
 
-        Instruction(OpCode opcode, float leftValue, OperandType leftType, void* rightValue, OperandType rightType)
-        {
-            this->opcode = opcode;
-            memcpy(&lhs[0], &leftValue, sizeof(float));
-            memcpy(&rhs[0], rightValue, sizeof(void*));
-            this->lhsOperandType = leftType;
-            this->rhsOperandType = rightType;
-            this->lhsDataType = Type::Single;
-            this->rhsDataType = Type::Pointer;
-            this->numOperands = 2;
-        }
-
         Instruction(OpCode opcode, double leftValue, OperandType leftType, unsigned char rightValue, OperandType rightType)
         {
             this->opcode = opcode;
@@ -1643,151 +1511,7 @@ namespace StackVM
             this->lhsDataType = Type::Double;
             this->rhsDataType = Type::Double;
             this->numOperands = 2;
-        }
-
-        Instruction(OpCode opcode, double leftValue, OperandType leftType, void* rightValue, OperandType rightType)
-        {
-            this->opcode = opcode;
-            memcpy(&lhs[0], &leftValue, sizeof(double));
-            memcpy(&rhs[0], rightValue, sizeof(void*));
-            this->lhsOperandType = leftType;
-            this->rhsOperandType = rightType;
-            this->lhsDataType = Type::Double;
-            this->rhsDataType = Type::Pointer;
-            this->numOperands = 2;
-        }
-
-        Instruction(OpCode opcode, void* leftValue, OperandType leftType, unsigned char rightValue, OperandType rightType)
-        {
-            this->opcode = opcode;
-            memcpy(&lhs[0], leftValue, sizeof(void*));
-            memcpy(&rhs[0], &rightValue, sizeof(unsigned char));
-            this->lhsOperandType = leftType;
-            this->rhsOperandType = rightType;
-            this->lhsDataType = Type::Pointer;
-            this->rhsDataType = Type::UInt8;
-            this->numOperands = 2;
-        }
-
-        Instruction(OpCode opcode, void* leftValue, OperandType leftType, char rightValue, OperandType rightType)
-        {
-            this->opcode = opcode;
-            memcpy(&lhs[0], leftValue, sizeof(void*));
-            memcpy(&rhs[0], &rightValue, sizeof(char));
-            this->lhsOperandType = leftType;
-            this->rhsOperandType = rightType;
-            this->lhsDataType = Type::Pointer;
-            this->rhsDataType = Type::Int8;
-            this->numOperands = 2;
-        }
-
-        Instruction(OpCode opcode, void* leftValue, OperandType leftType, uint16_t rightValue, OperandType rightType)
-        {
-            this->opcode = opcode;
-            memcpy(&lhs[0], leftValue, sizeof(void*));
-            memcpy(&rhs[0], &rightValue, sizeof(uint16_t));
-            this->lhsOperandType = leftType;
-            this->rhsOperandType = rightType;
-            this->lhsDataType = Type::Pointer;
-            this->rhsDataType = Type::UInt16;
-            this->numOperands = 2;
-        }
-
-        Instruction(OpCode opcode, void* leftValue, OperandType leftType, int16_t rightValue, OperandType rightType)
-        {
-            this->opcode = opcode;
-            memcpy(&lhs[0], leftValue, sizeof(void*));
-            memcpy(&rhs[0], &rightValue, sizeof(int16_t));
-            this->lhsOperandType = leftType;
-            this->rhsOperandType = rightType;
-            this->lhsDataType = Type::Pointer;
-            this->rhsDataType = Type::Int16;
-            this->numOperands = 2;
-        }
-
-        Instruction(OpCode opcode, void* leftValue, OperandType leftType, uint32_t rightValue, OperandType rightType)
-        {
-            this->opcode = opcode;
-            memcpy(&lhs[0], leftValue, sizeof(void*));
-            memcpy(&rhs[0], &rightValue, sizeof(uint32_t));
-            this->lhsOperandType = leftType;
-            this->rhsOperandType = rightType;
-            this->lhsDataType = Type::Pointer;
-            this->rhsDataType = Type::UInt32;
-            this->numOperands = 2;
-        }
-
-        Instruction(OpCode opcode, void* leftValue, OperandType leftType, int32_t rightValue, OperandType rightType)
-        {
-            this->opcode = opcode;
-            memcpy(&lhs[0], leftValue, sizeof(void*));
-            memcpy(&rhs[0], &rightValue, sizeof(int32_t));
-            this->lhsOperandType = leftType;
-            this->rhsOperandType = rightType;
-            this->lhsDataType = Type::Pointer;
-            this->rhsDataType = Type::Int32;
-            this->numOperands = 2;
-        }
-
-        Instruction(OpCode opcode, void* leftValue, OperandType leftType, uint64_t rightValue, OperandType rightType)
-        {
-            this->opcode = opcode;
-            memcpy(&lhs[0], leftValue, sizeof(void*));
-            memcpy(&rhs[0], &rightValue, sizeof(uint64_t));
-            this->lhsOperandType = leftType;
-            this->rhsOperandType = rightType;
-            this->lhsDataType = Type::Pointer;
-            this->rhsDataType = Type::UInt64;
-            this->numOperands = 2;
-        }
-
-        Instruction(OpCode opcode, void* leftValue, OperandType leftType, int64_t rightValue, OperandType rightType)
-        {
-            this->opcode = opcode;
-            memcpy(&lhs[0], leftValue, sizeof(void*));
-            memcpy(&rhs[0], &rightValue, sizeof(int64_t));
-            this->lhsOperandType = leftType;
-            this->rhsOperandType = rightType;
-            this->lhsDataType = Type::Pointer;
-            this->rhsDataType = Type::Int64;
-            this->numOperands = 2;
-        }
-
-        Instruction(OpCode opcode, void* leftValue, OperandType leftType, float rightValue, OperandType rightType)
-        {
-            this->opcode = opcode;
-            memcpy(&lhs[0], leftValue, sizeof(void*));
-            memcpy(&rhs[0], &rightValue, sizeof(float));
-            this->lhsOperandType = leftType;
-            this->rhsOperandType = rightType;
-            this->lhsDataType = Type::Pointer;
-            this->rhsDataType = Type::Single;
-            this->numOperands = 2;
-        }
-
-        Instruction(OpCode opcode, void* leftValue, OperandType leftType, double rightValue, OperandType rightType)
-        {
-            this->opcode = opcode;
-            memcpy(&lhs[0], leftValue, sizeof(void*));
-            memcpy(&rhs[0], &rightValue, sizeof(double));
-            this->lhsOperandType = leftType;
-            this->rhsOperandType = rightType;
-            this->lhsDataType = Type::Pointer;
-            this->rhsDataType = Type::Double;
-            this->numOperands = 2;
-        }
-
-        Instruction(OpCode opcode, void* leftValue, OperandType leftType, void* rightValue, OperandType rightType)
-        {
-            this->opcode = opcode;
-            memcpy(&lhs[0], leftValue, sizeof(void*));
-            memcpy(&rhs[0], rightValue, sizeof(void*));
-            this->lhsOperandType = leftType;
-            this->rhsOperandType = rightType;
-            this->lhsDataType = Type::Pointer;
-            this->rhsDataType = Type::Pointer;
-            this->numOperands = 2;
-        }        
+        }   
 
         void Dump()
         {
@@ -1809,9 +1533,6 @@ namespace StackVM
                     break;       
                 case Type::Int8:
                     lhs += "Int8";
-                    break;      
-                case Type::Pointer:
-                    lhs += "Pointer";
                     break;
                 case Type::Single:
                     lhs += "Single";
@@ -1846,9 +1567,6 @@ namespace StackVM
                     break;       
                 case Type::Int8:
                     rhs += "Int8";
-                    break;      
-                case Type::Pointer:
-                    rhs += "Pointer";
                     break;
                 case Type::Single:
                     rhs += "Single";

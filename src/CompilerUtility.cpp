@@ -85,7 +85,6 @@ namespace StackVM
         typeToStringMap[Type::UInt64]   = "UInt64";
         typeToStringMap[Type::Double]   = "Double";
         typeToStringMap[Type::Single]   = "Single";
-        typeToStringMap[Type::Pointer]  = "Pointer";
 
         isInitialized = true;
     }

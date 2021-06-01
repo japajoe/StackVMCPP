@@ -64,8 +64,7 @@ namespace StackVM
         UInt32,
         UInt64,
         Double,
-        Single,
-        Pointer
+        Single
     };
 
     enum class OperandType : uint8_t

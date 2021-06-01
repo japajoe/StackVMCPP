@@ -71,10 +71,6 @@ namespace StackVM
                     memcpy(&buffer[sp], value, sizeof(char));
                     sp += sizeof(char);                   
                     break;      
-                case Type::Pointer:
-                    memcpy(&buffer[sp], value, sizeof(void*));
-                    sp += sizeof(void*);                
-                    break;
                 case Type::Single:
                     memcpy(&buffer[sp], value, sizeof(float));
                     sp += sizeof(float);           

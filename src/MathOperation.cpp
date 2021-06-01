@@ -53,8 +53,6 @@ namespace StackVM
                         break;       
                     case Type::Int8:
                         MathOperation::Add(reinterpret_cast<double*>(lhs), reinterpret_cast<char*>(rhs));
-                        break;      
-                    case Type::Pointer:
                         break;
                     case Type::Single:
                         MathOperation::Add(reinterpret_cast<double*>(lhs), reinterpret_cast<float*>(rhs));
@@ -93,8 +91,6 @@ namespace StackVM
                     case Type::Int8:
                         MathOperation::Add(reinterpret_cast<int16_t*>(lhs), reinterpret_cast<char*>(rhs));
                         break;      
-                    case Type::Pointer:
-                        break;
                     case Type::Single:
                         MathOperation::Add(reinterpret_cast<int16_t*>(lhs), reinterpret_cast<float*>(rhs));
                         break;        
@@ -131,8 +127,6 @@ namespace StackVM
                         break;       
                     case Type::Int8:
                         MathOperation::Add(reinterpret_cast<int32_t*>(lhs), reinterpret_cast<char*>(rhs));
-                        break;      
-                    case Type::Pointer:
                         break;
                     case Type::Single:
                         MathOperation::Add(reinterpret_cast<int32_t*>(lhs), reinterpret_cast<float*>(rhs));
@@ -170,8 +164,6 @@ namespace StackVM
                         break;       
                     case Type::Int8:
                         MathOperation::Add(reinterpret_cast<int64_t*>(lhs), reinterpret_cast<char*>(rhs));
-                        break;      
-                    case Type::Pointer:
                         break;
                     case Type::Single:
                         MathOperation::Add(reinterpret_cast<int64_t*>(lhs), reinterpret_cast<float*>(rhs));
@@ -210,8 +202,6 @@ namespace StackVM
                     case Type::Int8:
                         MathOperation::Add(reinterpret_cast<char*>(lhs), reinterpret_cast<char*>(rhs));
                         break;      
-                    case Type::Pointer:
-                        break;
                     case Type::Single:
                         MathOperation::Add(reinterpret_cast<char*>(lhs), reinterpret_cast<float*>(rhs));
                         break;        
@@ -228,10 +218,6 @@ namespace StackVM
                         MathOperation::Add(reinterpret_cast<char*>(lhs), reinterpret_cast<unsigned char*>(rhs));
                         break;                                                                                                                                                                                                                                                                                                                                                         
                 }
-                break;
-            }
-            case Type::Pointer:
-            {
                 break;
             }
             case Type::Single:
@@ -253,8 +239,6 @@ namespace StackVM
                     case Type::Int8:
                         MathOperation::Add(reinterpret_cast<float*>(lhs), reinterpret_cast<char*>(rhs));
                         break;      
-                    case Type::Pointer:
-                        break;
                     case Type::Single:
                         MathOperation::Add(reinterpret_cast<float*>(lhs), reinterpret_cast<float*>(rhs));
                         break;        
@@ -292,8 +276,6 @@ namespace StackVM
                     case Type::Int8:
                         MathOperation::Add(reinterpret_cast<uint16_t*>(lhs), reinterpret_cast<char*>(rhs));
                         break;      
-                    case Type::Pointer:
-                        break;
                     case Type::Single:
                         MathOperation::Add(reinterpret_cast<uint16_t*>(lhs), reinterpret_cast<float*>(rhs));
                         break;        
@@ -331,8 +313,6 @@ namespace StackVM
                     case Type::Int8:
                         MathOperation::Add(reinterpret_cast<uint32_t*>(lhs), reinterpret_cast<char*>(rhs));
                         break;      
-                    case Type::Pointer:
-                        break;
                     case Type::Single:
                         MathOperation::Add(reinterpret_cast<uint32_t*>(lhs), reinterpret_cast<float*>(rhs));
                         break;        
@@ -370,8 +350,6 @@ namespace StackVM
                     case Type::Int8:
                         MathOperation::Add(reinterpret_cast<uint64_t*>(lhs), reinterpret_cast<char*>(rhs));
                         break;      
-                    case Type::Pointer:
-                        break;
                     case Type::Single:
                         MathOperation::Add(reinterpret_cast<uint64_t*>(lhs), reinterpret_cast<float*>(rhs));
                         break;        
@@ -409,8 +387,6 @@ namespace StackVM
                     case Type::Int8:
                         MathOperation::Add(reinterpret_cast<unsigned char*>(lhs), reinterpret_cast<char*>(rhs));
                         break;      
-                    case Type::Pointer:
-                        break;
                     case Type::Single:
                         MathOperation::Add(reinterpret_cast<unsigned char*>(lhs), reinterpret_cast<float*>(rhs));
                         break;        
@@ -458,8 +434,6 @@ namespace StackVM
                     case Type::Int8:
                         MathOperation::Subtract(reinterpret_cast<double*>(lhs), reinterpret_cast<char*>(rhs));
                         break;      
-                    case Type::Pointer:
-                        break;
                     case Type::Single:
                         MathOperation::Subtract(reinterpret_cast<double*>(lhs), reinterpret_cast<float*>(rhs));
                         break;        
@@ -497,8 +471,6 @@ namespace StackVM
                     case Type::Int8:
                         MathOperation::Subtract(reinterpret_cast<int16_t*>(lhs), reinterpret_cast<char*>(rhs));
                         break;      
-                    case Type::Pointer:
-                        break;
                     case Type::Single:
                         MathOperation::Subtract(reinterpret_cast<int16_t*>(lhs), reinterpret_cast<float*>(rhs));
                         break;        
@@ -536,8 +508,6 @@ namespace StackVM
                     case Type::Int8:
                         MathOperation::Subtract(reinterpret_cast<int32_t*>(lhs), reinterpret_cast<char*>(rhs));
                         break;      
-                    case Type::Pointer:
-                        break;
                     case Type::Single:
                         MathOperation::Subtract(reinterpret_cast<int32_t*>(lhs), reinterpret_cast<float*>(rhs));
                         break;        
@@ -575,8 +545,6 @@ namespace StackVM
                     case Type::Int8:
                         MathOperation::Subtract(reinterpret_cast<int64_t*>(lhs), reinterpret_cast<char*>(rhs));
                         break;      
-                    case Type::Pointer:
-                        break;
                     case Type::Single:
                         MathOperation::Subtract(reinterpret_cast<int64_t*>(lhs), reinterpret_cast<float*>(rhs));
                         break;        
@@ -614,8 +582,6 @@ namespace StackVM
                     case Type::Int8:
                         MathOperation::Subtract(reinterpret_cast<char*>(lhs), reinterpret_cast<char*>(rhs));
                         break;      
-                    case Type::Pointer:
-                        break;
                     case Type::Single:
                         MathOperation::Subtract(reinterpret_cast<char*>(lhs), reinterpret_cast<float*>(rhs));
                         break;        
@@ -632,10 +598,6 @@ namespace StackVM
                         MathOperation::Subtract(reinterpret_cast<char*>(lhs), reinterpret_cast<unsigned char*>(rhs));
                         break;                                                                                                                                                                                                                                                                                                                                                         
                 }
-                break;
-            }
-            case Type::Pointer:
-            {
                 break;
             }
             case Type::Single:
@@ -657,8 +619,6 @@ namespace StackVM
                     case Type::Int8:
                         MathOperation::Subtract(reinterpret_cast<float*>(lhs), reinterpret_cast<char*>(rhs));
                         break;      
-                    case Type::Pointer:
-                        break;
                     case Type::Single:
                         MathOperation::Subtract(reinterpret_cast<float*>(lhs), reinterpret_cast<float*>(rhs));
                         break;        
@@ -696,8 +656,6 @@ namespace StackVM
                     case Type::Int8:
                         MathOperation::Subtract(reinterpret_cast<uint16_t*>(lhs), reinterpret_cast<char*>(rhs));
                         break;      
-                    case Type::Pointer:
-                        break;
                     case Type::Single:
                         MathOperation::Subtract(reinterpret_cast<uint16_t*>(lhs), reinterpret_cast<float*>(rhs));
                         break;        
@@ -735,8 +693,6 @@ namespace StackVM
                     case Type::Int8:
                         MathOperation::Subtract(reinterpret_cast<uint32_t*>(lhs), reinterpret_cast<char*>(rhs));
                         break;      
-                    case Type::Pointer:
-                        break;
                     case Type::Single:
                         MathOperation::Subtract(reinterpret_cast<uint32_t*>(lhs), reinterpret_cast<float*>(rhs));
                         break;        
@@ -774,8 +730,6 @@ namespace StackVM
                     case Type::Int8:
                         MathOperation::Subtract(reinterpret_cast<uint64_t*>(lhs), reinterpret_cast<char*>(rhs));
                         break;      
-                    case Type::Pointer:
-                        break;
                     case Type::Single:
                         MathOperation::Subtract(reinterpret_cast<uint64_t*>(lhs), reinterpret_cast<float*>(rhs));
                         break;        
@@ -813,8 +767,6 @@ namespace StackVM
                     case Type::Int8:
                         MathOperation::Subtract(reinterpret_cast<unsigned char*>(lhs), reinterpret_cast<char*>(rhs));
                         break;      
-                    case Type::Pointer:
-                        break;
                     case Type::Single:
                         MathOperation::Subtract(reinterpret_cast<unsigned char*>(lhs), reinterpret_cast<float*>(rhs));
                         break;        
@@ -862,8 +814,6 @@ namespace StackVM
                     case Type::Int8:
                         MathOperation::Multiply(reinterpret_cast<double*>(lhs), reinterpret_cast<char*>(rhs));
                         break;      
-                    case Type::Pointer:
-                        break;
                     case Type::Single:
                         MathOperation::Multiply(reinterpret_cast<double*>(lhs), reinterpret_cast<float*>(rhs));
                         break;        
@@ -901,8 +851,6 @@ namespace StackVM
                     case Type::Int8:
                         MathOperation::Multiply(reinterpret_cast<int16_t*>(lhs), reinterpret_cast<char*>(rhs));
                         break;      
-                    case Type::Pointer:
-                        break;
                     case Type::Single:
                         MathOperation::Multiply(reinterpret_cast<int16_t*>(lhs), reinterpret_cast<float*>(rhs));
                         break;        
@@ -940,8 +888,6 @@ namespace StackVM
                     case Type::Int8:
                         MathOperation::Multiply(reinterpret_cast<int32_t*>(lhs), reinterpret_cast<char*>(rhs));
                         break;      
-                    case Type::Pointer:
-                        break;
                     case Type::Single:
                         MathOperation::Multiply(reinterpret_cast<int32_t*>(lhs), reinterpret_cast<float*>(rhs));
                         break;        
@@ -979,8 +925,6 @@ namespace StackVM
                     case Type::Int8:
                         MathOperation::Multiply(reinterpret_cast<int64_t*>(lhs), reinterpret_cast<char*>(rhs));
                         break;      
-                    case Type::Pointer:
-                        break;
                     case Type::Single:
                         MathOperation::Multiply(reinterpret_cast<int64_t*>(lhs), reinterpret_cast<float*>(rhs));
                         break;        
@@ -1018,8 +962,6 @@ namespace StackVM
                     case Type::Int8:
                         MathOperation::Multiply(reinterpret_cast<char*>(lhs), reinterpret_cast<char*>(rhs));
                         break;      
-                    case Type::Pointer:
-                        break;
                     case Type::Single:
                         MathOperation::Multiply(reinterpret_cast<char*>(lhs), reinterpret_cast<float*>(rhs));
                         break;        
@@ -1036,10 +978,6 @@ namespace StackVM
                         MathOperation::Multiply(reinterpret_cast<char*>(lhs), reinterpret_cast<unsigned char*>(rhs));
                         break;                                                                                                                                                                                                                                                                                                                                                         
                 }
-                break;
-            }
-            case Type::Pointer:
-            {
                 break;
             }
             case Type::Single:
@@ -1061,8 +999,6 @@ namespace StackVM
                     case Type::Int8:
                         MathOperation::Multiply(reinterpret_cast<float*>(lhs), reinterpret_cast<char*>(rhs));
                         break;      
-                    case Type::Pointer:
-                        break;
                     case Type::Single:
                         MathOperation::Multiply(reinterpret_cast<float*>(lhs), reinterpret_cast<float*>(rhs));
                         break;        
@@ -1100,8 +1036,6 @@ namespace StackVM
                     case Type::Int8:
                         MathOperation::Multiply(reinterpret_cast<uint16_t*>(lhs), reinterpret_cast<char*>(rhs));
                         break;      
-                    case Type::Pointer:
-                        break;
                     case Type::Single:
                         MathOperation::Multiply(reinterpret_cast<uint16_t*>(lhs), reinterpret_cast<float*>(rhs));
                         break;        
@@ -1139,8 +1073,6 @@ namespace StackVM
                     case Type::Int8:
                         MathOperation::Multiply(reinterpret_cast<uint32_t*>(lhs), reinterpret_cast<char*>(rhs));
                         break;      
-                    case Type::Pointer:
-                        break;
                     case Type::Single:
                         MathOperation::Multiply(reinterpret_cast<uint32_t*>(lhs), reinterpret_cast<float*>(rhs));
                         break;        
@@ -1178,8 +1110,6 @@ namespace StackVM
                     case Type::Int8:
                         MathOperation::Multiply(reinterpret_cast<uint64_t*>(lhs), reinterpret_cast<char*>(rhs));
                         break;      
-                    case Type::Pointer:
-                        break;
                     case Type::Single:
                         MathOperation::Multiply(reinterpret_cast<uint64_t*>(lhs), reinterpret_cast<float*>(rhs));
                         break;        
@@ -1217,8 +1147,6 @@ namespace StackVM
                     case Type::Int8:
                         MathOperation::Multiply(reinterpret_cast<unsigned char*>(lhs), reinterpret_cast<char*>(rhs));
                         break;      
-                    case Type::Pointer:
-                        break;
                     case Type::Single:
                         MathOperation::Multiply(reinterpret_cast<unsigned char*>(lhs), reinterpret_cast<float*>(rhs));
                         break;        
@@ -1266,8 +1194,6 @@ namespace StackVM
                     case Type::Int8:
                         MathOperation::Divide(reinterpret_cast<double*>(lhs), reinterpret_cast<char*>(rhs));
                         break;      
-                    case Type::Pointer:
-                        break;
                     case Type::Single:
                         MathOperation::Divide(reinterpret_cast<double*>(lhs), reinterpret_cast<float*>(rhs));
                         break;        
@@ -1305,8 +1231,6 @@ namespace StackVM
                     case Type::Int8:
                         MathOperation::Divide(reinterpret_cast<int16_t*>(lhs), reinterpret_cast<char*>(rhs));
                         break;      
-                    case Type::Pointer:
-                        break;
                     case Type::Single:
                         MathOperation::Divide(reinterpret_cast<int16_t*>(lhs), reinterpret_cast<float*>(rhs));
                         break;        
@@ -1344,8 +1268,6 @@ namespace StackVM
                     case Type::Int8:
                         MathOperation::Divide(reinterpret_cast<int32_t*>(lhs), reinterpret_cast<char*>(rhs));
                         break;      
-                    case Type::Pointer:
-                        break;
                     case Type::Single:
                         MathOperation::Divide(reinterpret_cast<int32_t*>(lhs), reinterpret_cast<float*>(rhs));
                         break;        
@@ -1383,8 +1305,6 @@ namespace StackVM
                     case Type::Int8:
                         MathOperation::Divide(reinterpret_cast<int64_t*>(lhs), reinterpret_cast<char*>(rhs));
                         break;      
-                    case Type::Pointer:
-                        break;
                     case Type::Single:
                         MathOperation::Divide(reinterpret_cast<int64_t*>(lhs), reinterpret_cast<float*>(rhs));
                         break;        
@@ -1422,8 +1342,6 @@ namespace StackVM
                     case Type::Int8:
                         MathOperation::Divide(reinterpret_cast<char*>(lhs), reinterpret_cast<char*>(rhs));
                         break;      
-                    case Type::Pointer:
-                        break;
                     case Type::Single:
                         MathOperation::Divide(reinterpret_cast<char*>(lhs), reinterpret_cast<float*>(rhs));
                         break;        
@@ -1440,10 +1358,6 @@ namespace StackVM
                         MathOperation::Divide(reinterpret_cast<char*>(lhs), reinterpret_cast<unsigned char*>(rhs));
                         break;                                                                                                                                                                                                                                                                                                                                                         
                 }
-                break;
-            }
-            case Type::Pointer:
-            {
                 break;
             }
             case Type::Single:
@@ -1465,8 +1379,6 @@ namespace StackVM
                     case Type::Int8:
                         MathOperation::Divide(reinterpret_cast<float*>(lhs), reinterpret_cast<char*>(rhs));
                         break;      
-                    case Type::Pointer:
-                        break;
                     case Type::Single:
                         MathOperation::Divide(reinterpret_cast<float*>(lhs), reinterpret_cast<float*>(rhs));
                         break;        
@@ -1504,8 +1416,6 @@ namespace StackVM
                     case Type::Int8:
                         MathOperation::Divide(reinterpret_cast<uint16_t*>(lhs), reinterpret_cast<char*>(rhs));
                         break;      
-                    case Type::Pointer:
-                        break;
                     case Type::Single:
                         MathOperation::Divide(reinterpret_cast<uint16_t*>(lhs), reinterpret_cast<float*>(rhs));
                         break;        
@@ -1543,8 +1453,6 @@ namespace StackVM
                     case Type::Int8:
                         MathOperation::Divide(reinterpret_cast<uint32_t*>(lhs), reinterpret_cast<char*>(rhs));
                         break;      
-                    case Type::Pointer:
-                        break;
                     case Type::Single:
                         MathOperation::Divide(reinterpret_cast<uint32_t*>(lhs), reinterpret_cast<float*>(rhs));
                         break;        
@@ -1582,8 +1490,6 @@ namespace StackVM
                     case Type::Int8:
                         MathOperation::Divide(reinterpret_cast<uint64_t*>(lhs), reinterpret_cast<char*>(rhs));
                         break;      
-                    case Type::Pointer:
-                        break;
                     case Type::Single:
                         MathOperation::Divide(reinterpret_cast<uint64_t*>(lhs), reinterpret_cast<float*>(rhs));
                         break;        
@@ -1621,8 +1527,6 @@ namespace StackVM
                     case Type::Int8:
                         MathOperation::Divide(reinterpret_cast<unsigned char*>(lhs), reinterpret_cast<char*>(rhs));
                         break;      
-                    case Type::Pointer:
-                        break;
                     case Type::Single:
                         MathOperation::Divide(reinterpret_cast<unsigned char*>(lhs), reinterpret_cast<float*>(rhs));
                         break;        
@@ -1672,8 +1576,6 @@ namespace StackVM
                     case Type::Int8:
                         result = MathOperation::Compare(reinterpret_cast<double*>(lhs), reinterpret_cast<char*>(rhs));
                         break;      
-                    case Type::Pointer:
-                        break;
                     case Type::Single:
                         result = MathOperation::Compare(reinterpret_cast<double*>(lhs), reinterpret_cast<float*>(rhs));
                         break;        
@@ -1711,8 +1613,6 @@ namespace StackVM
                     case Type::Int8:
                         result = MathOperation::Compare(reinterpret_cast<int16_t*>(lhs), reinterpret_cast<char*>(rhs));
                         break;      
-                    case Type::Pointer:
-                        break;
                     case Type::Single:
                         result = MathOperation::Compare(reinterpret_cast<int16_t*>(lhs), reinterpret_cast<float*>(rhs));
                         break;        
@@ -1750,8 +1650,6 @@ namespace StackVM
                     case Type::Int8:
                         result = MathOperation::Compare(reinterpret_cast<int32_t*>(lhs), reinterpret_cast<char*>(rhs));
                         break;      
-                    case Type::Pointer:
-                        break;
                     case Type::Single:
                         result = MathOperation::Compare(reinterpret_cast<int32_t*>(lhs), reinterpret_cast<float*>(rhs));
                         break;        
@@ -1789,8 +1687,6 @@ namespace StackVM
                     case Type::Int8:
                         result = MathOperation::Compare(reinterpret_cast<int64_t*>(lhs), reinterpret_cast<char*>(rhs));
                         break;      
-                    case Type::Pointer:
-                        break;
                     case Type::Single:
                         result = MathOperation::Compare(reinterpret_cast<int64_t*>(lhs), reinterpret_cast<float*>(rhs));
                         break;        
@@ -1828,8 +1724,6 @@ namespace StackVM
                     case Type::Int8:
                         result = MathOperation::Compare(reinterpret_cast<char*>(lhs), reinterpret_cast<char*>(rhs));
                         break;      
-                    case Type::Pointer:
-                        break;
                     case Type::Single:
                         result = MathOperation::Compare(reinterpret_cast<char*>(lhs), reinterpret_cast<float*>(rhs));
                         break;        
@@ -1846,10 +1740,6 @@ namespace StackVM
                         result = MathOperation::Compare(reinterpret_cast<char*>(lhs), reinterpret_cast<unsigned char*>(rhs));
                         break;                                                                                                                                                                                                                                                                                                                                                         
                 }
-                break;
-            }
-            case Type::Pointer:
-            {
                 break;
             }
             case Type::Single:
@@ -1871,8 +1761,6 @@ namespace StackVM
                     case Type::Int8:
                         result = MathOperation::Compare(reinterpret_cast<float*>(lhs), reinterpret_cast<char*>(rhs));
                         break;      
-                    case Type::Pointer:
-                        break;
                     case Type::Single:
                         result = MathOperation::Compare(reinterpret_cast<float*>(lhs), reinterpret_cast<float*>(rhs));
                         break;        
@@ -1910,8 +1798,6 @@ namespace StackVM
                     case Type::Int8:
                         result = MathOperation::Compare(reinterpret_cast<uint16_t*>(lhs), reinterpret_cast<char*>(rhs));
                         break;      
-                    case Type::Pointer:
-                        break;
                     case Type::Single:
                         result = MathOperation::Compare(reinterpret_cast<uint16_t*>(lhs), reinterpret_cast<float*>(rhs));
                         break;        
@@ -1949,8 +1835,6 @@ namespace StackVM
                     case Type::Int8:
                         result = MathOperation::Compare(reinterpret_cast<uint32_t*>(lhs), reinterpret_cast<char*>(rhs));
                         break;      
-                    case Type::Pointer:
-                        break;
                     case Type::Single:
                         result = MathOperation::Compare(reinterpret_cast<uint32_t*>(lhs), reinterpret_cast<float*>(rhs));
                         break;        
@@ -1988,8 +1872,6 @@ namespace StackVM
                     case Type::Int8:
                         result = MathOperation::Compare(reinterpret_cast<uint64_t*>(lhs), reinterpret_cast<char*>(rhs));
                         break;      
-                    case Type::Pointer:
-                        break;
                     case Type::Single:
                         result = MathOperation::Compare(reinterpret_cast<uint64_t*>(lhs), reinterpret_cast<float*>(rhs));
                         break;        
@@ -2027,8 +1909,6 @@ namespace StackVM
                     case Type::Int8:
                         result = MathOperation::Compare(reinterpret_cast<unsigned char*>(lhs), reinterpret_cast<char*>(rhs));
                         break;      
-                    case Type::Pointer:
-                        break;
                     case Type::Single:
                         result = MathOperation::Compare(reinterpret_cast<unsigned char*>(lhs), reinterpret_cast<float*>(rhs));
                         break;        
