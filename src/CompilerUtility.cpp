@@ -6,6 +6,7 @@ namespace StackVM
     std::map<std::string, OpCodeInfo> CompilerUtility::opcodeInfoMap;
     std::map<std::string, uint32_t> CompilerUtility::registerMap;
     std::map<std::string, DefineDirective> CompilerUtility::directivesMap;
+    std::map<Type, std::string> CompilerUtility::typeToStringMap;
 
     void CompilerUtility::Initialize()
     {
@@ -74,6 +75,18 @@ namespace StackVM
         directivesMap["dd"] = DefineDirective::DD;
         directivesMap["dq"] = DefineDirective::DQ;
 
+        typeToStringMap[Type::Int8]     = "Int8";
+        typeToStringMap[Type::Int16]    = "Int16";
+        typeToStringMap[Type::Int32]    = "Int32";
+        typeToStringMap[Type::Int64]    = "Int64";
+        typeToStringMap[Type::UInt8]    = "UInt8";
+        typeToStringMap[Type::UInt16]   = "UInt16";
+        typeToStringMap[Type::UInt32]   = "UInt32";
+        typeToStringMap[Type::UInt64]   = "UInt64";
+        typeToStringMap[Type::Double]   = "Double";
+        typeToStringMap[Type::Single]   = "Single";
+        typeToStringMap[Type::Pointer]  = "Pointer";
+
         isInitialized = true;
     }
 
@@ -92,12 +105,10 @@ namespace StackVM
         RemoveWhiteSpace(lines);
         RemoveEmptyLines(lines);
         RemoveCommentLines(lines);
-        
-
         return lines;
     }
 
-    bool CompilerUtility::Tokenize(const std::vector<LineInfo>& lines, std::vector<Token>& tokens)
+    bool CompilerUtility::Tokenize(std::vector<LineInfo>& lines, std::vector<Token>& tokens)
     {
         enum TokenizationState
         {
@@ -109,7 +120,35 @@ namespace StackVM
 
         for(size_t i = 0; i < lines.size(); i++)
         {
+            bool containsSpaceCharLiteral = false;
+
+            if(StringUtility::Contains(lines[i].text, "' '"))
+            {
+                containsSpaceCharLiteral = true;
+                lines[i].text = StringUtility::Replace(lines[i].text, "' '", "");
+            }
+
             std::vector<std::string> components = StringUtility::Split(lines[i].text, ' ');
+
+            if(containsSpaceCharLiteral)
+            {
+                components.push_back("' '");
+                
+
+                auto it = components.begin();
+
+                while(it != components.end()) 
+                {            
+                    if(it->size() == 0) 
+                    {
+                        it = components.erase(it);
+                    }
+                    else 
+                    {
+                        ++it;
+                    }
+                }
+            }            
 
             if(components.size() == 0)
                 components.push_back(lines[i].text);
@@ -118,6 +157,9 @@ namespace StackVM
             {
                 if(StringUtility::EndsWith(components[j], ","))
                     components[j].pop_back();
+
+                if(StringUtility::Contains(components[j], "'"))
+                    StringUtility::Replace(components[j], "'", "");
             }
 
             if(lines[i].text == "section .data")
@@ -375,7 +417,7 @@ namespace StackVM
             else if(val > 127 && val <= 32767)
                 return Type::Int16;
             else            
-                return Type::Int8;            
+                return Type::UInt8;            
         }
         else
         {

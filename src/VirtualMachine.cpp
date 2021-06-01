@@ -47,21 +47,27 @@ namespace StackVM
         if(currentInstruction == nullptr)
             return false;
 
+        uint32_t instructionIndex = (currentInstruction - entryInstruction);
+        std::string currentIndex = std::to_string(instructionIndex);
+
         switch(currentInstruction->opcode)
         {
             case OpCode::HLT:
             {
+                Debug("HLT " + currentIndex);
                 currentInstruction = nullptr;
                 std::cout << "Elapsed time " << elapsedTime << std::endl;
                 return false;
             }
             case OpCode::NOP:
             {
+                Debug("NOP " + currentIndex);
                 ++currentInstruction;
                 break;
             }
             case OpCode::MOV:
             {
+                Debug("MOV " + currentIndex);
                 byte* dst = GetLeftOperandPointer(currentInstruction);
                 byte* src = GetRightOperandPointer(currentInstruction);     
 
@@ -78,6 +84,7 @@ namespace StackVM
             }
             case OpCode::PUSH:
             {
+                Debug("PUSH " + currentIndex);
                 byte* src = GetLeftOperandPointer(currentInstruction);
                 Type type = GetLeftOperandDataType(currentInstruction);
                 stack.push(src, type);
@@ -86,6 +93,7 @@ namespace StackVM
             }
             case OpCode::PUSHI8:
             {
+                Debug("PUSHI8 " + currentIndex);
                 byte* src = GetLeftOperandPointer(currentInstruction);
                 stack.push_from_type<char>(src);
                 ++currentInstruction;
@@ -93,6 +101,7 @@ namespace StackVM
             }
             case OpCode::PUSHU8:
             {
+                Debug("PUSHU8 " + currentIndex);
                 byte* src = GetLeftOperandPointer(currentInstruction);
                 stack.push_from_type<unsigned char>(src);
                 ++currentInstruction;
@@ -100,6 +109,7 @@ namespace StackVM
             }            
             case OpCode::PUSHF:
             {
+                Debug("PUSHF " + currentIndex);
                 byte* src = GetLeftOperandPointer(currentInstruction);
                 stack.push_from_type<float>(src);
                 ++currentInstruction;
@@ -107,6 +117,7 @@ namespace StackVM
             }
             case OpCode::PUSHD:
             {
+                Debug("PUSHD " + currentIndex);
                 byte* src = GetLeftOperandPointer(currentInstruction);
                 stack.push_from_type<double>(src);
                 ++currentInstruction;
@@ -114,6 +125,7 @@ namespace StackVM
             }                  
             case OpCode::PUSHI32:
             {
+                Debug("PUSHI32 " + currentIndex);
                 byte* src = GetLeftOperandPointer(currentInstruction);
                 stack.push_from_type<int32_t>(src);
                 ++currentInstruction;
@@ -121,6 +133,7 @@ namespace StackVM
             }
             case OpCode::PUSHU32:
             {
+                Debug("PUSHU32 " + currentIndex);
                 byte* src = GetLeftOperandPointer(currentInstruction);
                 stack.push_from_type<uint32_t>(src);
                 ++currentInstruction;
@@ -128,6 +141,7 @@ namespace StackVM
             }            
             case OpCode::PUSHI16:
             {
+                Debug("PUSHI16 " + currentIndex);
                 byte* src = GetLeftOperandPointer(currentInstruction);
                 stack.push_from_type<int16_t>(src);
                 ++currentInstruction;
@@ -135,6 +149,7 @@ namespace StackVM
             }    
             case OpCode::PUSHU16:
             {
+                Debug("PUSHU16 " + currentIndex);
                 byte* src = GetLeftOperandPointer(currentInstruction);
                 stack.push_from_type<uint16_t>(src);
                 ++currentInstruction;
@@ -142,6 +157,7 @@ namespace StackVM
             }                          
             case OpCode::PUSHI64:
             {
+                Debug("PUSHI64 " + currentIndex);
                 byte* src = GetLeftOperandPointer(currentInstruction);
                 stack.push_from_type<int64_t>(src);
                 ++currentInstruction;
@@ -149,6 +165,7 @@ namespace StackVM
             }
             case OpCode::PUSHU64:
             {
+                Debug("PUSHU64 " + currentIndex);
                 byte* src = GetLeftOperandPointer(currentInstruction);
                 stack.push_from_type<uint64_t>(src);
                 ++currentInstruction;
@@ -156,6 +173,7 @@ namespace StackVM
             }                                    
             case OpCode::POP:
             {
+                Debug("POP " + currentIndex);
                 if(currentInstruction->numOperands == 1)
                 {
                     byte* dst = GetLeftOperandPointer(currentInstruction);
@@ -171,6 +189,7 @@ namespace StackVM
             }
             case OpCode::POPI8:
             {
+                Debug("POPI8 " + currentIndex);
                 if(currentInstruction->numOperands == 1)
                 {
                     byte* dst = GetLeftOperandPointer(currentInstruction);
@@ -191,6 +210,7 @@ namespace StackVM
             }
             case OpCode::POPU8:
             {
+                Debug("POPU8 " + currentIndex);
                 if(currentInstruction->numOperands == 1)
                 {
                     byte* dst = GetLeftOperandPointer(currentInstruction);
@@ -371,13 +391,16 @@ namespace StackVM
             }            
             case OpCode::PRINT:
             {
+                Debug("PRINT " + currentIndex);
+
+                //int8_t numArgs = stack.pop_char();
                 int32_t numArgs = stack.pop_int32();
 
                 char characters[numArgs + 1];
                 characters[numArgs] = '\0';
-
+                
                 for(size_t i = 0; i < numArgs; i++)
-                {
+                {     
                     char character = stack.pop_char();
                     characters[i] = character;
                 }

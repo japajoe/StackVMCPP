@@ -1867,7 +1867,7 @@ namespace StackVM
                     break;                                                                                                                                                                                                                                                                                                                                                         
             } 
 
-            std::cout << lhs << " " << rhs << std::endl;
+            std::cout << "Num operands " << numOperands << " " << lhs << " " << rhs << std::endl;
 
         }
     };

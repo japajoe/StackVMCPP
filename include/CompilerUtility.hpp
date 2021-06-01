@@ -94,9 +94,10 @@ namespace StackVM
         static std::map<std::string, OpCodeInfo> opcodeInfoMap;
         static std::map<std::string, uint32_t> registerMap;
         static std::map<std::string, DefineDirective> directivesMap;
+        static std::map<Type, std::string> typeToStringMap;
         static void Initialize();
         static std::vector<LineInfo> PreProcess(const std::string& source);
-        static bool Tokenize(const std::vector<LineInfo>& lines, std::vector<Token>& tokens);
+        static bool Tokenize(std::vector<LineInfo>& lines, std::vector<Token>& tokens);
         static void RemoveWhiteSpace(std::vector<LineInfo>& lines);
         static void RemoveEmptyLines(std::vector<LineInfo>& lines);
         static void RemoveCommentLines(std::vector<LineInfo>& lines);

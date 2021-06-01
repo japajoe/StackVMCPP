@@ -23,7 +23,8 @@ namespace StackVM
         std::map<std::string, uint32_t> dataMap;
         std::map<std::string, uint32_t> labelMap;
         void WriteError(int lineNumber, const std::string& error);
-        bool ProcessToken(std::vector<Token>& tokens, size_t index);       
+        bool ProcessToken(std::vector<Token>& tokens, size_t index);
+        bool ProcessSingleOperandInstruction(std::vector<Token>& tokens, size_t index, const OpCodeInfo& opcodeInfo);
     };
 }
 #endif
