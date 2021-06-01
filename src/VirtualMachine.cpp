@@ -1,5 +1,6 @@
 #include "VirtualMachine.hpp"
 #include "MathOperation.hpp"
+#include "ConversionUtility.hpp"
 #include <cstring>
 #include <iostream>
 #include <algorithm>
@@ -71,13 +72,29 @@ namespace StackVM
                 byte* dst = GetLeftOperandPointer(currentInstruction);
                 byte* src = GetRightOperandPointer(currentInstruction);     
 
+
+                std::cout << "Moving data" << std::endl;
+
                 if(currentInstruction->lhsOperandType == OperandType::Register)           
                 {      
-                    Type type = GetRightOperandDataType(currentInstruction);
-                    SetDestinationRegisterDataType(currentInstruction, type);
+                    Type rhsType = GetRightOperandDataType(currentInstruction);
+                    SetDestinationRegisterDataType(currentInstruction, rhsType);
+                    memcpy(dst, src, 8);
                 }
+                else if(currentInstruction->lhsOperandType == OperandType::Variable)
+                {                    
+                    Type lhsType = GetLeftOperandDataType(currentInstruction);
+                    Type rhsType = GetRightOperandDataType(currentInstruction);
+                    uint16_t lhsSize = GetSizeOfType(lhsType);
+                    uint16_t rhsSize = GetSizeOfType(rhsType);
 
-                memcpy(dst, src, 8);
+                    byte buffer[8];
+                    memset(buffer, 0, 8);
+
+                    ConversionUtility::CastSourceToDestinationType(src, buffer, rhsType, lhsType);
+
+                    memcpy(dst, buffer, lhsSize);
+                }
 
                 ++currentInstruction;
                 break;
@@ -674,7 +691,7 @@ namespace StackVM
                 ptr = &registers[0] + (instruction->GetLeftValue<int32_t>() * (sizeof(byte) * 8));
                 break;
             case OperandType::Variable:
-                ptr = &assembly->data[0] + (instruction->GetLeftValue<int32_t>() * (sizeof(byte) * 8));
+                ptr = assembly->GetDataAtIndex(instruction->GetLeftValue<int32_t>());
                 break;
         }
         
@@ -694,7 +711,7 @@ namespace StackVM
                 ptr = &registers[0] + (instruction->GetRightValue<int32_t>() * (sizeof(byte) * 8));
                 break;
             case OperandType::Variable:
-                ptr = &assembly->data[0] + (instruction->GetRightValue<int32_t>() * (sizeof(byte) * 8));
+                ptr = assembly->GetDataAtIndex(instruction->GetLeftValue<int32_t>());
                 break;
         }
         
@@ -706,7 +723,7 @@ namespace StackVM
         return instruction->rhsDataType;
     }
 
-    Type VirtualMachine::GetLeftOperandDataType(Instruction* instruction)
+    Type VirtualMachine::GetLeftOperandDataType(Instruction* instruction) const
     {
         if(instruction->lhsOperandType == OperandType::Register)           
         {   
@@ -714,10 +731,16 @@ namespace StackVM
             memcpy(&index, &instruction->lhs[0], 4);
             return registerDataType[index];
         }
+        else if(instruction->lhsOperandType == OperandType::Variable)
+        {
+            int32_t index;
+            memcpy(&index, &currentInstruction->lhs[0], 4);
+            return assembly->types[index];
+        }        
         return instruction->lhsDataType;
     }
 
-    Type VirtualMachine::GetRightOperandDataType(Instruction* instruction)
+    Type VirtualMachine::GetRightOperandDataType(Instruction* instruction) const
     {
         if(instruction->rhsOperandType == OperandType::Register)
         {       
@@ -725,17 +748,52 @@ namespace StackVM
             memcpy(&index, &currentInstruction->rhs[0], 4);
             return registerDataType[index];
         }
+        else if(instruction->rhsOperandType == OperandType::Variable)
+        {
+            int32_t index;
+            memcpy(&index, &currentInstruction->rhs[0], 4);
+            return assembly->types[index];
+        }
         return instruction->rhsDataType;
     }
 
-    int32_t VirtualMachine::GetSourceRegisterIndex(Instruction* instruction)
+    uint16_t VirtualMachine::GetSizeOfType(Type type) const
+    {
+        switch(type)
+        {
+            case Type::Int8:
+                return sizeof(char);
+            case Type::Int16:
+                return sizeof(int16_t);
+            case Type::Int32:
+                return sizeof(int32_t);
+            case Type::Int64:
+                return sizeof(int64_t);
+            case Type::UInt8:
+                return sizeof(unsigned char);
+            case Type::UInt16:
+                return sizeof(uint16_t);
+            case Type::UInt32:
+                return sizeof(uint32_t);
+            case Type::UInt64:
+                return sizeof(uint64_t);
+            case Type::Double:
+                return sizeof(double);
+            case Type::Single:
+                return sizeof(float);
+        }
+
+        return 0;
+    }
+
+    int32_t VirtualMachine::GetSourceRegisterIndex(Instruction* instruction) const
     {
         int32_t index = 0;
         memcpy(&index, &instruction->rhs[0], 4);
         return index;
     }
     
-    int32_t VirtualMachine::GetDestinationRegisterIndex(Instruction* instruction)
+    int32_t VirtualMachine::GetDestinationRegisterIndex(Instruction* instruction) const
     {
         int32_t index = 0;
         memcpy(&index, &instruction->lhs[0], 4);
@@ -747,6 +805,18 @@ namespace StackVM
         int32_t index = GetDestinationRegisterIndex(instruction);
         memcpy(&index, &instruction->lhs[0], 4);
         registerDataType[index] = type;
+    }
+
+    void VirtualMachine::WriteBytesToBuffer(byte* dst, Type dstType, byte* src, Type srcType)
+    {
+        uint16_t dstSize = GetSizeOfType(dstType);
+        uint16_t srcSize = GetSizeOfType(srcType);
+
+        byte buffer[8];
+        memset(buffer, 0, 8);        
+        memcpy(buffer, src, srcSize);
+
+        
     }
 
     void VirtualMachine::LogMessage(const std::string& message)

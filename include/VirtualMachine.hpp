@@ -36,11 +36,13 @@ namespace StackVM
         int32_t elapsedTime;
         byte* GetLeftOperandPointer(Instruction* instruction);
         byte* GetRightOperandPointer(Instruction* instruction);
-        Type GetLeftOperandDataType(Instruction* instruction);
-        Type GetRightOperandDataType(Instruction* instruction);
-        int32_t GetSourceRegisterIndex(Instruction* instruction);
-        int32_t GetDestinationRegisterIndex(Instruction* instruction);        
+        Type GetLeftOperandDataType(Instruction* instruction) const;
+        Type GetRightOperandDataType(Instruction* instruction) const;
+        uint16_t GetSizeOfType(Type type) const;
+        int32_t GetSourceRegisterIndex(Instruction* instruction) const;
+        int32_t GetDestinationRegisterIndex(Instruction* instruction) const;        
         void SetDestinationRegisterDataType(Instruction* instruction, Type type);
+        void WriteBytesToBuffer(byte* dst, Type dstType, byte* src, Type srcType);
         void ResetState();
         void LogMessage(const std::string& message);
 

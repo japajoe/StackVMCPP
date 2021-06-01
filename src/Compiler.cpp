@@ -113,14 +113,15 @@ namespace StackVM
 
                     if(bytesWritten > 0)
                     {
+                        uint32_t index = assembly->types.size();
                         assembly->types.push_back(type);
 
-                        uint32_t index = assembly->data.size();
+
+                        assembly->indices.push_back(assembly->data.size());
 
                         for(size_t i = 0; i < bytesWritten; i++)
-                            assembly->data.push_back(data[i]);
+                            assembly->data.push_back(data[i]);                        
                         
-                        assembly->indices.push_back(index);
                         dataMap[identifierToken.text] = index;
                     }
                     else
@@ -244,7 +245,7 @@ namespace StackVM
                     }
                     else if(dataMap.count(leftOperandToken.text) > 0)
                     {
-                        uint32_t value = dataMap[leftOperandToken.text];                                            
+                        uint32_t value = dataMap[leftOperandToken.text];
                         assembly->instructions.push_back(Instruction(opcode, value, OperandType::Variable));
                     }                                        
                     else if(labelMap.count(leftOperandToken.text) > 0)
