@@ -21,12 +21,13 @@
 ; real_number4	    DQ	123.456     double
 
 section .data
-    iteration DW : 1
-    iterations DW : 20
+
+    numChars DD : 13
 
 section .text
 
-_print:
+_print:  
+    MOV iterations, 30
     PUSHI8 '\n'
     PUSHI8 '!'
     PUSHI8 'd'
@@ -37,9 +38,9 @@ _print:
     PUSHI8 ' '
     PUSHI8 'o'
     PUSHI8 'l'           
-    PUSHI8 'l'          
+    PUSHI8 'l'
     PUSHI8 'e'           
     PUSHI8 'H'
-    PUSHI32 13
+    PUSHI32 numChars ;You can also use an integer literal but this example uses a variable
     PRINT
     HLT
