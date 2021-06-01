@@ -20,14 +20,16 @@
 ; real_number3	    DD	1.234       float
 ; real_number4	    DQ	123.456     double
 
+; Take note that I haven't extensively tested this yet. Usage is on your own risk.
+; Opcodes that take 2 operands are not supported yet
+
 section .data
 
     numChars DD : 13
 
 section .text
 
-_print:  
-    MOV iterations, 30
+_print:
     PUSHI8 '\n'
     PUSHI8 '!'
     PUSHI8 'd'
