@@ -425,12 +425,12 @@ namespace StackVM
             }
             case OpCode::INC:
             {
-                byte value = 1;
+                uint16_t value = 1;
                 byte* dst = GetLeftOperandPointer(currentInstruction);
-                byte* src = &value;
+                byte* src = (byte*)&value;
 
                 Type typeLeft = GetLeftOperandDataType(currentInstruction);
-                Type typeRight = Type::UInt8;
+                Type typeRight = Type::UInt16;
 
                 MathOperation::Add(currentInstruction, dst, src, typeLeft, typeRight, &registers[0], &assembly->data[0]);
 
@@ -439,9 +439,9 @@ namespace StackVM
             }
             case OpCode::DEC:
             {
-                byte value = 1;
+                uint16_t value = 1;
                 byte* dst = GetLeftOperandPointer(currentInstruction);
-                byte* src = &value;
+                byte* src = (byte*)&value;
 
                 Type typeLeft = GetLeftOperandDataType(currentInstruction);
                 Type typeRight = Type::UInt8;
@@ -708,7 +708,7 @@ namespace StackVM
                 ptr = &registers[0] + (instruction->GetRightValue<int32_t>() * (sizeof(byte) * 8));
                 break;
             case OperandType::Variable:
-                ptr = assembly->GetDataAtIndex(instruction->GetLeftValue<int32_t>());
+                ptr = assembly->GetDataAtIndex(instruction->GetRightValue<int32_t>());
                 break;
         }
         

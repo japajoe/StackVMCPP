@@ -26,23 +26,28 @@
 section .data
 
     numChars DD : 13
+    iteration DD : 0
+    iterations DD : 10
 
 section .text
 
 _print:
-    PUSHI8 '\n'
-    PUSHI8 '!'
-    PUSHI8 'd'
-    PUSHI8 'l'
-    PUSHI8 'r'
-    PUSHI8 'o'
-    PUSHI8 'w'
-    PUSHI8 ' '
-    PUSHI8 'o'
-    PUSHI8 'l'           
-    PUSHI8 'l'
-    PUSHI8 'e'           
-    PUSHI8 'H'
-    PUSHI32 numChars ;You can also use an integer literal but this example uses a variable
-    PRINT
-    HLT
+    pushi8 '\n'
+    pushi8 '!'
+    pushi8 'd'
+    pushi8 'l'
+    pushi8 'r'
+    pushi8 'o'
+    pushi8 'w'
+    pushi8 ' '
+    pushi8 'o'
+    pushi8 'l'           
+    pushi8 'l'
+    pushi8 'e'           
+    pushi8 'H'
+    pushi32 numChars ;You can also use an integer literal but this example uses a variable
+    print
+    inc iteration
+    cmp iteration, iterations    
+    jne 0 ;labels are not yet supported but you can jump to any instruction providing you know its index
+    hlt
