@@ -407,7 +407,6 @@ namespace StackVM
             {
                 Debug("PRINT " + currentIndex);
 
-                //int8_t numArgs = stack.pop_char();
                 int32_t numArgs = stack.pop_int32();
 
                 char characters[numArgs + 1];
@@ -444,7 +443,7 @@ namespace StackVM
                 byte* src = (byte*)&value;
 
                 Type typeLeft = GetLeftOperandDataType(currentInstruction);
-                Type typeRight = Type::UInt8;
+                Type typeRight = Type::UInt16;
 
                 MathOperation::Subtract(currentInstruction, dst, src, typeLeft, typeRight, &registers[0], &assembly->data[0]);
                 ++currentInstruction;
@@ -715,11 +714,6 @@ namespace StackVM
         return ptr;
     }
 
-    Type VirtualMachine::GetRegisterDataType(Instruction* instruction) const
-    {
-        return instruction->rhsDataType;
-    }
-
     Type VirtualMachine::GetLeftOperandDataType(Instruction* instruction) const
     {
         if(instruction->lhsOperandType == OperandType::Register)           
@@ -782,13 +776,6 @@ namespace StackVM
 
         return 0;
     }
-
-    int32_t VirtualMachine::GetSourceRegisterIndex(Instruction* instruction) const
-    {
-        int32_t index = 0;
-        memcpy(&index, &instruction->rhs[0], 4);
-        return index;
-    }
     
     int32_t VirtualMachine::GetDestinationRegisterIndex(Instruction* instruction) const
     {
@@ -802,18 +789,6 @@ namespace StackVM
         int32_t index = GetDestinationRegisterIndex(instruction);
         memcpy(&index, &instruction->lhs[0], 4);
         registerDataType[index] = type;
-    }
-
-    void VirtualMachine::WriteBytesToBuffer(byte* dst, Type dstType, byte* src, Type srcType)
-    {
-        uint16_t dstSize = GetSizeOfType(dstType);
-        uint16_t srcSize = GetSizeOfType(srcType);
-
-        byte buffer[8];
-        memset(buffer, 0, 8);        
-        memcpy(buffer, src, srcSize);
-
-        
     }
 
     void VirtualMachine::LogMessage(const std::string& message)
