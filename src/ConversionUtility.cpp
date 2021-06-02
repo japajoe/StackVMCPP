@@ -3,6 +3,54 @@
 
 namespace StackVM
 {
+    std::string ConversionUtility::GetStringFromType(Type type)
+    {
+        switch(type)
+        {
+            case Type::Int8:
+            {
+                return "Int8";
+            }
+            case Type::Int16:
+            {
+                return "Int16";
+            }
+            case Type::Int32:
+            {
+                return "Int32";
+            }
+            case Type::Int64:
+            {
+                return "Int64";
+            }
+            case Type::UInt8:
+            {
+                return "UInt8";
+            }
+            case Type::UInt16:
+            {
+                return "UInt16";
+            }
+            case Type::UInt32:
+            {
+                return "UInt32";
+            }
+            case Type::UInt64:
+            {
+                return "UInt64";
+            }
+            case Type::Double:
+            {
+                return "Double";
+            }
+            case Type::Single:
+            {
+                return "Single";
+            }
+        }
+    }
+
+
     void ConversionUtility::CastSourceToDestinationType(byte* src, byte* dst, Type srcType, Type dstType)
     {
         switch(srcType)
@@ -688,7 +736,99 @@ namespace StackVM
             }               
             case Type::UInt32:
             {
-
+                switch(dstType)
+                {
+                    case Type::Double:
+                    {
+                        uint32_t vSrc;
+                        double vDst;
+                        memcpy(&vSrc, src, sizeof(uint32_t));
+                        vDst = static_cast<double>(vSrc);
+                        memcpy(dst, &vDst, sizeof(double));
+                        break;
+                    }
+                    case Type::Int16:
+                    {
+                        uint32_t vSrc;
+                        int16_t vDst;
+                        memcpy(&vSrc, src, sizeof(uint32_t));
+                        vDst = static_cast<int16_t>(vSrc);
+                        memcpy(dst, &vDst, sizeof(int16_t));
+                        break;
+                    }
+                    case Type::Int32:
+                    {
+                        uint32_t vSrc;
+                        int32_t vDst;
+                        memcpy(&vSrc, src, sizeof(uint32_t));
+                        vDst = static_cast<int32_t>(vSrc);
+                        memcpy(dst, &vDst, sizeof(int32_t));
+                        break;
+                    }
+                    case Type::Int64:
+                    {
+                        uint32_t vSrc;
+                        int64_t vDst;
+                        memcpy(&vSrc, src, sizeof(uint32_t));
+                        vDst = static_cast<int64_t>(vSrc);
+                        memcpy(dst, &vDst, sizeof(int64_t));
+                        break;       
+                    }
+                    case Type::Int8:
+                    {
+                        uint32_t vSrc;
+                        char vDst;
+                        memcpy(&vSrc, src, sizeof(uint32_t));
+                        vDst = static_cast<char>(vSrc);
+                        memcpy(dst, &vDst, sizeof(char));
+                        break;
+                    }
+                    case Type::Single:
+                    {
+                        uint32_t vSrc;
+                        float vDst;
+                        memcpy(&vSrc, src, sizeof(uint32_t));
+                        vDst = static_cast<float>(vSrc);
+                        memcpy(dst, &vDst, sizeof(float));
+                        break;        
+                    }
+                    case Type::UInt16:
+                    {
+                        uint32_t vSrc;
+                        uint16_t vDst;
+                        memcpy(&vSrc, src, sizeof(uint32_t));
+                        vDst = static_cast<uint16_t>(vSrc);
+                        memcpy(dst, &vDst, sizeof(uint16_t));
+                        break;       
+                    }
+                    case Type::UInt32:
+                    {
+                        uint32_t vSrc;
+                        uint32_t vDst;
+                        memcpy(&vSrc, src, sizeof(uint32_t));
+                        vDst = vSrc;
+                        memcpy(dst, &vDst, sizeof(uint32_t));
+                        break;        
+                    }
+                    case Type::UInt64:
+                    {
+                        uint32_t vSrc;
+                        uint64_t vDst;
+                        memcpy(&vSrc, src, sizeof(uint32_t));
+                        vDst = vSrc;
+                        memcpy(dst, &vDst, sizeof(uint64_t));
+                        break;                            
+                    }
+                    case Type::UInt8:
+                    {
+                        uint32_t vSrc;
+                        unsigned char vDst;
+                        memcpy(&vSrc, src, sizeof(uint32_t));
+                        vDst = static_cast<unsigned char>(vSrc);
+                        memcpy(dst, &vDst, sizeof(unsigned char));
+                        break;                                    
+                    }
+                }
                 break;
             }               
             case Type::UInt64:

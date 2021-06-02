@@ -512,7 +512,7 @@ namespace StackVM
             {
                 int16_t value = 0;
                 
-                if(!StringUtility::ParseNumber<int16_t>(text, value))
+                if(!StringUtility::ParseNumberLexical<int16_t>(text, value))
                 {
                     return 0;
                 }
@@ -525,7 +525,7 @@ namespace StackVM
             {
                 int32_t value = 0;
                 
-                if(!StringUtility::ParseNumber<int32_t>(text, value))
+                if(!StringUtility::ParseNumberLexical<int32_t>(text, value))
                 {
                     return 0;
                 }
@@ -538,7 +538,7 @@ namespace StackVM
             {
                 int64_t value = 0;
                 
-                if(!StringUtility::ParseNumber<int64_t>(text, value))
+                if(!StringUtility::ParseNumberLexical<int64_t>(text, value))
                 {
                     return 0;
                 }
@@ -558,7 +558,7 @@ namespace StackVM
             {
                 uint16_t value = 0;
                 
-                if(!StringUtility::ParseNumber<uint16_t>(text, value))
+                if(!StringUtility::ParseNumberLexical<uint16_t>(text, value))
                 {
                     return 0;
                 }
@@ -571,7 +571,7 @@ namespace StackVM
             {
                 uint32_t value = 0;
                 
-                if(!StringUtility::ParseNumber<uint32_t>(text, value))
+                if(!StringUtility::ParseNumberLexical<uint32_t>(text, value))
                 {
                     return 0;
                 }
@@ -584,7 +584,7 @@ namespace StackVM
             {
                 uint64_t value = 0;
                 
-                if(!StringUtility::ParseNumber<uint64_t>(text, value))
+                if(!StringUtility::ParseNumberLexical<uint64_t>(text, value))
                 {
                     return 0;
                 }
@@ -597,7 +597,7 @@ namespace StackVM
             {
                 float value = 0;
                 
-                if(!StringUtility::ParseNumber<float>(text, value))
+                if(!StringUtility::ParseNumberLexical<float>(text, value))
                 {
                     return 0;
                 }
@@ -610,7 +610,7 @@ namespace StackVM
             {
                 double value = 0;
                 
-                if(!StringUtility::ParseNumber<double>(text, value))
+                if(!StringUtility::ParseNumberLexical<double>(text, value))
                 {
                     return 0;
                 }

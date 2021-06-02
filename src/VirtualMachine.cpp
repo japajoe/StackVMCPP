@@ -70,10 +70,7 @@ namespace StackVM
             {
                 Debug("MOV " + currentIndex);
                 byte* dst = GetLeftOperandPointer(currentInstruction);
-                byte* src = GetRightOperandPointer(currentInstruction);     
-
-
-                std::cout << "Moving data" << std::endl;
+                byte* src = GetRightOperandPointer(currentInstruction);
 
                 if(currentInstruction->lhsOperandType == OperandType::Register)           
                 {      

@@ -162,16 +162,16 @@ namespace StackVM
                         {
                             Token& leftOperandToken = tokens[index+1];
 
-                            if(leftOperandToken.type != TokenType::OPERAND)
-                            {
-                                assembly->instructions.push_back(Instruction(opcode));
-                            }
-                            else
+                            if(leftOperandToken.type == TokenType::OPERAND)
                             {
                                 if(!ProcessSingleOperandInstruction(tokens, index, opcodeInfo))
                                 {
                                     return false;
-                                }
+                                }                                
+                            }
+                            else
+                            {
+                                assembly->instructions.push_back(Instruction(opcode));
                             }
                         }
                         
@@ -188,24 +188,59 @@ namespace StackVM
                         {
                             Token& leftOperandToken = tokens[index+1];
 
-                            if(leftOperandToken.type != TokenType::OPERAND)
-                            {
-                                WriteError(identifierToken.lineNumber, "Unexpected token '" + identifierToken.text + "'");
-                                return false;
-                            }
-                            else
+                            if(leftOperandToken.type == TokenType::OPERAND)
                             {
                                 if(!ProcessSingleOperandInstruction(tokens, index, opcodeInfo))
                                 {
                                     return false;
                                 }
+                            }
+                            else
+                            {
+                                WriteError(leftOperandToken.lineNumber, "Unexpected token '" + leftOperandToken.text + "'");
+                                return false;                                
                             }                            
                         }
                         break;
                     }
                     case OperandInfo::Two:
                     {
+                        if((index + 1) >= tokens.size())
+                        {
+                            WriteError(identifierToken.lineNumber, "Passing 0 operands to instruction which requires 2");
+                            return false;
+                        }
+                        else if((index + 2) >= tokens.size())
+                        {
+                            WriteError(identifierToken.lineNumber, "Passing 1 operand to instruction which requires 2");
+                            return false;
+                        }
+                        else
+                        {
+                            Token& leftOperandToken = tokens[index+1];
+                            Token& rightOperandToken = tokens[index+2];
 
+                            if(leftOperandToken.type == TokenType::OPERAND)
+                            {
+                                if(rightOperandToken.type == TokenType::OPERAND)
+                                {
+                                    if(!ProcessDoubleOperandInstruction(tokens, index, opcodeInfo))
+                                    {
+                                        return false;
+                                    }
+                                }
+                                else
+                                {
+                                    WriteError(rightOperandToken.lineNumber, "Unexpected token '" + rightOperandToken.text + "'");
+                                    return false;  
+                                }
+                            }
+                            else
+                            {
+                                WriteError(leftOperandToken.lineNumber, "Unexpected token '" + leftOperandToken.text + "'");
+                                return false;   
+                            }
+                        }
                         break;
                     }
                 }
@@ -226,136 +261,218 @@ namespace StackVM
         OpCode opcode = opcodeInfo.code;
 
         Token& leftOperandToken = tokens[index+1];
-        if(leftOperandToken.type == TokenType::OPERAND)
-        {
-            if(CompilerUtility::IsDirectiveToken(leftOperandToken.text))
-            {
-                WriteError(leftOperandToken.lineNumber, "Invalid operand value. The value '" + leftOperandToken.text + "' is reserved for define directives");
-                return false;
-            }
-            
-            switch(opcodeInfo.leftTypeOption)
-            {
-                case OperandTypeOption::All:
-                {
-                    if(CompilerUtility::registerMap.count(leftOperandToken.text) > 0)
-                    {
-                        uint32_t value = CompilerUtility::registerMap[leftOperandToken.text];
-                        assembly->instructions.push_back(Instruction(opcode, value, OperandType::Register));
-                    }
-                    else if(dataMap.count(leftOperandToken.text) > 0)
-                    {
-                        uint32_t value = dataMap[leftOperandToken.text];
-                        assembly->instructions.push_back(Instruction(opcode, value, OperandType::Variable));
-                    }                                        
-                    else if(labelMap.count(leftOperandToken.text) > 0)
-                    {
-                        uint32_t value = labelMap[leftOperandToken.text];                                            
-                        assembly->instructions.push_back(Instruction(opcode, value, OperandType::IntegerLiteral));
-                    }
-                    else
-                    {
-                        uint64_t temp = 0;
-                        if(StringUtility::ParseNumberLexical<uint64_t>(leftOperandToken.text, temp))
-                        {
-                            Type type = CompilerUtility::GetNumberTypeFromText(leftOperandToken.text);                            
 
-                            //Force minimum size of integers to 4 bytes
-                            if(type == Type::UInt8)
-                                type = Type::UInt32;
-                            else if(type == Type::Int8)
-                                type = Type::Int32;
-
-                            byte leftValue[8];
-                            memset(leftValue, 0, 8);
-                            int bytesWritten = CompilerUtility::WriteStringValueToBuffer(leftOperandToken.text, leftValue, type);
-
-                            if(bytesWritten > 0)
-                            {
-                                assembly->instructions.push_back(Instruction(opcode, leftValue, type, OperandType::IntegerLiteral));
-                            }
-                            else
-                            {
-                                WriteError(leftOperandToken.lineNumber, "Failed to write value '" + leftOperandToken.text + "' to instruction");
-                                return false;
-                            }
-                        }
-                        else
-                        {
-                            if(StringUtility::StartsWith(leftOperandToken.text, "\\") && leftOperandToken.text.size() == 2)
-                            {
-                                char character;
-                                
-                                switch(leftOperandToken.text[1])
-                                {
-                                    case 'a':  character = '\a'; break;
-                                    case 'b':  character = '\b'; break;
-                                    case 'f':  character = '\f'; break;
-                                    case 'n':  character = '\n'; break;
-                                    case 'r':  character = '\r'; break;
-                                    case 't':  character = '\t'; break;
-                                    case 'v':  character = '\v'; break;
-                                    case '\\':  character = '\\'; break;
-                                    case '\'':  character = '\''; break;
-                                    case '"':  character = '"'; break;
-                                    case '?':  character = '\?'; break;
-                                    default:
-                                    {
-                                        WriteError(leftOperandToken.lineNumber, "Unknown escape sequence '" + leftOperandToken.text + "'");
-                                        return false;
-                                    }
-                                }
-
-                                Type type = Type::Int8;
-                                byte leftValue[8];
-                                memset(leftValue, 0, 8);
-                                memcpy(leftValue, &character, sizeof(char));
-                                assembly->instructions.push_back(Instruction(opcode, leftValue, type, OperandType::IntegerLiteral));
-                            }
-                            else
-                            {
-                                char character = leftOperandToken.text[0];
-                                Type type = Type::Int8;
-                                byte leftValue[8];
-                                memset(leftValue, 0, 8);
-                                memcpy(leftValue, &character, sizeof(char));
-                                assembly->instructions.push_back(Instruction(opcode, leftValue, type, OperandType::IntegerLiteral));
-                            }
-                        }
-                    }
-                    break;
-                }
-                case OperandTypeOption::RegisterOrVariable:
-                {
-                    if(CompilerUtility::registerMap.count(leftOperandToken.text) > 0)
-                    {
-                        uint32_t value = CompilerUtility::registerMap[leftOperandToken.text];
-                        assembly->instructions.push_back(Instruction(opcode, value, OperandType::Register));
-                    }
-                    else if(dataMap.count(leftOperandToken.text) > 0)
-                    {
-                        uint32_t value = dataMap[leftOperandToken.text];                                            
-                        assembly->instructions.push_back(Instruction(opcode, value, OperandType::Variable));
-                    }                                        
-                    else if(labelMap.count(leftOperandToken.text) > 0)
-                    {
-                        uint32_t value = labelMap[leftOperandToken.text];                                            
-                        assembly->instructions.push_back(Instruction(opcode, value, OperandType::IntegerLiteral));
-                    }
-                    else
-                    {
-                        WriteError(leftOperandToken.lineNumber, "Unexpected value '" + leftOperandToken.text + "'");
-                        return false;
-                    }                                        
-                    break;
-                }
-            }
-        }
-        else
+        if(leftOperandToken.type != TokenType::OPERAND)
         {
             WriteError(leftOperandToken.lineNumber, "Trying to process token as TokenType::OPERAND while it is of a different type");
             return false;
         }
+
+        if(CompilerUtility::IsDirectiveToken(leftOperandToken.text))
+        {
+            WriteError(leftOperandToken.lineNumber, "Invalid operand value. The value '" + leftOperandToken.text + "' is reserved for define directives");
+            return false;
+        }
+
+        OperandType leftOperandType;       
+        Type leftType;        
+        byte leftValue[8];        
+        memset(leftValue, 0, 8);        
+
+        if(DecodeInstruction(leftOperandToken, opcodeInfo.leftTypeOption, leftOperandType, leftType, leftValue))
+        {
+            assembly->instructions.push_back(Instruction(opcodeInfo.code, leftValue, leftType, leftOperandType));
+        }
+        else
+        {
+            return false;
+        }        
+
+        return true;
+    }
+
+    bool Compiler::ProcessDoubleOperandInstruction(std::vector<Token>& tokens, size_t index, const OpCodeInfo& opcodeInfo)
+    {
+        OpCode opcode = opcodeInfo.code;
+        Token& leftOperandToken = tokens[index+1];
+        Token& rightOperandToken = tokens[index+2];
+
+        if(leftOperandToken.type != TokenType::OPERAND)
+        {
+            WriteError(leftOperandToken.lineNumber, "Trying to process token as TokenType::OPERAND while it is of a different type");
+            return false;
+        }
+        
+        if(rightOperandToken.type != TokenType::OPERAND)
+        {
+            WriteError(rightOperandToken.lineNumber, "Trying to process token as TokenType::OPERAND while it is of a different type");
+            return false;
+        }
+
+        if(CompilerUtility::IsDirectiveToken(leftOperandToken.text))
+        {
+            WriteError(leftOperandToken.lineNumber, "Invalid operand value. The value '" + leftOperandToken.text + "' is reserved for define directives");
+            return false;
+        }
+
+        if(CompilerUtility::IsDirectiveToken(rightOperandToken.text))
+        {
+            WriteError(rightOperandToken.lineNumber, "Invalid operand value. The value '" + leftOperandToken.text + "' is reserved for define directives");
+            return false;
+        }                
+
+        OperandType leftOperandType;
+        OperandType rightOperandType;
+        Type leftType;
+        Type rightType;
+        byte leftValue[8];
+        byte rightValue[8];
+        memset(leftValue, 0, 8);
+        memset(rightValue, 0, 8);
+
+        if(DecodeInstruction(leftOperandToken, opcodeInfo.leftTypeOption, leftOperandType, leftType, leftValue))
+        {
+            if(DecodeInstruction(rightOperandToken, opcodeInfo.rightTypeOption, rightOperandType, rightType, rightValue))
+            {
+                assembly->instructions.push_back(Instruction(opcodeInfo.code, leftValue, leftType, leftOperandType, rightValue, rightType, rightOperandType));
+            }
+            else
+            {
+                return false;
+            }
+        }
+        else
+        {
+            return false;
+        }
+
+        return true;        
+    }
+
+    bool Compiler::DecodeInstruction(Token& operandToken, OperandTypeOption operandTypeOption, OperandType& operandType, Type& operandValueType, byte* operandValue)
+    {
+        switch(operandTypeOption)
+        {
+            case OperandTypeOption::All:
+            {
+                if(CompilerUtility::registerMap.count(operandToken.text) > 0)
+                {
+                    uint32_t value = CompilerUtility::registerMap[operandToken.text];
+                    memcpy(operandValue, &value, sizeof(uint32_t));
+                    operandType = OperandType::Register;
+                    operandValueType = Type::UInt32;
+                }
+                else if(dataMap.count(operandToken.text) > 0)
+                {
+                    uint32_t value = dataMap[operandToken.text];
+                    memcpy(operandValue, &value, sizeof(uint32_t));
+                    operandType = OperandType::Variable;
+                    operandValueType = Type::UInt32;
+                }                                        
+                else if(labelMap.count(operandToken.text) > 0)
+                {
+                    uint32_t value = labelMap[operandToken.text];
+                    memcpy(operandValue, &value, sizeof(uint32_t));
+                    operandType = OperandType::IntegerLiteral;
+                    operandValueType = Type::UInt32;
+                }
+                else
+                {
+                    uint64_t temp = 0;
+                    if(StringUtility::ParseNumberLexical<uint64_t>(operandToken.text, temp))
+                    {
+                        operandValueType = CompilerUtility::GetNumberTypeFromText(operandToken.text);                            
+
+                        //Force minimum size of integers to 4 bytes
+                        if(operandValueType == Type::UInt8)
+                            operandValueType = Type::UInt32;
+                        else if(operandValueType == Type::Int8)
+                            operandValueType = Type::Int32;
+
+                        int bytesWritten = CompilerUtility::WriteStringValueToBuffer(operandToken.text, operandValue, operandValueType);
+
+                        if(bytesWritten > 0)
+                        {
+                            operandType = OperandType::IntegerLiteral;
+                        }
+                        else
+                        {
+                            WriteError(operandToken.lineNumber, "Failed to write value '" + operandToken.text + "' to instruction");
+                            return false;
+                        }
+                    }
+                    else
+                    {
+                        if(StringUtility::StartsWith(operandToken.text, "\\") && operandToken.text.size() == 2)
+                        {
+                            char character;
+                            
+                            switch(operandToken.text[1])
+                            {
+                                case 'a':  character = '\a'; break;
+                                case 'b':  character = '\b'; break;
+                                case 'f':  character = '\f'; break;
+                                case 'n':  character = '\n'; break;
+                                case 'r':  character = '\r'; break;
+                                case 't':  character = '\t'; break;
+                                case 'v':  character = '\v'; break;
+                                case '\\':  character = '\\'; break;
+                                case '\'':  character = '\''; break;
+                                case '"':  character = '"'; break;
+                                case '?':  character = '\?'; break;
+                                default:
+                                {
+                                    WriteError(operandToken.lineNumber, "Unknown escape sequence '" + operandToken.text + "'");
+                                    return false;
+                                }
+                            }
+
+                            operandValueType = Type::Int8;
+                            operandType = OperandType::IntegerLiteral;
+                            memcpy(operandValue, &character, sizeof(char));
+                        }
+                        else
+                        {
+                            char character = operandToken.text[0];
+                            operandValueType = Type::Int8;
+                            operandType = OperandType::IntegerLiteral;
+                            memcpy(operandValue, &character, sizeof(char));
+                        }
+                    }
+                }
+                break;
+            }
+            case OperandTypeOption::RegisterOrVariable:
+            {
+                if(CompilerUtility::registerMap.count(operandToken.text) > 0)
+                {
+                    uint32_t value = CompilerUtility::registerMap[operandToken.text];
+                    memcpy(operandValue, &value, sizeof(uint32_t));
+                    operandType = OperandType::Register;
+                    operandValueType = Type::UInt32;
+                }
+                else if(dataMap.count(operandToken.text) > 0)
+                {
+                    uint32_t value = dataMap[operandToken.text];
+                    memcpy(operandValue, &value, sizeof(uint32_t));
+                    operandType = OperandType::Variable;
+                    operandValueType = Type::UInt32;
+                }                                        
+                else if(labelMap.count(operandToken.text) > 0)
+                {
+                    uint32_t value = labelMap[operandToken.text];
+                    memcpy(operandValue, &value, sizeof(uint32_t));
+                    operandType = OperandType::IntegerLiteral;
+                    operandValueType = Type::UInt32;
+                }
+                else
+                {
+                    WriteError(operandToken.lineNumber, "Unexpected value '" + operandToken.text + "'");
+                    return false;
+                }                                        
+                break;
+            }
+        }        
 
         return true;
     }

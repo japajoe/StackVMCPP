@@ -25,6 +25,8 @@ namespace StackVM
         void WriteError(int lineNumber, const std::string& error);
         bool ProcessToken(std::vector<Token>& tokens, size_t index);
         bool ProcessSingleOperandInstruction(std::vector<Token>& tokens, size_t index, const OpCodeInfo& opcodeInfo);
+        bool ProcessDoubleOperandInstruction(std::vector<Token>& tokens, size_t index, const OpCodeInfo& opcodeInfo);
+        bool DecodeInstruction(Token& operandToken, OperandTypeOption operandTypeOption, OperandType& operandType, Type& operandValueType, byte* operandValue);
     };
 }
 #endif
