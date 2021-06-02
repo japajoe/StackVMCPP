@@ -75,8 +75,10 @@ namespace StackVM
                 if(currentInstruction->lhsOperandType == OperandType::Register)           
                 {      
                     Type rhsType = GetRightOperandDataType(currentInstruction);
+                    uint16_t rhsSize = GetSizeOfType(rhsType);
                     SetDestinationRegisterDataType(currentInstruction, rhsType);
-                    memcpy(dst, src, 8);
+                    memset(dst, 0, 8); //clears any previous data in register
+                    memcpy(dst, src, rhsSize);
                 }
                 else if(currentInstruction->lhsOperandType == OperandType::Variable)
                 {                    
@@ -232,9 +234,9 @@ namespace StackVM
                     memcpy(dst, &src, sizeof(unsigned char));
                     
                     if(currentInstruction->lhsOperandType == OperandType::Register)
-                    {        
+                    {
                         SetDestinationRegisterDataType(currentInstruction, Type::UInt8);
-                    }                    
+                    }
                 }
                 else
                 {
