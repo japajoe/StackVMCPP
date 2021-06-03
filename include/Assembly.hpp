@@ -24,7 +24,6 @@ namespace StackVM
 		byte* GetDataAtIndex(uint32_t index)
 		{
 			return index >= indices.size() ? nullptr : &data[indices[index]];
-			//return index >= indices.size() ? nullptr : &data[index];
 		}
 
 		byte* GetDataAtIndex(uint32_t index, Type& type)
@@ -33,7 +32,6 @@ namespace StackVM
 				return nullptr;
 			type = types[index];
 
-			//return &data[index];
 			return &data[indices[index]];
 		}
 	};

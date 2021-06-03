@@ -640,7 +640,9 @@ namespace StackVM
         for(size_t i = 0; i < tokens.size(); i++)
         {
             if(tokens[i].type == type)
+            {
                 count++;
+            }
         }
 
         return count;

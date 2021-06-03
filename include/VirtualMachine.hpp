@@ -41,6 +41,10 @@ namespace StackVM
         uint16_t GetSizeOfType(Type type) const;
         int32_t GetDestinationRegisterIndex(Instruction* instruction) const;        
         void SetDestinationRegisterDataType(Instruction* instruction, Type type);
+        void IncrementInstructionPointer();
+        void IncrementInstructionPointer(uint32_t offset);
+        void SetInstructionPointer(uint32_t offset);
+        void SetStackPointer(uint32_t offset);
         void ResetState();
         void LogMessage(const std::string& message);
     public:

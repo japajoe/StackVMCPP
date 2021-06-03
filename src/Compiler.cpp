@@ -26,14 +26,33 @@ namespace StackVM
         size_t numFunctions = CompilerUtility::CountTokens(tokens, TokenType::FUNCTION_LABEL);
         size_t numOpcodes = CompilerUtility::CountTokens(tokens, TokenType::OPCODE);
 
+        size_t numInstructions = 0;
+        Token prevToken = tokens[0];
+
+        for(size_t i = 0 ; i < tokens.size(); i++)
+        {
+            if(i > 0)
+                prevToken = tokens[i-1];
+
+            if(tokens[i].type == TokenType::OPCODE)
+            {
+                if(prevToken.type == TokenType::FUNCTION_LABEL)
+                {
+                    labelMap[prevToken.text] = numInstructions;
+                    //std::cout << "Found label " << prevToken.text << " to index " << numInstructions << std::endl;
+                }
+                numInstructions++;
+            }
+        }
+
         for(size_t i = 0; i < tokens.size(); i++)
         {
             if(tokens[i].type == TokenType::VARIABLE_LABEL || 
                tokens[i].type == TokenType::FUNCTION_LABEL ||
                tokens[i].type == TokenType::OPCODE)
             {
-                index = i;
-                if(!ProcessToken(tokens, index))
+                
+                if(!ProcessToken(tokens, i))
                 {
                     return false;
                 }
@@ -44,7 +63,8 @@ namespace StackVM
     }
 
     bool Compiler::ProcessToken(std::vector<Token>& tokens, size_t index)
-    {
+    {        
+
         switch(tokens[index].type)
         {
             case TokenType::VARIABLE_LABEL:
@@ -57,7 +77,7 @@ namespace StackVM
 
                 Token& identifierToken = tokens[index];
                 Token& directiveToken  = tokens[index+1];
-                Token& valueToken      = tokens[index+2];
+                Token& valueToken      = tokens[index+2];                
 
                 if(directiveToken.type == TokenType::DIRECTIVE_SPECIFIER)
                 {
@@ -115,8 +135,6 @@ namespace StackVM
                     {
                         uint32_t index = assembly->types.size();
                         assembly->types.push_back(type);
-
-
                         assembly->indices.push_back(assembly->data.size());
 
                         for(size_t i = 0; i < bytesWritten; i++)
@@ -134,9 +152,9 @@ namespace StackVM
             }
             case TokenType::FUNCTION_LABEL:
             {
-                Token& identifierToken = tokens[index];
+                //Token& identifierToken = tokens[index];
                 //labelMap[identifierToken.text] = 0;
-                labelMap[identifierToken.text] = assembly->instructions.size();
+                //labelMap[identifierToken.text] = assembly->instructions.size();
                 break;
             }
             case TokenType::OPCODE:

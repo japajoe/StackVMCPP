@@ -21,16 +21,13 @@
 ; real_number4	    DQ	123.456     double
 
 ; Take note that I haven't extensively tested this yet. Usage is on your own risk.
-; Opcodes that take 2 operands are not supported yet
 
 section .data
-
-    numChars DD : 13
-    iteration DD : 0
-    iterations DD : 10
+    iteration dd : 0
+    iterations dd : 10
+    numChars dd : 13
 
 section .text
-
 _print:
     pushi8 '\n'
     pushi8 '!'
@@ -41,13 +38,14 @@ _print:
     pushi8 'w'
     pushi8 ' '
     pushi8 'o'
-    pushi8 'l'           
     pushi8 'l'
-    pushi8 'e'           
+    pushi8 'l'
+    pushi8 'e'
     pushi8 'H'
-    pushi32 numChars ;You can also use an integer literal but this example uses a variable
+    pushi32 numChars
     print
     inc iteration
-    cmp iteration, iterations    
-    jne 0 ;labels are not yet supported but you can jump to any instruction providing you know its index
+    cmp iteration, iterations
+    jne _print
+_stop:
     hlt

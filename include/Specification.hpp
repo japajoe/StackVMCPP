@@ -2,6 +2,7 @@
 #define STACKVM_SPECIFICATION_HPP
 
 #include <cstdint>
+#include <string>
 
 namespace StackVM
 {
@@ -50,7 +51,8 @@ namespace StackVM
         JZ,
         JNZ,
         NOP,
-        HLT
+        HLT,
+        NUM_OPCODES
     };
 
     enum Type : uint8_t
@@ -135,6 +137,52 @@ namespace StackVM
         RBX,
         RCX,
         RDX        
+    };
+
+    static std::string opcodeDictionary[] =
+    {
+        "MOV",
+        "INC",
+        "DEC",
+        "ADD",
+        "SUB",
+        "MUL",
+        "DIV",
+        "PUSH",
+        "PUSHI8",
+        "PUSHU8",
+        "PUSHF",
+        "PUSHD",
+        "PUSHI32",
+        "PUSHU32",
+        "PUSHI16",
+        "PUSHU16",
+        "PUSHI64",
+        "PUSHU64",
+        "POP",
+        "POPI8",
+        "POPU8",
+        "POPF",
+        "POPD",
+        "POPI32",
+        "POPU32",
+        "POPI16",
+        "POPU16",
+        "POPI64",
+        "POPU64",
+        "PRINT",
+        "CMP",
+        "JMP",
+        "JE",
+        "JNE",
+        "JG",
+        "JGE",
+        "JL",
+        "JLE",
+        "JZ",
+        "JNZ",
+        "NOP",
+        "HLT"
     };
 }
 

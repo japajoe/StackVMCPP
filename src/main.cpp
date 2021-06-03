@@ -59,9 +59,11 @@ void CompileProgram()
 
         Assembly assembly;
 
-        //Compiler isn't fully implemented yet so output shouldn't be loaded into virtual machine
         if(compiler.Compile(source, assembly)) 
         {
+            // for(size_t i = 0; i < assembly.instructions.size(); i++)
+            //     assembly.instructions[i].Dump();
+
             if(machine.LoadProgram(&assembly))
             {
                 bool execute = true;

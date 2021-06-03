@@ -1515,77 +1515,82 @@ namespace StackVM
 
         void Dump()
         {
-            std::string lhs = "LHS ";
-            std::string rhs = "RHS ";
+            std::string lhsType = "LHS ";
+            std::string rhsType = "RHS ";
             switch(lhsDataType)
             {
                 case Type::Double:
-                    lhs += "Double";
+                    lhsType += "Double " + std::to_string(*(double*)lhs);
                     break;
                 case Type::Int16:
-                    lhs += "Int16";
+                    lhsType += "Int16 " + std::to_string(*(int16_t*)lhs);
                     break;
                 case Type::Int32:
-                    lhs += "Int32";
+                    lhsType += "Int32 " + std::to_string(*(int32_t*)lhs);
                     break;
                 case Type::Int64:
-                    lhs += "Int64";
+                    lhsType += "Int64 " + std::to_string(*(int64_t*)lhs);
                     break;       
                 case Type::Int8:
-                    lhs += "Int8";
+                    lhsType += "Int8 " + std::to_string(*(char*)lhs);
                     break;
                 case Type::Single:
-                    lhs += "Single";
+                    lhsType += "Single " + std::to_string(*(float*)lhs);
                     break;        
                 case Type::UInt16:
-                    lhs += "UInt16";
+                    lhsType += "UInt16 " + std::to_string(*(uint16_t*)lhs);
                     break;       
                 case Type::UInt32:
-                    lhs += "UInt32";
+                    lhsType += "UInt32 " + std::to_string(*(uint32_t*)lhs);
                     break;        
                 case Type::UInt64:
-                    lhs += "UInt64";
+                    lhsType += "UInt64 " + std::to_string(*(uint64_t*)lhs);
                     break;                            
                 case Type::UInt8:
-                    lhs += "UInt8";
+                    lhsType += "UInt8 " + std::to_string(*(unsigned char*)lhs);
                     break;                                                                                                                                                                                                                                                                                                                                                         
             }
 
             switch(rhsDataType)
             {
                 case Type::Double:
-                    rhs += "Double";
+                    rhsType += "Double " + std::to_string(*(double*)rhs);
                     break;
                 case Type::Int16:
-                    rhs += "Int16";
+                    rhsType += "Int16 " + std::to_string(*(int16_t*)rhs);
                     break;
                 case Type::Int32:
-                    rhs += "Int32";
+                    rhsType += "Int32 " + std::to_string(*(int32_t*)rhs);
                     break;
                 case Type::Int64:
-                    rhs += "Int64";
+                    rhsType += "Int64 " + std::to_string(*(int64_t*)rhs);
                     break;       
                 case Type::Int8:
-                    rhs += "Int8";
+                    rhsType += "Int8 " + std::to_string(*(char*)rhs);
                     break;
                 case Type::Single:
-                    rhs += "Single";
+                    rhsType += "Single " + std::to_string(*(float*)rhs);
                     break;        
                 case Type::UInt16:
-                    rhs += "UInt16";
+                    rhsType += "UInt16 " + std::to_string(*(uint16_t*)rhs);
                     break;       
                 case Type::UInt32:
-                    rhs += "UInt32";
+                    rhsType += "UInt32 " + std::to_string(*(uint32_t*)rhs);
                     break;        
                 case Type::UInt64:
-                    rhs += "UInt64";
+                    rhsType += "UInt64 " + std::to_string(*(uint64_t*)rhs);
                     break;                            
                 case Type::UInt8:
-                    rhs += "UInt8";
+                    rhsType += "UInt8 " + std::to_string(*(unsigned char*)rhs);
                     break;                                                                                                                                                                                                                                                                                                                                                         
             } 
 
-            std::cout << "Num operands " << numOperands << " " << lhs << " " << rhs << std::endl;
+            if(numOperands == 0)
+                std::cout << opcodeDictionary[opcode] << std::endl;
+            else if(numOperands == 1)
+                std::cout << opcodeDictionary[opcode] << "\t" << lhsType << std::endl;
+            else
+                std::cout << opcodeDictionary[opcode] << "\t" << lhsType << "\t" << rhsType << std::endl;
 
         }
     };

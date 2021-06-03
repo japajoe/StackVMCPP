@@ -51,6 +51,8 @@ namespace StackVM
         uint32_t instructionIndex = (currentInstruction - entryInstruction);
         std::string currentIndex = std::to_string(instructionIndex);
 
+        Debug("OpCode " + std::to_string(currentInstruction->opcode));
+
         switch(currentInstruction->opcode)
         {
             case OpCode::HLT:
@@ -63,7 +65,7 @@ namespace StackVM
             case OpCode::NOP:
             {
                 Debug("NOP " + currentIndex);
-                ++currentInstruction;
+                IncrementInstructionPointer();
                 break;
             }
             case OpCode::MOV:
@@ -95,7 +97,7 @@ namespace StackVM
                     memcpy(dst, buffer, lhsSize);
                 }
 
-                ++currentInstruction;
+                IncrementInstructionPointer();
                 break;
             }
             case OpCode::PUSH:
@@ -104,7 +106,8 @@ namespace StackVM
                 byte* src = GetLeftOperandPointer(currentInstruction);
                 Type type = GetLeftOperandDataType(currentInstruction);
                 stack.push(src, type);
-                ++currentInstruction;                
+                IncrementInstructionPointer();
+                SetStackPointer(stack.getPointer());
                 break;
             }
             case OpCode::PUSHI8:
@@ -112,7 +115,8 @@ namespace StackVM
                 Debug("PUSHI8 " + currentIndex);
                 byte* src = GetLeftOperandPointer(currentInstruction);
                 stack.push_from_type<char>(src);
-                ++currentInstruction;
+                IncrementInstructionPointer();
+                SetStackPointer(stack.getPointer());
                 break;
             }
             case OpCode::PUSHU8:
@@ -120,7 +124,8 @@ namespace StackVM
                 Debug("PUSHU8 " + currentIndex);
                 byte* src = GetLeftOperandPointer(currentInstruction);
                 stack.push_from_type<unsigned char>(src);
-                ++currentInstruction;
+                IncrementInstructionPointer();
+                SetStackPointer(stack.getPointer());
                 break;
             }            
             case OpCode::PUSHF:
@@ -128,7 +133,8 @@ namespace StackVM
                 Debug("PUSHF " + currentIndex);
                 byte* src = GetLeftOperandPointer(currentInstruction);
                 stack.push_from_type<float>(src);
-                ++currentInstruction;
+                IncrementInstructionPointer();
+                SetStackPointer(stack.getPointer());
                 break;
             }
             case OpCode::PUSHD:
@@ -136,7 +142,8 @@ namespace StackVM
                 Debug("PUSHD " + currentIndex);
                 byte* src = GetLeftOperandPointer(currentInstruction);
                 stack.push_from_type<double>(src);
-                ++currentInstruction;
+                IncrementInstructionPointer();
+                SetStackPointer(stack.getPointer());
                 break;
             }                  
             case OpCode::PUSHI32:
@@ -144,7 +151,8 @@ namespace StackVM
                 Debug("PUSHI32 " + currentIndex);
                 byte* src = GetLeftOperandPointer(currentInstruction);
                 stack.push_from_type<int32_t>(src);
-                ++currentInstruction;
+                IncrementInstructionPointer();
+                SetStackPointer(stack.getPointer());
                 break;
             }
             case OpCode::PUSHU32:
@@ -152,7 +160,8 @@ namespace StackVM
                 Debug("PUSHU32 " + currentIndex);
                 byte* src = GetLeftOperandPointer(currentInstruction);
                 stack.push_from_type<uint32_t>(src);
-                ++currentInstruction;
+                IncrementInstructionPointer();
+                SetStackPointer(stack.getPointer());
                 break;
             }            
             case OpCode::PUSHI16:
@@ -160,7 +169,8 @@ namespace StackVM
                 Debug("PUSHI16 " + currentIndex);
                 byte* src = GetLeftOperandPointer(currentInstruction);
                 stack.push_from_type<int16_t>(src);
-                ++currentInstruction;
+                IncrementInstructionPointer();
+                SetStackPointer(stack.getPointer());
                 break;
             }    
             case OpCode::PUSHU16:
@@ -168,7 +178,8 @@ namespace StackVM
                 Debug("PUSHU16 " + currentIndex);
                 byte* src = GetLeftOperandPointer(currentInstruction);
                 stack.push_from_type<uint16_t>(src);
-                ++currentInstruction;
+                IncrementInstructionPointer();
+                SetStackPointer(stack.getPointer());
                 break;
             }                          
             case OpCode::PUSHI64:
@@ -176,7 +187,8 @@ namespace StackVM
                 Debug("PUSHI64 " + currentIndex);
                 byte* src = GetLeftOperandPointer(currentInstruction);
                 stack.push_from_type<int64_t>(src);
-                ++currentInstruction;
+                IncrementInstructionPointer();
+                SetStackPointer(stack.getPointer());
                 break;
             }
             case OpCode::PUSHU64:
@@ -184,7 +196,8 @@ namespace StackVM
                 Debug("PUSHU64 " + currentIndex);
                 byte* src = GetLeftOperandPointer(currentInstruction);
                 stack.push_from_type<uint64_t>(src);
-                ++currentInstruction;
+                IncrementInstructionPointer();
+                SetStackPointer(stack.getPointer());
                 break;
             }                                    
             case OpCode::POP:
@@ -200,7 +213,8 @@ namespace StackVM
                 {
                     stack.pop_bytes();
                 }
-                ++currentInstruction;
+                IncrementInstructionPointer();
+                SetStackPointer(stack.getPointer());
                 break;
             }
             case OpCode::POPI8:
@@ -221,7 +235,8 @@ namespace StackVM
                 {
                     stack.pop_char();
                 }                
-                ++currentInstruction;
+                IncrementInstructionPointer();
+                SetStackPointer(stack.getPointer());
                 break;
             }
             case OpCode::POPU8:
@@ -242,11 +257,13 @@ namespace StackVM
                 {
                     stack.pop_uchar();
                 }                 
-                ++currentInstruction;
+                IncrementInstructionPointer();
+                SetStackPointer(stack.getPointer());
                 break;
             }
             case OpCode::POPF:
             {
+                Debug("POPF " + currentIndex);
                 if(currentInstruction->numOperands == 1)
                 {
                     byte* dst = GetLeftOperandPointer(currentInstruction);
@@ -262,11 +279,13 @@ namespace StackVM
                 {
                     stack.pop_float();
                 }                 
-                ++currentInstruction;
+                IncrementInstructionPointer();
+                SetStackPointer(stack.getPointer());
                 break;
             }
             case OpCode::POPD:
             {
+                Debug("POPD " + currentIndex);
                 if(currentInstruction->numOperands == 1)
                 {
                     byte* dst = GetLeftOperandPointer(currentInstruction);
@@ -282,11 +301,13 @@ namespace StackVM
                 {
                     stack.pop_double();
                 }                 
-                ++currentInstruction;
+                IncrementInstructionPointer();
+                SetStackPointer(stack.getPointer());
                 break;
             }
             case OpCode::POPI32:
             {
+                Debug("POPI32 " + currentIndex);
                 if(currentInstruction->numOperands == 1)
                 {
                     byte* dst = GetLeftOperandPointer(currentInstruction);
@@ -302,11 +323,13 @@ namespace StackVM
                 {
                     stack.pop_int32();
                 }                
-                ++currentInstruction;
+                IncrementInstructionPointer();
+                SetStackPointer(stack.getPointer());
                 break;
             }
             case OpCode::POPU32:
             {
+                Debug("POPU32 " + currentIndex);
                 if(currentInstruction->numOperands == 1)
                 {
                     byte* dst = GetLeftOperandPointer(currentInstruction);
@@ -322,11 +345,13 @@ namespace StackVM
                 {
                     stack.pop_uint32();
                 }                
-                ++currentInstruction;
+                IncrementInstructionPointer();
+                SetStackPointer(stack.getPointer());
                 break;
             }
             case OpCode::POPI16:
             {
+                Debug("POPI16 " + currentIndex);
                 if(currentInstruction->numOperands == 1)
                 {
                     byte* dst = GetLeftOperandPointer(currentInstruction);
@@ -342,11 +367,13 @@ namespace StackVM
                 {
                     stack.pop_int16();
                 }                 
-                ++currentInstruction;
+                IncrementInstructionPointer();
+                SetStackPointer(stack.getPointer());
                 break;
             }
             case OpCode::POPU16:
             {
+                Debug("POPU16 " + currentIndex);
                 if(currentInstruction->numOperands == 1)
                 {
                     byte* dst = GetLeftOperandPointer(currentInstruction);
@@ -362,11 +389,13 @@ namespace StackVM
                 {
                     stack.pop_uint16();
                 }                
-                ++currentInstruction;
+                IncrementInstructionPointer();
+                SetStackPointer(stack.getPointer());
                 break;
             }
             case OpCode::POPI64:
             {
+                Debug("POPI64 " + currentIndex);
                 if(currentInstruction->numOperands == 1)
                 {
                     byte* dst = GetLeftOperandPointer(currentInstruction);
@@ -382,11 +411,13 @@ namespace StackVM
                 {
                     stack.pop_int64();
                 }                   
-                ++currentInstruction;
+                IncrementInstructionPointer();
+                SetStackPointer(stack.getPointer());
                 break;
             }
             case OpCode::POPU64:
             {
+                Debug("POPU64 " + currentIndex);
                 if(currentInstruction->numOperands == 1)
                 {
                     byte* dst = GetLeftOperandPointer(currentInstruction);
@@ -402,7 +433,8 @@ namespace StackVM
                 {
                     stack.pop_uint64();
                 }                
-                ++currentInstruction;
+                IncrementInstructionPointer();
+                SetStackPointer(stack.getPointer());
                 break;
             }            
             case OpCode::PRINT:
@@ -421,11 +453,13 @@ namespace StackVM
                 }
 
                 printf(characters);
-                ++currentInstruction;
+                IncrementInstructionPointer();
+                SetStackPointer(stack.getPointer());
                 break;
             }
             case OpCode::INC:
             {
+                Debug("INC " + currentIndex);
                 uint16_t value = 1;
                 byte* dst = GetLeftOperandPointer(currentInstruction);
                 byte* src = (byte*)&value;
@@ -435,11 +469,12 @@ namespace StackVM
 
                 MathOperation::Add(currentInstruction, dst, src, typeLeft, typeRight, &registers[0], &assembly->data[0]);
 
-                ++currentInstruction;
+                IncrementInstructionPointer();
                 break;
             }
             case OpCode::DEC:
             {
+                Debug("DEC " + currentIndex);
                 uint16_t value = 1;
                 byte* dst = GetLeftOperandPointer(currentInstruction);
                 byte* src = (byte*)&value;
@@ -448,11 +483,12 @@ namespace StackVM
                 Type typeRight = Type::UInt16;
 
                 MathOperation::Subtract(currentInstruction, dst, src, typeLeft, typeRight, &registers[0], &assembly->data[0]);
-                ++currentInstruction;
+                IncrementInstructionPointer();
                 break;
             }
             case OpCode::ADD:
             {
+                Debug("ADD " + currentIndex);
                 byte* dst = GetLeftOperandPointer(currentInstruction);
                 byte* src = GetRightOperandPointer(currentInstruction);
 
@@ -461,11 +497,12 @@ namespace StackVM
 
                 MathOperation::Add(currentInstruction, dst, src, typeLeft, typeRight, &registers[0], &assembly->data[0]);
                 
-                ++currentInstruction;
+                IncrementInstructionPointer();
                 break;
             }
             case OpCode::SUB:
             {
+                Debug("SUB " + currentIndex);
                 byte* dst = GetLeftOperandPointer(currentInstruction);
                 byte* src = GetRightOperandPointer(currentInstruction);
 
@@ -474,11 +511,12 @@ namespace StackVM
 
                 MathOperation::Subtract(currentInstruction, dst, src, typeLeft, typeRight, &registers[0], &assembly->data[0]);
                 
-                ++currentInstruction;
+                IncrementInstructionPointer();
                 break;
             }
             case OpCode::MUL:
             {
+                Debug("MUL " + currentIndex);
                 byte* dst = GetLeftOperandPointer(currentInstruction);
                 byte* src = GetRightOperandPointer(currentInstruction);
 
@@ -487,11 +525,12 @@ namespace StackVM
 
                 MathOperation::Multiply(currentInstruction, dst, src, typeLeft, typeRight, &registers[0], &assembly->data[0]);
 
-                ++currentInstruction;
+                IncrementInstructionPointer();
                 break;
             }
             case OpCode::DIV:
             {
+                Debug("DIV " + currentIndex);
                 byte* dst = GetLeftOperandPointer(currentInstruction);
                 byte* src = GetRightOperandPointer(currentInstruction);
 
@@ -500,11 +539,12 @@ namespace StackVM
 
                 MathOperation::Divide(currentInstruction, dst, src, typeLeft, typeRight, &registers[0], &assembly->data[0]);
 
-                ++currentInstruction;
+                IncrementInstructionPointer();
                 break;
             }
             case OpCode::CMP:
             {
+                Debug("CMP " + currentIndex);
                 byte* dst = GetLeftOperandPointer(currentInstruction);
                 byte* src = GetRightOperandPointer(currentInstruction);
 
@@ -513,141 +553,151 @@ namespace StackVM
 
                 MathOperation::Compare(currentInstruction, dst, src, typeLeft, typeRight, &registers[0], &assembly->data[0]);
 
-                ++currentInstruction;
+                IncrementInstructionPointer();
                 break;
             }
             case OpCode::JMP:
             {
+                Debug("JMP " + currentIndex);
                 byte* dst = GetLeftOperandPointer(currentInstruction);
-                int32_t offset;
+                uint32_t offset;
                 memcpy(&offset, dst, sizeof(int32_t));
-                currentInstruction = (entryInstruction + offset);
 
+                std::cout << "JMP offset " << offset << std::endl;
+                SetInstructionPointer(offset);
                 break;
             }
             case OpCode::JE:
             {
+                Debug("JE " + currentIndex);
                 if(MathOperation::GetCompareFlag() == 0)
                 {
                     byte* dst = GetLeftOperandPointer(currentInstruction);
                     int32_t offset;
                     memcpy(&offset, dst, sizeof(int32_t));
-                    currentInstruction = (entryInstruction + offset);                    
+                    SetInstructionPointer(offset);                    
                 }
                 else
                 {
-                    ++currentInstruction;
+                    IncrementInstructionPointer();
                 }
                 break;
             }
             case OpCode::JNE:
             {
+                Debug("JNE " + currentIndex);
                 if(MathOperation::GetCompareFlag() != 0)
                 {
                     byte* dst = GetLeftOperandPointer(currentInstruction);
-                    int32_t offset;
-                    memcpy(&offset, dst, sizeof(int32_t));
-                    currentInstruction = (entryInstruction + offset);                    
+                    uint32_t offset;
+                    memcpy(&offset, dst, sizeof(uint32_t));
+                    SetInstructionPointer(offset);                    
                 }
                 else
                 {
-                    ++currentInstruction;
+                    IncrementInstructionPointer();
                 }                
                 break;
             }
             case OpCode::JG:
             {
+                Debug("JG " + currentIndex);
                 if(MathOperation::GetCompareFlag() > 0)
                 {
                     byte* dst = GetLeftOperandPointer(currentInstruction);
                     int32_t offset;
                     memcpy(&offset, dst, sizeof(int32_t));
-                    currentInstruction = (entryInstruction + offset);                    
+                    SetInstructionPointer(offset);                    
                 }
                 else
                 {
-                    ++currentInstruction;
+                    IncrementInstructionPointer();
                 }                 
                 break;
             }
             case OpCode::JGE:
             {
+                Debug("JGE " + currentIndex);
                 if(MathOperation::GetCompareFlag() >= 0)
                 {
                     byte* dst = GetLeftOperandPointer(currentInstruction);
                     int32_t offset;
                     memcpy(&offset, dst, sizeof(int32_t));
-                    currentInstruction = (entryInstruction + offset);                    
+                    SetInstructionPointer(offset);                    
                 }
                 else
                 {
-                    ++currentInstruction;
+                    IncrementInstructionPointer();
                 }                 
                 break;
             }
             case OpCode::JL:
             {
+                Debug("JL " + currentIndex);
                 if(MathOperation::GetCompareFlag() < 0)
                 {
                     byte* dst = GetLeftOperandPointer(currentInstruction);
                     int32_t offset;
                     memcpy(&offset, dst, sizeof(int32_t));
-                    currentInstruction = (entryInstruction + offset);                    
+                    SetInstructionPointer(offset);                    
                 }
                 else
                 {
-                    ++currentInstruction;
+                    IncrementInstructionPointer();
                 }                 
                 break;
             }
             case OpCode::JLE:
             {
+                Debug("JLE " + currentIndex);
                 if(MathOperation::GetCompareFlag() <= 0)
                 {
                     byte* dst = GetLeftOperandPointer(currentInstruction);
                     int32_t offset;
                     memcpy(&offset, dst, sizeof(int32_t));
-                    currentInstruction = (entryInstruction + offset);                    
+                    SetInstructionPointer(offset);                    
                 }
                 else
                 {
-                    ++currentInstruction;
+                    IncrementInstructionPointer();
                 }                 
                 break;
             }
             case OpCode::JZ:
             {
+                Debug("JZ " + currentIndex);
                 if(MathOperation::GetZeroFlag() == 0)
                 {
                     byte* dst = GetLeftOperandPointer(currentInstruction);
                     int32_t offset;
                     memcpy(&offset, dst, sizeof(int32_t));
-                    currentInstruction = (entryInstruction + offset);                    
+                    SetInstructionPointer(offset);                    
                 }
                 else
                 {
-                    ++currentInstruction;
+                    IncrementInstructionPointer();
                 }                 
                 break;
             }
             case OpCode::JNZ:
             {
+                Debug("JNZ " + currentIndex);
                 if(MathOperation::GetZeroFlag() != 0)
                 {
                     byte* dst = GetLeftOperandPointer(currentInstruction);
                     int32_t offset;
                     memcpy(&offset, dst, sizeof(int32_t));
-                    currentInstruction = (entryInstruction + offset);                    
+                    SetInstructionPointer(offset);                    
                 }
                 else
                 {
-                    ++currentInstruction;
+                    IncrementInstructionPointer();
                 }                 
                 break;
             }            
             default:
             {
-                ++currentInstruction;
+                IncrementInstructionPointer();
                 break;
             }
         }
@@ -792,6 +842,40 @@ namespace StackVM
         memcpy(&index, &instruction->lhs[0], 4);
         registerDataType[index] = type;
     }
+
+    void VirtualMachine::IncrementInstructionPointer()
+    {
+        currentInstruction += 1;
+        uint32_t address = static_cast<uint32_t>(currentInstruction - entryInstruction);
+        memset(&registers[EIP * 8], 0, 8);
+        memcpy(&registers[EIP * 8], &address, sizeof(uint32_t));
+        registerDataType[EIP] = Type::UInt32;
+    }
+
+    void VirtualMachine::IncrementInstructionPointer(uint32_t offset)
+    {
+        currentInstruction += offset;
+        uint32_t address = static_cast<uint32_t>(currentInstruction - entryInstruction);
+        memset(&registers[EIP * 8], 0, 8);
+        memcpy(&registers[EIP * 8], &address, sizeof(uint32_t));
+        registerDataType[EIP] = Type::UInt32;        
+    }    
+
+    void VirtualMachine::SetInstructionPointer(uint32_t offset)
+    {
+        currentInstruction = (entryInstruction + offset);
+        uint32_t address = static_cast<uint32_t>(currentInstruction - entryInstruction);
+        memset(&registers[EIP * 8], 0, 8);
+        memcpy(&registers[EIP * 8], &address, sizeof(uint32_t));
+        registerDataType[EIP] = Type::UInt32;
+    }
+
+    void VirtualMachine::SetStackPointer(uint32_t offset)
+    {
+        memset(&registers[ESP * 8], 0, 8);
+        memcpy(&registers[ESP * 8], &offset, sizeof(uint32_t));
+        registerDataType[ESP] = Type::UInt32;
+    }    
 
     void VirtualMachine::LogMessage(const std::string& message)
     {
