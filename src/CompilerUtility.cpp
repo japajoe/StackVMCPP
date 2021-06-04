@@ -122,7 +122,7 @@ namespace StackVM
 
         for(size_t i = 0; i < lines.size(); i++)
         {
-            bool containsSpaceCharLiteral = false;
+            bool containsSpaceCharLiteral = false;   
 
             if(StringUtility::Contains(lines[i].text, "' '"))
             {
@@ -134,13 +134,13 @@ namespace StackVM
 
             if(containsSpaceCharLiteral)
             {
-                components.push_back("' '");
-                
+                components.push_back("' '");                
 
                 auto it = components.begin();
 
                 while(it != components.end()) 
-                {            
+                {          
+                    //remove empty strings  
                     if(it->size() == 0) 
                     {
                         it = components.erase(it);
@@ -228,8 +228,13 @@ namespace StackVM
                         }
                         else
                         {
-                            WriteError(lines[i].lineNumber, "Invalid value '" + components[3] + "'");
-                            return false;
+                            if(components[3].size() == 1)
+                            {
+                                tokens.push_back(Token(TokenType::CHARACTER_LITERAL, components[3], lines[i].lineNumber));
+                            }
+                            
+                            //WriteError(lines[i].lineNumber, "Invalid value '" + components[3] + "'");
+                            //return false;
                         }
                     }
                     else

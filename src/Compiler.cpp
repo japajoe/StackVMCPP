@@ -438,6 +438,7 @@ namespace StackVM
                                 case '\'':  character = '\''; break;
                                 case '"':  character = '"'; break;
                                 case '?':  character = '\?'; break;
+                                case '0':  character = '\0'; break;
                                 default:
                                 {
                                     WriteError(operandToken.lineNumber, "Unknown escape sequence '" + operandToken.text + "'");
