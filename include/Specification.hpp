@@ -40,7 +40,10 @@ namespace StackVM
         POPI64,
         POPU64,
         PRINT,
+        PRINTF,
         CMP,
+        CALL,
+        RET,
         JMP,
         JE,
         JNE,
@@ -55,18 +58,32 @@ namespace StackVM
         NUM_OPCODES
     };
 
+    // enum Type : uint8_t
+    // {
+    //     Int8 = 0,
+    //     Int16 = 1,
+    //     Int32 = 2,
+    //     Int64 = 3,
+    //     UInt8 = 4,
+    //     UInt16 = 5,
+    //     UInt32 = 6,
+    //     UInt64 = 7,
+    //     Double = 8,
+    //     Single = 9
+    // };
+
     enum Type : uint8_t
     {
-        Int8,
-        Int16,
-        Int32,
-        Int64,
-        UInt8,
-        UInt16,
-        UInt32,
-        UInt64,
-        Double,
-        Single
+        UInt8 = 0,
+        Int8 = 1,
+        UInt16 = 2,
+        Int16 = 3,
+        UInt32 = 4,
+        Int32 = 5,
+        UInt64 = 6,
+        Int64 = 7,
+        Single = 8,
+        Double = 9        
     };
 
     enum class OperandType : uint8_t
@@ -171,7 +188,10 @@ namespace StackVM
         "POPI64",
         "POPU64",
         "PRINT",
+        "PRINTF",
         "CMP",
+        "CALL",
+        "RET",
         "JMP",
         "JE",
         "JNE",

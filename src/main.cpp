@@ -14,6 +14,21 @@ void RunExampleProgram();
 
 int main()
 {
+    // auto startTime = high_resolution_clock::now();
+    
+    // for(int i = 0; i < 1000000; i++)
+    // {
+    //     std::cout << "Hello world! " << i << '\n';
+    // }
+    
+    // auto endTime = high_resolution_clock::now();
+
+    // auto ms_int = duration_cast<milliseconds>(endTime - startTime);
+    // int64_t elapsedTime = ms_int.count();
+
+    // std::cout << "Elapsed time " << elapsedTime << std::endl;
+
+
     CompileProgram();
     //RunExampleProgram();
     return 0;

@@ -3,14 +3,86 @@
 
 namespace StackVM
 {
+	//WARNING: This class contains generated code, so it's not recommend to casually start changing things
+	
     int MathOperation::zeroFlag = 0;
     int MathOperation::compareFlag = 0;
-    bool debugOperations = false;
+
+    CmpCallbackPtr MathOperation::cmpFunctions[][10] =
+    {
+        { CompareUInt8UInt8, CompareUInt8Int8, CompareUInt8UInt16, CompareUInt8Int16, CompareUInt8UInt32, CompareUInt8Int32, CompareUInt8UInt64, CompareUInt8Int64, CompareUInt8Single, CompareUInt8Double },
+        { CompareInt8UInt8, CompareInt8Int8, CompareInt8UInt16, CompareInt8Int16, CompareInt8UInt32, CompareInt8Int32, CompareInt8UInt64, CompareInt8Int64, CompareInt8Single, CompareInt8Double }, 
+        { CompareUInt16UInt8, CompareUInt16Int8, CompareUInt16UInt16, CompareUInt16Int16, CompareUInt16UInt32, CompareUInt16Int32, CompareUInt16UInt64, CompareUInt16Int64, CompareUInt16Single, CompareUInt16Double },
+        { CompareInt16UInt8, CompareInt16Int8, CompareInt16UInt16, CompareInt16Int16, CompareInt16UInt32, CompareInt16Int32, CompareInt16UInt64, CompareInt16Int64, CompareInt16Single, CompareInt16Double },
+        { CompareUInt32UInt8, CompareUInt32Int8, CompareUInt32UInt16, CompareUInt32Int16, CompareUInt32UInt32, CompareUInt32Int32, CompareUInt32UInt64, CompareUInt32Int64, CompareUInt32Single, CompareUInt32Double },
+        { CompareInt32UInt8, CompareInt32Int8, CompareInt32UInt16, CompareInt32Int16, CompareInt32UInt32, CompareInt32Int32, CompareInt32UInt64, CompareInt32Int64, CompareInt32Single, CompareInt32Double },
+        { CompareUInt64UInt8, CompareUInt64Int8, CompareUInt64UInt16, CompareUInt64Int16, CompareUInt64UInt32, CompareUInt64Int32, CompareUInt64UInt64, CompareUInt64Int64, CompareUInt64Single, CompareUInt64Double },
+        { CompareInt64UInt8, CompareInt64Int8, CompareInt64UInt16, CompareInt64Int16, CompareInt64UInt32, CompareInt64Int32, CompareInt64UInt64, CompareInt64Int64, CompareInt64Single, CompareInt64Double },
+        { CompareSingleUInt8, CompareSingleInt8, CompareSingleUInt16, CompareSingleInt16, CompareSingleUInt32, CompareSingleInt32, CompareSingleUInt64, CompareSingleInt64, CompareSingleSingle, CompareSingleDouble },
+        { CompareDoubleUInt8, CompareDoubleInt8, CompareDoubleUInt16, CompareDoubleInt16, CompareDoubleUInt32, CompareDoubleInt32, CompareDoubleUInt64, CompareDoubleInt64, CompareDoubleSingle, CompareDoubleDouble }
+    };
+
+    AddCallbackPtr MathOperation::addFunctions[][10] =
+    {
+        { AddUInt8UInt8, AddUInt8Int8, AddUInt8UInt16, AddUInt8Int16, AddUInt8UInt32, AddUInt8Int32, AddUInt8UInt64, AddUInt8Int64, AddUInt8Single, AddUInt8Double }, 
+        { AddInt8UInt8, AddInt8Int8, AddInt8UInt16, AddInt8Int16, AddInt8UInt32, AddInt8Int32, AddInt8UInt64, AddInt8Int64, AddInt8Single, AddInt8Double },
+        { AddUInt16UInt8, AddUInt16Int8, AddUInt16UInt16, AddUInt16Int16, AddUInt16UInt32, AddUInt16Int32, AddUInt16UInt64, AddUInt16Int64, AddUInt16Single, AddUInt16Double },
+        { AddInt16UInt8, AddInt16Int8, AddInt16UInt16, AddInt16Int16, AddInt16UInt32, AddInt16Int32, AddInt16UInt64, AddInt16Int64, AddInt16Single, AddInt16Double },
+        { AddUInt32UInt8, AddUInt32Int8, AddUInt32UInt16, AddUInt32Int16, AddUInt32UInt32, AddUInt32Int32, AddUInt32UInt64, AddUInt32Int64, AddUInt32Single, AddUInt32Double },
+        { AddInt32UInt8, AddInt32Int8, AddInt32UInt16, AddInt32Int16, AddInt32UInt32, AddInt32Int32, AddInt32UInt64, AddInt32Int64, AddInt32Single, AddInt32Double },
+        { AddUInt64UInt8, AddUInt64Int8, AddUInt64UInt16, AddUInt64Int16, AddUInt64UInt32, AddUInt64Int32, AddUInt64UInt64, AddUInt64Int64, AddUInt64Single, AddUInt64Double },
+        { AddInt64UInt8, AddInt64Int8, AddInt64UInt16, AddInt64Int16, AddInt64UInt32, AddInt64Int32, AddInt64UInt64, AddInt64Int64, AddInt64Single, AddInt64Double },
+        { AddSingleUInt8, AddSingleInt8, AddSingleUInt16, AddSingleInt16, AddSingleUInt32, AddSingleInt32, AddSingleUInt64, AddSingleInt64, AddSingleSingle, AddSingleDouble },
+        { AddDoubleUInt8, AddDoubleInt8, AddDoubleUInt16, AddDoubleInt16, AddDoubleUInt32, AddDoubleInt32, AddDoubleUInt64, AddDoubleInt64, AddDoubleSingle, AddDoubleDouble }
+    };
+
+    SubCallbackPtr MathOperation::subFunctions[][10] =
+    {
+        { SubtractUInt8UInt8, SubtractUInt8Int8, SubtractUInt8UInt16, SubtractUInt8Int16, SubtractUInt8UInt32, SubtractUInt8Int32, SubtractUInt8UInt64, SubtractUInt8Int64, SubtractUInt8Single, SubtractUInt8Double }, 
+        { SubtractInt8UInt8, SubtractInt8Int8, SubtractInt8UInt16, SubtractInt8Int16, SubtractInt8UInt32, SubtractInt8Int32, SubtractInt8UInt64, SubtractInt8Int64, SubtractInt8Single, SubtractInt8Double },
+        { SubtractUInt16UInt8, SubtractUInt16Int8, SubtractUInt16UInt16, SubtractUInt16Int16, SubtractUInt16UInt32, SubtractUInt16Int32, SubtractUInt16UInt64, SubtractUInt16Int64, SubtractUInt16Single, SubtractUInt16Double },
+        { SubtractInt16UInt8, SubtractInt16Int8, SubtractInt16UInt16, SubtractInt16Int16, SubtractInt16UInt32, SubtractInt16Int32, SubtractInt16UInt64, SubtractInt16Int64, SubtractInt16Single, SubtractInt16Double },
+        { SubtractUInt32UInt8, SubtractUInt32Int8, SubtractUInt32UInt16, SubtractUInt32Int16, SubtractUInt32UInt32, SubtractUInt32Int32, SubtractUInt32UInt64, SubtractUInt32Int64, SubtractUInt32Single, SubtractUInt32Double },
+        { SubtractInt32UInt8, SubtractInt32Int8, SubtractInt32UInt16, SubtractInt32Int16, SubtractInt32UInt32, SubtractInt32Int32, SubtractInt32UInt64, SubtractInt32Int64, SubtractInt32Single, SubtractInt32Double },
+        { SubtractUInt64UInt8, SubtractUInt64Int8, SubtractUInt64UInt16, SubtractUInt64Int16, SubtractUInt64UInt32, SubtractUInt64Int32, SubtractUInt64UInt64, SubtractUInt64Int64, SubtractUInt64Single, SubtractUInt64Double },
+        { SubtractInt64UInt8, SubtractInt64Int8, SubtractInt64UInt16, SubtractInt64Int16, SubtractInt64UInt32, SubtractInt64Int32, SubtractInt64UInt64, SubtractInt64Int64, SubtractInt64Single, SubtractInt64Double },
+        { SubtractSingleUInt8, SubtractSingleInt8, SubtractSingleUInt16, SubtractSingleInt16, SubtractSingleUInt32, SubtractSingleInt32, SubtractSingleUInt64, SubtractSingleInt64, SubtractSingleSingle, SubtractSingleDouble },
+        { SubtractDoubleUInt8, SubtractDoubleInt8, SubtractDoubleUInt16, SubtractDoubleInt16, SubtractDoubleUInt32, SubtractDoubleInt32, SubtractDoubleUInt64, SubtractDoubleInt64, SubtractDoubleSingle, SubtractDoubleDouble }
+    };
+
+    MulCallbackPtr MathOperation::mulFunctions[][10] =
+    {
+        { MultiplyUInt8UInt8, MultiplyUInt8Int8, MultiplyUInt8UInt16, MultiplyUInt8Int16, MultiplyUInt8UInt32, MultiplyUInt8Int32, MultiplyUInt8UInt64, MultiplyUInt8Int64, MultiplyUInt8Single, MultiplyUInt8Double }, 
+        { MultiplyInt8UInt8, MultiplyInt8Int8, MultiplyInt8UInt16, MultiplyInt8Int16, MultiplyInt8UInt32, MultiplyInt8Int32, MultiplyInt8UInt64, MultiplyInt8Int64, MultiplyInt8Single, MultiplyInt8Double },
+        { MultiplyUInt16UInt8, MultiplyUInt16Int8, MultiplyUInt16UInt16, MultiplyUInt16Int16, MultiplyUInt16UInt32, MultiplyUInt16Int32, MultiplyUInt16UInt64, MultiplyUInt16Int64, MultiplyUInt16Single, MultiplyUInt16Double },
+        { MultiplyInt16UInt8, MultiplyInt16Int8, MultiplyInt16UInt16, MultiplyInt16Int16, MultiplyInt16UInt32, MultiplyInt16Int32, MultiplyInt16UInt64, MultiplyInt16Int64, MultiplyInt16Single, MultiplyInt16Double },
+        { MultiplyUInt32UInt8, MultiplyUInt32Int8, MultiplyUInt32UInt16, MultiplyUInt32Int16, MultiplyUInt32UInt32, MultiplyUInt32Int32, MultiplyUInt32UInt64, MultiplyUInt32Int64, MultiplyUInt32Single, MultiplyUInt32Double },
+        { MultiplyInt32UInt8, MultiplyInt32Int8, MultiplyInt32UInt16, MultiplyInt32Int16, MultiplyInt32UInt32, MultiplyInt32Int32, MultiplyInt32UInt64, MultiplyInt32Int64, MultiplyInt32Single, MultiplyInt32Double },
+        { MultiplyUInt64UInt8, MultiplyUInt64Int8, MultiplyUInt64UInt16, MultiplyUInt64Int16, MultiplyUInt64UInt32, MultiplyUInt64Int32, MultiplyUInt64UInt64, MultiplyUInt64Int64, MultiplyUInt64Single, MultiplyUInt64Double },
+        { MultiplyInt64UInt8, MultiplyInt64Int8, MultiplyInt64UInt16, MultiplyInt64Int16, MultiplyInt64UInt32, MultiplyInt64Int32, MultiplyInt64UInt64, MultiplyInt64Int64, MultiplyInt64Single, MultiplyInt64Double },
+        { MultiplySingleUInt8, MultiplySingleInt8, MultiplySingleUInt16, MultiplySingleInt16, MultiplySingleUInt32, MultiplySingleInt32, MultiplySingleUInt64, MultiplySingleInt64, MultiplySingleSingle, MultiplySingleDouble },
+        { MultiplyDoubleUInt8, MultiplyDoubleInt8, MultiplyDoubleUInt16, MultiplyDoubleInt16, MultiplyDoubleUInt32, MultiplyDoubleInt32, MultiplyDoubleUInt64, MultiplyDoubleInt64, MultiplyDoubleSingle, MultiplyDoubleDouble }
+    };
+
+    DivCallbackPtr MathOperation::divFunctions[][10] =
+    {
+        { DivideUInt8UInt8, DivideUInt8Int8, DivideUInt8UInt16, DivideUInt8Int16, DivideUInt8UInt32, DivideUInt8Int32, DivideUInt8UInt64, DivideUInt8Int64, DivideUInt8Single, DivideUInt8Double }, 
+        { DivideInt8UInt8, DivideInt8Int8, DivideInt8UInt16, DivideInt8Int16, DivideInt8UInt32, DivideInt8Int32, DivideInt8UInt64, DivideInt8Int64, DivideInt8Single, DivideInt8Double },
+        { DivideUInt16UInt8, DivideUInt16Int8, DivideUInt16UInt16, DivideUInt16Int16, DivideUInt16UInt32, DivideUInt16Int32, DivideUInt16UInt64, DivideUInt16Int64, DivideUInt16Single, DivideUInt16Double },
+        { DivideInt16UInt8, DivideInt16Int8, DivideInt16UInt16, DivideInt16Int16, DivideInt16UInt32, DivideInt16Int32, DivideInt16UInt64, DivideInt16Int64, DivideInt16Single, DivideInt16Double },
+        { DivideUInt32UInt8, DivideUInt32Int8, DivideUInt32UInt16, DivideUInt32Int16, DivideUInt32UInt32, DivideUInt32Int32, DivideUInt32UInt64, DivideUInt32Int64, DivideUInt32Single, DivideUInt32Double },
+        { DivideInt32UInt8, DivideInt32Int8, DivideInt32UInt16, DivideInt32Int16, DivideInt32UInt32, DivideInt32Int32, DivideInt32UInt64, DivideInt32Int64, DivideInt32Single, DivideInt32Double },
+        { DivideUInt64UInt8, DivideUInt64Int8, DivideUInt64UInt16, DivideUInt64Int16, DivideUInt64UInt32, DivideUInt64Int32, DivideUInt64UInt64, DivideUInt64Int64, DivideUInt64Single, DivideUInt64Double },
+        { DivideInt64UInt8, DivideInt64Int8, DivideInt64UInt16, DivideInt64Int16, DivideInt64UInt32, DivideInt64Int32, DivideInt64UInt64, DivideInt64Int64, DivideInt64Single, DivideInt64Double },
+        { DivideSingleUInt8, DivideSingleInt8, DivideSingleUInt16, DivideSingleInt16, DivideSingleUInt32, DivideSingleInt32, DivideSingleUInt64, DivideSingleInt64, DivideSingleSingle, DivideSingleDouble },
+        { DivideDoubleUInt8, DivideDoubleInt8, DivideDoubleUInt16, DivideDoubleInt16, DivideDoubleUInt32, DivideDoubleInt32, DivideDoubleUInt64, DivideDoubleInt64, DivideDoubleSingle, DivideDoubleDouble }
+    };
 
     int MathOperation::GetZeroFlag()
     {
         return zeroFlag;
     }
+	
     int MathOperation::GetCompareFlag()
     {
         return compareFlag;
@@ -28,1906 +100,9 @@ namespace StackVM
         zeroFlag = flagZero;
     }
 
-    void MathOperation::Add(Instruction* instruction, byte* lhs, byte* rhs, Type lhsDataType, Type rhsDataType, byte* registers, byte* assemblyData)
+    void MathOperation::Compare(byte* lhs, byte* rhs, Type lhsDataType, Type rhsDataType)
     {
-        if(debugOperations)
-            std::cout << "ADD: LHS type " << (int)lhsDataType << " RHS type " << (int)rhsDataType << std::endl;
-
-        switch(lhsDataType)
-        {
-            case Type::Double:
-            {
-                switch(rhsDataType)
-                {
-                    case Type::Double:
-                        MathOperation::Add(reinterpret_cast<double*>(lhs), reinterpret_cast<double*>(rhs));
-                        break;
-                    case Type::Int16:
-                        MathOperation::Add(reinterpret_cast<double*>(lhs), reinterpret_cast<int16_t*>(rhs));
-                        break;
-                    case Type::Int32:
-                        MathOperation::Add(reinterpret_cast<double*>(lhs), reinterpret_cast<int32_t*>(rhs));
-                        break;
-                    case Type::Int64:
-                        MathOperation::Add(reinterpret_cast<double*>(lhs), reinterpret_cast<int64_t*>(rhs));
-                        break;       
-                    case Type::Int8:
-                        MathOperation::Add(reinterpret_cast<double*>(lhs), reinterpret_cast<char*>(rhs));
-                        break;
-                    case Type::Single:
-                        MathOperation::Add(reinterpret_cast<double*>(lhs), reinterpret_cast<float*>(rhs));
-                        break;        
-                    case Type::UInt16:
-                        MathOperation::Add(reinterpret_cast<double*>(lhs), reinterpret_cast<uint16_t*>(rhs));
-                        break;       
-                    case Type::UInt32:
-                        MathOperation::Add(reinterpret_cast<double*>(lhs), reinterpret_cast<uint32_t*>(rhs));
-                        break;        
-                    case Type::UInt64:
-                        MathOperation::Add(reinterpret_cast<double*>(lhs), reinterpret_cast<uint64_t*>(rhs));
-                        break;                            
-                    case Type::UInt8:
-                        MathOperation::Add(reinterpret_cast<double*>(lhs), reinterpret_cast<unsigned char*>(rhs));
-                        break;                                                                                                                                                                                                                                                                                                                                                         
-                }
-                break;
-            }
-            case Type::Int16:
-            {
-                switch(rhsDataType)
-                {
-                    case Type::Double:
-                        MathOperation::Add(reinterpret_cast<int16_t*>(lhs), reinterpret_cast<double*>(rhs));
-                        break;
-                    case Type::Int16:
-                        MathOperation::Add(reinterpret_cast<int16_t*>(lhs), reinterpret_cast<int16_t*>(rhs));
-                        break;
-                    case Type::Int32:
-                        MathOperation::Add(reinterpret_cast<int16_t*>(lhs), reinterpret_cast<int32_t*>(rhs));
-                        break;
-                    case Type::Int64:
-                        MathOperation::Add(reinterpret_cast<int16_t*>(lhs), reinterpret_cast<int64_t*>(rhs));
-                        break;       
-                    case Type::Int8:
-                        MathOperation::Add(reinterpret_cast<int16_t*>(lhs), reinterpret_cast<char*>(rhs));
-                        break;      
-                    case Type::Single:
-                        MathOperation::Add(reinterpret_cast<int16_t*>(lhs), reinterpret_cast<float*>(rhs));
-                        break;        
-                    case Type::UInt16:
-                        MathOperation::Add(reinterpret_cast<int16_t*>(lhs), reinterpret_cast<uint16_t*>(rhs));
-                        break;       
-                    case Type::UInt32:
-                        MathOperation::Add(reinterpret_cast<int16_t*>(lhs), reinterpret_cast<uint32_t*>(rhs));
-                        break;        
-                    case Type::UInt64:
-                        MathOperation::Add(reinterpret_cast<int16_t*>(lhs), reinterpret_cast<uint64_t*>(rhs));
-                        break;                            
-                    case Type::UInt8:
-                        MathOperation::Add(reinterpret_cast<int16_t*>(lhs), reinterpret_cast<unsigned char*>(rhs));
-                        break;                                                                                                                                                                                                                                                                                                                                                         
-                }
-                break;
-            }
-            case Type::Int32:
-            {
-                switch(rhsDataType)
-                {
-                    case Type::Double:
-                        MathOperation::Add(reinterpret_cast<int32_t*>(lhs), reinterpret_cast<double*>(rhs));
-                        break;
-                    case Type::Int16:
-                        MathOperation::Add(reinterpret_cast<int32_t*>(lhs), reinterpret_cast<int16_t*>(rhs));
-                        break;
-                    case Type::Int32:
-                        MathOperation::Add(reinterpret_cast<int32_t*>(lhs), reinterpret_cast<int32_t*>(rhs));
-                        break;
-                    case Type::Int64:
-                        MathOperation::Add(reinterpret_cast<int32_t*>(lhs), reinterpret_cast<int64_t*>(rhs));
-                        break;       
-                    case Type::Int8:
-                        MathOperation::Add(reinterpret_cast<int32_t*>(lhs), reinterpret_cast<char*>(rhs));
-                        break;
-                    case Type::Single:
-                        MathOperation::Add(reinterpret_cast<int32_t*>(lhs), reinterpret_cast<float*>(rhs));
-                        break;        
-                    case Type::UInt16:
-                        MathOperation::Add(reinterpret_cast<int32_t*>(lhs), reinterpret_cast<uint16_t*>(rhs));
-                        break;       
-                    case Type::UInt32:
-                        MathOperation::Add(reinterpret_cast<int32_t*>(lhs), reinterpret_cast<uint32_t*>(rhs));
-                        break;        
-                    case Type::UInt64:
-                        MathOperation::Add(reinterpret_cast<int32_t*>(lhs), reinterpret_cast<uint64_t*>(rhs));
-                        break;                            
-                    case Type::UInt8:
-                        MathOperation::Add(reinterpret_cast<int32_t*>(lhs), reinterpret_cast<unsigned char*>(rhs));
-                        break;                                                                                                                                                                                                                                                                                                                                                         
-                }
-                break;
-            }                                                                           
-            case Type::Int64:
-            {
-                switch(rhsDataType)
-                {
-                    case Type::Double:
-                        MathOperation::Add(reinterpret_cast<int64_t*>(lhs), reinterpret_cast<double*>(rhs));
-                        break;
-                    case Type::Int16:
-                        MathOperation::Add(reinterpret_cast<int64_t*>(lhs), reinterpret_cast<int16_t*>(rhs));
-                        break;
-                    case Type::Int32:
-                        MathOperation::Add(reinterpret_cast<int64_t*>(lhs), reinterpret_cast<int32_t*>(rhs));
-                        break;
-                    case Type::Int64:
-                        MathOperation::Add(reinterpret_cast<int64_t*>(lhs), reinterpret_cast<int64_t*>(rhs));
-                        break;       
-                    case Type::Int8:
-                        MathOperation::Add(reinterpret_cast<int64_t*>(lhs), reinterpret_cast<char*>(rhs));
-                        break;
-                    case Type::Single:
-                        MathOperation::Add(reinterpret_cast<int64_t*>(lhs), reinterpret_cast<float*>(rhs));
-                        break;        
-                    case Type::UInt16:
-                        MathOperation::Add(reinterpret_cast<int64_t*>(lhs), reinterpret_cast<uint16_t*>(rhs));
-                        break;       
-                    case Type::UInt32:
-                        MathOperation::Add(reinterpret_cast<int64_t*>(lhs), reinterpret_cast<uint32_t*>(rhs));
-                        break;        
-                    case Type::UInt64:
-                        MathOperation::Add(reinterpret_cast<int64_t*>(lhs), reinterpret_cast<uint64_t*>(rhs));
-                        break;                            
-                    case Type::UInt8:
-                        MathOperation::Add(reinterpret_cast<int64_t*>(lhs), reinterpret_cast<unsigned char*>(rhs));
-                        break;                                                                                                                                                                                                                                                                                                                                                         
-                }
-                break;
-            }
-            case Type::Int8:
-            {
-                switch(rhsDataType)
-                {
-                    case Type::Double:
-                        MathOperation::Add(reinterpret_cast<char*>(lhs), reinterpret_cast<double*>(rhs));
-                        break;
-                    case Type::Int16:
-                        MathOperation::Add(reinterpret_cast<char*>(lhs), reinterpret_cast<int16_t*>(rhs));
-                        break;
-                    case Type::Int32:
-                        MathOperation::Add(reinterpret_cast<char*>(lhs), reinterpret_cast<int32_t*>(rhs));
-                        break;
-                    case Type::Int64:
-                        MathOperation::Add(reinterpret_cast<char*>(lhs), reinterpret_cast<int64_t*>(rhs));
-                        break;       
-                    case Type::Int8:
-                        MathOperation::Add(reinterpret_cast<char*>(lhs), reinterpret_cast<char*>(rhs));
-                        break;      
-                    case Type::Single:
-                        MathOperation::Add(reinterpret_cast<char*>(lhs), reinterpret_cast<float*>(rhs));
-                        break;        
-                    case Type::UInt16:
-                        MathOperation::Add(reinterpret_cast<char*>(lhs), reinterpret_cast<uint16_t*>(rhs));
-                        break;       
-                    case Type::UInt32:
-                        MathOperation::Add(reinterpret_cast<char*>(lhs), reinterpret_cast<uint32_t*>(rhs));
-                        break;        
-                    case Type::UInt64:
-                        MathOperation::Add(reinterpret_cast<char*>(lhs), reinterpret_cast<uint64_t*>(rhs));
-                        break;                            
-                    case Type::UInt8:
-                        MathOperation::Add(reinterpret_cast<char*>(lhs), reinterpret_cast<unsigned char*>(rhs));
-                        break;                                                                                                                                                                                                                                                                                                                                                         
-                }
-                break;
-            }
-            case Type::Single:
-            {
-                switch(rhsDataType)
-                {
-                    case Type::Double:
-                        MathOperation::Add(reinterpret_cast<float*>(lhs), reinterpret_cast<double*>(rhs));
-                        break;
-                    case Type::Int16:
-                        MathOperation::Add(reinterpret_cast<float*>(lhs), reinterpret_cast<int16_t*>(rhs));
-                        break;
-                    case Type::Int32:
-                        MathOperation::Add(reinterpret_cast<float*>(lhs), reinterpret_cast<int32_t*>(rhs));
-                        break;
-                    case Type::Int64:
-                        MathOperation::Add(reinterpret_cast<float*>(lhs), reinterpret_cast<int64_t*>(rhs));
-                        break;       
-                    case Type::Int8:
-                        MathOperation::Add(reinterpret_cast<float*>(lhs), reinterpret_cast<char*>(rhs));
-                        break;      
-                    case Type::Single:
-                        MathOperation::Add(reinterpret_cast<float*>(lhs), reinterpret_cast<float*>(rhs));
-                        break;        
-                    case Type::UInt16:
-                        MathOperation::Add(reinterpret_cast<float*>(lhs), reinterpret_cast<uint16_t*>(rhs));
-                        break;       
-                    case Type::UInt32:
-                        MathOperation::Add(reinterpret_cast<float*>(lhs), reinterpret_cast<uint32_t*>(rhs));
-                        break;        
-                    case Type::UInt64:
-                        MathOperation::Add(reinterpret_cast<float*>(lhs), reinterpret_cast<uint64_t*>(rhs));
-                        break;                            
-                    case Type::UInt8:
-                        MathOperation::Add(reinterpret_cast<float*>(lhs), reinterpret_cast<unsigned char*>(rhs));
-                        break;                                                                                                                                                                                                                                                                                                                                                         
-                }
-                break;
-            }               
-            case Type::UInt16:
-            {
-                switch(rhsDataType)
-                {
-                    case Type::Double:
-                        MathOperation::Add(reinterpret_cast<uint16_t*>(lhs), reinterpret_cast<double*>(rhs));
-                        break;
-                    case Type::Int16:
-                        MathOperation::Add(reinterpret_cast<uint16_t*>(lhs), reinterpret_cast<int16_t*>(rhs));
-                        break;
-                    case Type::Int32:
-                        MathOperation::Add(reinterpret_cast<uint16_t*>(lhs), reinterpret_cast<int32_t*>(rhs));
-                        break;
-                    case Type::Int64:
-                        MathOperation::Add(reinterpret_cast<uint16_t*>(lhs), reinterpret_cast<int64_t*>(rhs));
-                        break;       
-                    case Type::Int8:
-                        MathOperation::Add(reinterpret_cast<uint16_t*>(lhs), reinterpret_cast<char*>(rhs));
-                        break;      
-                    case Type::Single:
-                        MathOperation::Add(reinterpret_cast<uint16_t*>(lhs), reinterpret_cast<float*>(rhs));
-                        break;        
-                    case Type::UInt16:
-                        MathOperation::Add(reinterpret_cast<uint16_t*>(lhs), reinterpret_cast<uint16_t*>(rhs));
-                        break;       
-                    case Type::UInt32:
-                        MathOperation::Add(reinterpret_cast<uint16_t*>(lhs), reinterpret_cast<uint32_t*>(rhs));
-                        break;        
-                    case Type::UInt64:
-                        MathOperation::Add(reinterpret_cast<uint16_t*>(lhs), reinterpret_cast<uint64_t*>(rhs));
-                        break;                            
-                    case Type::UInt8:
-                        MathOperation::Add(reinterpret_cast<uint16_t*>(lhs), reinterpret_cast<unsigned char*>(rhs));
-                        break;                                                                                                                                                                                                                                                                                                                                                         
-                }
-                break;
-            }               
-            case Type::UInt32:
-            {
-                switch(rhsDataType)
-                {
-                    case Type::Double:
-                        MathOperation::Add(reinterpret_cast<uint32_t*>(lhs), reinterpret_cast<double*>(rhs));
-                        break;
-                    case Type::Int16:
-                        MathOperation::Add(reinterpret_cast<uint32_t*>(lhs), reinterpret_cast<int16_t*>(rhs));
-                        break;
-                    case Type::Int32:
-                        MathOperation::Add(reinterpret_cast<uint32_t*>(lhs), reinterpret_cast<int32_t*>(rhs));
-                        break;
-                    case Type::Int64:
-                        MathOperation::Add(reinterpret_cast<uint32_t*>(lhs), reinterpret_cast<int64_t*>(rhs));
-                        break;       
-                    case Type::Int8:
-                        MathOperation::Add(reinterpret_cast<uint32_t*>(lhs), reinterpret_cast<char*>(rhs));
-                        break;      
-                    case Type::Single:
-                        MathOperation::Add(reinterpret_cast<uint32_t*>(lhs), reinterpret_cast<float*>(rhs));
-                        break;        
-                    case Type::UInt16:
-                        MathOperation::Add(reinterpret_cast<uint32_t*>(lhs), reinterpret_cast<uint16_t*>(rhs));
-                        break;       
-                    case Type::UInt32:
-                        MathOperation::Add(reinterpret_cast<uint32_t*>(lhs), reinterpret_cast<uint32_t*>(rhs));
-                        break;        
-                    case Type::UInt64:
-                        MathOperation::Add(reinterpret_cast<uint32_t*>(lhs), reinterpret_cast<uint64_t*>(rhs));
-                        break;                            
-                    case Type::UInt8:
-                        MathOperation::Add(reinterpret_cast<uint32_t*>(lhs), reinterpret_cast<unsigned char*>(rhs));
-                        break;                                                                                                                                                                                                                                                                                                                                                         
-                }
-                break;
-            }               
-            case Type::UInt64:
-            {
-                switch(rhsDataType)
-                {
-                    case Type::Double:
-                        MathOperation::Add(reinterpret_cast<uint64_t*>(lhs), reinterpret_cast<double*>(rhs));
-                        break;
-                    case Type::Int16:
-                        MathOperation::Add(reinterpret_cast<uint64_t*>(lhs), reinterpret_cast<int16_t*>(rhs));
-                        break;
-                    case Type::Int32:
-                        MathOperation::Add(reinterpret_cast<uint64_t*>(lhs), reinterpret_cast<int32_t*>(rhs));
-                        break;
-                    case Type::Int64:
-                        MathOperation::Add(reinterpret_cast<uint64_t*>(lhs), reinterpret_cast<int64_t*>(rhs));
-                        break;       
-                    case Type::Int8:
-                        MathOperation::Add(reinterpret_cast<uint64_t*>(lhs), reinterpret_cast<char*>(rhs));
-                        break;      
-                    case Type::Single:
-                        MathOperation::Add(reinterpret_cast<uint64_t*>(lhs), reinterpret_cast<float*>(rhs));
-                        break;        
-                    case Type::UInt16:
-                        MathOperation::Add(reinterpret_cast<uint64_t*>(lhs), reinterpret_cast<uint16_t*>(rhs));
-                        break;       
-                    case Type::UInt32:
-                        MathOperation::Add(reinterpret_cast<uint64_t*>(lhs), reinterpret_cast<uint32_t*>(rhs));
-                        break;        
-                    case Type::UInt64:
-                        MathOperation::Add(reinterpret_cast<uint64_t*>(lhs), reinterpret_cast<uint64_t*>(rhs));
-                        break;                            
-                    case Type::UInt8:
-                        MathOperation::Add(reinterpret_cast<uint64_t*>(lhs), reinterpret_cast<unsigned char*>(rhs));
-                        break;                                                                                                                                                                                                                                                                                                                                                         
-                }
-                break;
-            }               
-            case Type::UInt8:
-            {
-                switch(rhsDataType)
-                {
-                    case Type::Double:
-                        MathOperation::Add(reinterpret_cast<unsigned char*>(lhs), reinterpret_cast<double*>(rhs));
-                        break;
-                    case Type::Int16:
-                        MathOperation::Add(reinterpret_cast<unsigned char*>(lhs), reinterpret_cast<int16_t*>(rhs));
-                        break;
-                    case Type::Int32:
-                        MathOperation::Add(reinterpret_cast<unsigned char*>(lhs), reinterpret_cast<int32_t*>(rhs));
-                        break;
-                    case Type::Int64:
-                        MathOperation::Add(reinterpret_cast<unsigned char*>(lhs), reinterpret_cast<int64_t*>(rhs));
-                        break;       
-                    case Type::Int8:
-                        MathOperation::Add(reinterpret_cast<unsigned char*>(lhs), reinterpret_cast<char*>(rhs));
-                        break;      
-                    case Type::Single:
-                        MathOperation::Add(reinterpret_cast<unsigned char*>(lhs), reinterpret_cast<float*>(rhs));
-                        break;        
-                    case Type::UInt16:
-                        MathOperation::Add(reinterpret_cast<unsigned char*>(lhs), reinterpret_cast<uint16_t*>(rhs));
-                        break;       
-                    case Type::UInt32:
-                        MathOperation::Add(reinterpret_cast<unsigned char*>(lhs), reinterpret_cast<uint32_t*>(rhs));
-                        break;        
-                    case Type::UInt64:
-                        MathOperation::Add(reinterpret_cast<unsigned char*>(lhs), reinterpret_cast<uint64_t*>(rhs));
-                        break;                            
-                    case Type::UInt8:
-                        MathOperation::Add(reinterpret_cast<unsigned char*>(lhs), reinterpret_cast<unsigned char*>(rhs));
-                        break;                                                                                                                                                                                                                                                                                                                                                         
-                }
-                break;
-            }
-        }            
-    }
-
-    void MathOperation::Subtract(Instruction* instruction, byte* lhs, byte* rhs, Type lhsDataType, Type rhsDataType, byte* registers, byte* assemblyData)
-    {
-        if(debugOperations)
-            std::cout << "SUB: LHS type " << (int)lhsDataType << " RHS type " << (int)rhsDataType << std::endl;
-
-        switch(lhsDataType)
-        {
-            case Type::Double:
-            {
-                switch(rhsDataType)
-                {
-                    case Type::Double:
-                        MathOperation::Subtract(reinterpret_cast<double*>(lhs), reinterpret_cast<double*>(rhs));
-                        break;
-                    case Type::Int16:
-                        MathOperation::Subtract(reinterpret_cast<double*>(lhs), reinterpret_cast<int16_t*>(rhs));
-                        break;
-                    case Type::Int32:
-                        MathOperation::Subtract(reinterpret_cast<double*>(lhs), reinterpret_cast<int32_t*>(rhs));
-                        break;
-                    case Type::Int64:
-                        MathOperation::Subtract(reinterpret_cast<double*>(lhs), reinterpret_cast<int64_t*>(rhs));
-                        break;       
-                    case Type::Int8:
-                        MathOperation::Subtract(reinterpret_cast<double*>(lhs), reinterpret_cast<char*>(rhs));
-                        break;      
-                    case Type::Single:
-                        MathOperation::Subtract(reinterpret_cast<double*>(lhs), reinterpret_cast<float*>(rhs));
-                        break;        
-                    case Type::UInt16:
-                        MathOperation::Subtract(reinterpret_cast<double*>(lhs), reinterpret_cast<uint16_t*>(rhs));
-                        break;       
-                    case Type::UInt32:
-                        MathOperation::Subtract(reinterpret_cast<double*>(lhs), reinterpret_cast<uint32_t*>(rhs));
-                        break;        
-                    case Type::UInt64:
-                        MathOperation::Subtract(reinterpret_cast<double*>(lhs), reinterpret_cast<uint64_t*>(rhs));
-                        break;                            
-                    case Type::UInt8:
-                        MathOperation::Subtract(reinterpret_cast<double*>(lhs), reinterpret_cast<unsigned char*>(rhs));
-                        break;                                                                                                                                                                                                                                                                                                                                                         
-                }
-                break;
-            }
-            case Type::Int16:
-            {
-                switch(rhsDataType)
-                {
-                    case Type::Double:
-                        MathOperation::Subtract(reinterpret_cast<int16_t*>(lhs), reinterpret_cast<double*>(rhs));
-                        break;
-                    case Type::Int16:
-                        MathOperation::Subtract(reinterpret_cast<int16_t*>(lhs), reinterpret_cast<int16_t*>(rhs));
-                        break;
-                    case Type::Int32:
-                        MathOperation::Subtract(reinterpret_cast<int16_t*>(lhs), reinterpret_cast<int32_t*>(rhs));
-                        break;
-                    case Type::Int64:
-                        MathOperation::Subtract(reinterpret_cast<int16_t*>(lhs), reinterpret_cast<int64_t*>(rhs));
-                        break;       
-                    case Type::Int8:
-                        MathOperation::Subtract(reinterpret_cast<int16_t*>(lhs), reinterpret_cast<char*>(rhs));
-                        break;      
-                    case Type::Single:
-                        MathOperation::Subtract(reinterpret_cast<int16_t*>(lhs), reinterpret_cast<float*>(rhs));
-                        break;        
-                    case Type::UInt16:
-                        MathOperation::Subtract(reinterpret_cast<int16_t*>(lhs), reinterpret_cast<uint16_t*>(rhs));
-                        break;       
-                    case Type::UInt32:
-                        MathOperation::Subtract(reinterpret_cast<int16_t*>(lhs), reinterpret_cast<uint32_t*>(rhs));
-                        break;        
-                    case Type::UInt64:
-                        MathOperation::Subtract(reinterpret_cast<int16_t*>(lhs), reinterpret_cast<uint64_t*>(rhs));
-                        break;                            
-                    case Type::UInt8:
-                        MathOperation::Subtract(reinterpret_cast<int16_t*>(lhs), reinterpret_cast<unsigned char*>(rhs));
-                        break;                                                                                                                                                                                                                                                                                                                                                         
-                }
-                break;
-            }
-            case Type::Int32:
-            {
-                switch(rhsDataType)
-                {
-                    case Type::Double:
-                        MathOperation::Subtract(reinterpret_cast<int32_t*>(lhs), reinterpret_cast<double*>(rhs));
-                        break;
-                    case Type::Int16:
-                        MathOperation::Subtract(reinterpret_cast<int32_t*>(lhs), reinterpret_cast<int16_t*>(rhs));
-                        break;
-                    case Type::Int32:
-                        MathOperation::Subtract(reinterpret_cast<int32_t*>(lhs), reinterpret_cast<int32_t*>(rhs));
-                        break;
-                    case Type::Int64:
-                        MathOperation::Subtract(reinterpret_cast<int32_t*>(lhs), reinterpret_cast<int64_t*>(rhs));
-                        break;       
-                    case Type::Int8:
-                        MathOperation::Subtract(reinterpret_cast<int32_t*>(lhs), reinterpret_cast<char*>(rhs));
-                        break;      
-                    case Type::Single:
-                        MathOperation::Subtract(reinterpret_cast<int32_t*>(lhs), reinterpret_cast<float*>(rhs));
-                        break;        
-                    case Type::UInt16:
-                        MathOperation::Subtract(reinterpret_cast<int32_t*>(lhs), reinterpret_cast<uint16_t*>(rhs));
-                        break;       
-                    case Type::UInt32:
-                        MathOperation::Subtract(reinterpret_cast<int32_t*>(lhs), reinterpret_cast<uint32_t*>(rhs));
-                        break;        
-                    case Type::UInt64:
-                        MathOperation::Subtract(reinterpret_cast<int32_t*>(lhs), reinterpret_cast<uint64_t*>(rhs));
-                        break;                            
-                    case Type::UInt8:
-                        MathOperation::Subtract(reinterpret_cast<int32_t*>(lhs), reinterpret_cast<unsigned char*>(rhs));
-                        break;                                                                                                                                                                                                                                                                                                                                                         
-                }
-                break;
-            }                                                                           
-            case Type::Int64:
-            {
-                switch(rhsDataType)
-                {
-                    case Type::Double:
-                        MathOperation::Subtract(reinterpret_cast<int64_t*>(lhs), reinterpret_cast<double*>(rhs));
-                        break;
-                    case Type::Int16:
-                        MathOperation::Subtract(reinterpret_cast<int64_t*>(lhs), reinterpret_cast<int16_t*>(rhs));
-                        break;
-                    case Type::Int32:
-                        MathOperation::Subtract(reinterpret_cast<int64_t*>(lhs), reinterpret_cast<int32_t*>(rhs));
-                        break;
-                    case Type::Int64:
-                        MathOperation::Subtract(reinterpret_cast<int64_t*>(lhs), reinterpret_cast<int64_t*>(rhs));
-                        break;       
-                    case Type::Int8:
-                        MathOperation::Subtract(reinterpret_cast<int64_t*>(lhs), reinterpret_cast<char*>(rhs));
-                        break;      
-                    case Type::Single:
-                        MathOperation::Subtract(reinterpret_cast<int64_t*>(lhs), reinterpret_cast<float*>(rhs));
-                        break;        
-                    case Type::UInt16:
-                        MathOperation::Subtract(reinterpret_cast<int64_t*>(lhs), reinterpret_cast<uint16_t*>(rhs));
-                        break;       
-                    case Type::UInt32:
-                        MathOperation::Subtract(reinterpret_cast<int64_t*>(lhs), reinterpret_cast<uint32_t*>(rhs));
-                        break;        
-                    case Type::UInt64:
-                        MathOperation::Subtract(reinterpret_cast<int64_t*>(lhs), reinterpret_cast<uint64_t*>(rhs));
-                        break;                            
-                    case Type::UInt8:
-                        MathOperation::Subtract(reinterpret_cast<int64_t*>(lhs), reinterpret_cast<unsigned char*>(rhs));
-                        break;                                                                                                                                                                                                                                                                                                                                                         
-                }
-                break;
-            }
-            case Type::Int8:
-            {
-                switch(rhsDataType)
-                {
-                    case Type::Double:
-                        MathOperation::Subtract(reinterpret_cast<char*>(lhs), reinterpret_cast<double*>(rhs));
-                        break;
-                    case Type::Int16:
-                        MathOperation::Subtract(reinterpret_cast<char*>(lhs), reinterpret_cast<int16_t*>(rhs));
-                        break;
-                    case Type::Int32:
-                        MathOperation::Subtract(reinterpret_cast<char*>(lhs), reinterpret_cast<int32_t*>(rhs));
-                        break;
-                    case Type::Int64:
-                        MathOperation::Subtract(reinterpret_cast<char*>(lhs), reinterpret_cast<int64_t*>(rhs));
-                        break;       
-                    case Type::Int8:
-                        MathOperation::Subtract(reinterpret_cast<char*>(lhs), reinterpret_cast<char*>(rhs));
-                        break;      
-                    case Type::Single:
-                        MathOperation::Subtract(reinterpret_cast<char*>(lhs), reinterpret_cast<float*>(rhs));
-                        break;        
-                    case Type::UInt16:
-                        MathOperation::Subtract(reinterpret_cast<char*>(lhs), reinterpret_cast<uint16_t*>(rhs));
-                        break;       
-                    case Type::UInt32:
-                        MathOperation::Subtract(reinterpret_cast<char*>(lhs), reinterpret_cast<uint32_t*>(rhs));
-                        break;        
-                    case Type::UInt64:
-                        MathOperation::Subtract(reinterpret_cast<char*>(lhs), reinterpret_cast<uint64_t*>(rhs));
-                        break;                            
-                    case Type::UInt8:
-                        MathOperation::Subtract(reinterpret_cast<char*>(lhs), reinterpret_cast<unsigned char*>(rhs));
-                        break;                                                                                                                                                                                                                                                                                                                                                         
-                }
-                break;
-            }
-            case Type::Single:
-            {
-                switch(rhsDataType)
-                {
-                    case Type::Double:
-                        MathOperation::Subtract(reinterpret_cast<float*>(lhs), reinterpret_cast<double*>(rhs));
-                        break;
-                    case Type::Int16:
-                        MathOperation::Subtract(reinterpret_cast<float*>(lhs), reinterpret_cast<int16_t*>(rhs));
-                        break;
-                    case Type::Int32:
-                        MathOperation::Subtract(reinterpret_cast<float*>(lhs), reinterpret_cast<int32_t*>(rhs));
-                        break;
-                    case Type::Int64:
-                        MathOperation::Subtract(reinterpret_cast<float*>(lhs), reinterpret_cast<int64_t*>(rhs));
-                        break;       
-                    case Type::Int8:
-                        MathOperation::Subtract(reinterpret_cast<float*>(lhs), reinterpret_cast<char*>(rhs));
-                        break;      
-                    case Type::Single:
-                        MathOperation::Subtract(reinterpret_cast<float*>(lhs), reinterpret_cast<float*>(rhs));
-                        break;        
-                    case Type::UInt16:
-                        MathOperation::Subtract(reinterpret_cast<float*>(lhs), reinterpret_cast<uint16_t*>(rhs));
-                        break;       
-                    case Type::UInt32:
-                        MathOperation::Subtract(reinterpret_cast<float*>(lhs), reinterpret_cast<uint32_t*>(rhs));
-                        break;        
-                    case Type::UInt64:
-                        MathOperation::Subtract(reinterpret_cast<float*>(lhs), reinterpret_cast<uint64_t*>(rhs));
-                        break;                            
-                    case Type::UInt8:
-                        MathOperation::Subtract(reinterpret_cast<float*>(lhs), reinterpret_cast<unsigned char*>(rhs));
-                        break;                                                                                                                                                                                                                                                                                                                                                         
-                }
-                break;
-            }               
-            case Type::UInt16:
-            {
-                switch(rhsDataType)
-                {
-                    case Type::Double:
-                        MathOperation::Subtract(reinterpret_cast<uint16_t*>(lhs), reinterpret_cast<double*>(rhs));
-                        break;
-                    case Type::Int16:
-                        MathOperation::Subtract(reinterpret_cast<uint16_t*>(lhs), reinterpret_cast<int16_t*>(rhs));
-                        break;
-                    case Type::Int32:
-                        MathOperation::Subtract(reinterpret_cast<uint16_t*>(lhs), reinterpret_cast<int32_t*>(rhs));
-                        break;
-                    case Type::Int64:
-                        MathOperation::Subtract(reinterpret_cast<uint16_t*>(lhs), reinterpret_cast<int64_t*>(rhs));
-                        break;       
-                    case Type::Int8:
-                        MathOperation::Subtract(reinterpret_cast<uint16_t*>(lhs), reinterpret_cast<char*>(rhs));
-                        break;      
-                    case Type::Single:
-                        MathOperation::Subtract(reinterpret_cast<uint16_t*>(lhs), reinterpret_cast<float*>(rhs));
-                        break;        
-                    case Type::UInt16:
-                        MathOperation::Subtract(reinterpret_cast<uint16_t*>(lhs), reinterpret_cast<uint16_t*>(rhs));
-                        break;       
-                    case Type::UInt32:
-                        MathOperation::Subtract(reinterpret_cast<uint16_t*>(lhs), reinterpret_cast<uint32_t*>(rhs));
-                        break;        
-                    case Type::UInt64:
-                        MathOperation::Subtract(reinterpret_cast<uint16_t*>(lhs), reinterpret_cast<uint64_t*>(rhs));
-                        break;                            
-                    case Type::UInt8:
-                        MathOperation::Subtract(reinterpret_cast<uint16_t*>(lhs), reinterpret_cast<unsigned char*>(rhs));
-                        break;                                                                                                                                                                                                                                                                                                                                                         
-                }
-                break;
-            }               
-            case Type::UInt32:
-            {
-                switch(rhsDataType)
-                {
-                    case Type::Double:
-                        MathOperation::Subtract(reinterpret_cast<uint32_t*>(lhs), reinterpret_cast<double*>(rhs));
-                        break;
-                    case Type::Int16:
-                        MathOperation::Subtract(reinterpret_cast<uint32_t*>(lhs), reinterpret_cast<int16_t*>(rhs));
-                        break;
-                    case Type::Int32:
-                        MathOperation::Subtract(reinterpret_cast<uint32_t*>(lhs), reinterpret_cast<int32_t*>(rhs));
-                        break;
-                    case Type::Int64:
-                        MathOperation::Subtract(reinterpret_cast<uint32_t*>(lhs), reinterpret_cast<int64_t*>(rhs));
-                        break;       
-                    case Type::Int8:
-                        MathOperation::Subtract(reinterpret_cast<uint32_t*>(lhs), reinterpret_cast<char*>(rhs));
-                        break;      
-                    case Type::Single:
-                        MathOperation::Subtract(reinterpret_cast<uint32_t*>(lhs), reinterpret_cast<float*>(rhs));
-                        break;        
-                    case Type::UInt16:
-                        MathOperation::Subtract(reinterpret_cast<uint32_t*>(lhs), reinterpret_cast<uint16_t*>(rhs));
-                        break;       
-                    case Type::UInt32:
-                        MathOperation::Subtract(reinterpret_cast<uint32_t*>(lhs), reinterpret_cast<uint32_t*>(rhs));
-                        break;        
-                    case Type::UInt64:
-                        MathOperation::Subtract(reinterpret_cast<uint32_t*>(lhs), reinterpret_cast<uint64_t*>(rhs));
-                        break;                            
-                    case Type::UInt8:
-                        MathOperation::Subtract(reinterpret_cast<uint32_t*>(lhs), reinterpret_cast<unsigned char*>(rhs));
-                        break;                                                                                                                                                                                                                                                                                                                                                         
-                }
-                break;
-            }               
-            case Type::UInt64:
-            {
-                switch(rhsDataType)
-                {
-                    case Type::Double:
-                        MathOperation::Subtract(reinterpret_cast<uint64_t*>(lhs), reinterpret_cast<double*>(rhs));
-                        break;
-                    case Type::Int16:
-                        MathOperation::Subtract(reinterpret_cast<uint64_t*>(lhs), reinterpret_cast<int16_t*>(rhs));
-                        break;
-                    case Type::Int32:
-                        MathOperation::Subtract(reinterpret_cast<uint64_t*>(lhs), reinterpret_cast<int32_t*>(rhs));
-                        break;
-                    case Type::Int64:
-                        MathOperation::Subtract(reinterpret_cast<uint64_t*>(lhs), reinterpret_cast<int64_t*>(rhs));
-                        break;       
-                    case Type::Int8:
-                        MathOperation::Subtract(reinterpret_cast<uint64_t*>(lhs), reinterpret_cast<char*>(rhs));
-                        break;      
-                    case Type::Single:
-                        MathOperation::Subtract(reinterpret_cast<uint64_t*>(lhs), reinterpret_cast<float*>(rhs));
-                        break;        
-                    case Type::UInt16:
-                        MathOperation::Subtract(reinterpret_cast<uint64_t*>(lhs), reinterpret_cast<uint16_t*>(rhs));
-                        break;       
-                    case Type::UInt32:
-                        MathOperation::Subtract(reinterpret_cast<uint64_t*>(lhs), reinterpret_cast<uint32_t*>(rhs));
-                        break;        
-                    case Type::UInt64:
-                        MathOperation::Subtract(reinterpret_cast<uint64_t*>(lhs), reinterpret_cast<uint64_t*>(rhs));
-                        break;                            
-                    case Type::UInt8:
-                        MathOperation::Subtract(reinterpret_cast<uint64_t*>(lhs), reinterpret_cast<unsigned char*>(rhs));
-                        break;                                                                                                                                                                                                                                                                                                                                                         
-                }
-                break;
-            }               
-            case Type::UInt8:
-            {
-                switch(rhsDataType)
-                {
-                    case Type::Double:
-                        MathOperation::Subtract(reinterpret_cast<unsigned char*>(lhs), reinterpret_cast<double*>(rhs));
-                        break;
-                    case Type::Int16:
-                        MathOperation::Subtract(reinterpret_cast<unsigned char*>(lhs), reinterpret_cast<int16_t*>(rhs));
-                        break;
-                    case Type::Int32:
-                        MathOperation::Subtract(reinterpret_cast<unsigned char*>(lhs), reinterpret_cast<int32_t*>(rhs));
-                        break;
-                    case Type::Int64:
-                        MathOperation::Subtract(reinterpret_cast<unsigned char*>(lhs), reinterpret_cast<int64_t*>(rhs));
-                        break;       
-                    case Type::Int8:
-                        MathOperation::Subtract(reinterpret_cast<unsigned char*>(lhs), reinterpret_cast<char*>(rhs));
-                        break;      
-                    case Type::Single:
-                        MathOperation::Subtract(reinterpret_cast<unsigned char*>(lhs), reinterpret_cast<float*>(rhs));
-                        break;        
-                    case Type::UInt16:
-                        MathOperation::Subtract(reinterpret_cast<unsigned char*>(lhs), reinterpret_cast<uint16_t*>(rhs));
-                        break;       
-                    case Type::UInt32:
-                        MathOperation::Subtract(reinterpret_cast<unsigned char*>(lhs), reinterpret_cast<uint32_t*>(rhs));
-                        break;        
-                    case Type::UInt64:
-                        MathOperation::Subtract(reinterpret_cast<unsigned char*>(lhs), reinterpret_cast<uint64_t*>(rhs));
-                        break;                            
-                    case Type::UInt8:
-                        MathOperation::Subtract(reinterpret_cast<unsigned char*>(lhs), reinterpret_cast<unsigned char*>(rhs));
-                        break;                                                                                                                                                                                                                                                                                                                                                         
-                }
-                break;
-            }
-        }            
-    }
-
-    void MathOperation::Multiply(Instruction* instruction, byte* lhs, byte* rhs, Type lhsDataType, Type rhsDataType, byte* registers, byte* assemblyData)
-    {
-        if(debugOperations)
-            std::cout << "MUL: LHS type " << (int)lhsDataType << " RHS type " << (int)rhsDataType << std::endl;
-
-        switch(lhsDataType)
-        {
-            case Type::Double:
-            {
-                switch(rhsDataType)
-                {
-                    case Type::Double:
-                        MathOperation::Multiply(reinterpret_cast<double*>(lhs), reinterpret_cast<double*>(rhs));
-                        break;
-                    case Type::Int16:
-                        MathOperation::Multiply(reinterpret_cast<double*>(lhs), reinterpret_cast<int16_t*>(rhs));
-                        break;
-                    case Type::Int32:
-                        MathOperation::Multiply(reinterpret_cast<double*>(lhs), reinterpret_cast<int32_t*>(rhs));
-                        break;
-                    case Type::Int64:
-                        MathOperation::Multiply(reinterpret_cast<double*>(lhs), reinterpret_cast<int64_t*>(rhs));
-                        break;       
-                    case Type::Int8:
-                        MathOperation::Multiply(reinterpret_cast<double*>(lhs), reinterpret_cast<char*>(rhs));
-                        break;      
-                    case Type::Single:
-                        MathOperation::Multiply(reinterpret_cast<double*>(lhs), reinterpret_cast<float*>(rhs));
-                        break;        
-                    case Type::UInt16:
-                        MathOperation::Multiply(reinterpret_cast<double*>(lhs), reinterpret_cast<uint16_t*>(rhs));
-                        break;       
-                    case Type::UInt32:
-                        MathOperation::Multiply(reinterpret_cast<double*>(lhs), reinterpret_cast<uint32_t*>(rhs));
-                        break;        
-                    case Type::UInt64:
-                        MathOperation::Multiply(reinterpret_cast<double*>(lhs), reinterpret_cast<uint64_t*>(rhs));
-                        break;                            
-                    case Type::UInt8:
-                        MathOperation::Multiply(reinterpret_cast<double*>(lhs), reinterpret_cast<unsigned char*>(rhs));
-                        break;                                                                                                                                                                                                                                                                                                                                                         
-                }
-                break;
-            }
-            case Type::Int16:
-            {
-                switch(rhsDataType)
-                {
-                    case Type::Double:
-                        MathOperation::Multiply(reinterpret_cast<int16_t*>(lhs), reinterpret_cast<double*>(rhs));
-                        break;
-                    case Type::Int16:
-                        MathOperation::Multiply(reinterpret_cast<int16_t*>(lhs), reinterpret_cast<int16_t*>(rhs));
-                        break;
-                    case Type::Int32:
-                        MathOperation::Multiply(reinterpret_cast<int16_t*>(lhs), reinterpret_cast<int32_t*>(rhs));
-                        break;
-                    case Type::Int64:
-                        MathOperation::Multiply(reinterpret_cast<int16_t*>(lhs), reinterpret_cast<int64_t*>(rhs));
-                        break;       
-                    case Type::Int8:
-                        MathOperation::Multiply(reinterpret_cast<int16_t*>(lhs), reinterpret_cast<char*>(rhs));
-                        break;      
-                    case Type::Single:
-                        MathOperation::Multiply(reinterpret_cast<int16_t*>(lhs), reinterpret_cast<float*>(rhs));
-                        break;        
-                    case Type::UInt16:
-                        MathOperation::Multiply(reinterpret_cast<int16_t*>(lhs), reinterpret_cast<uint16_t*>(rhs));
-                        break;       
-                    case Type::UInt32:
-                        MathOperation::Multiply(reinterpret_cast<int16_t*>(lhs), reinterpret_cast<uint32_t*>(rhs));
-                        break;        
-                    case Type::UInt64:
-                        MathOperation::Multiply(reinterpret_cast<int16_t*>(lhs), reinterpret_cast<uint64_t*>(rhs));
-                        break;                            
-                    case Type::UInt8:
-                        MathOperation::Multiply(reinterpret_cast<int16_t*>(lhs), reinterpret_cast<unsigned char*>(rhs));
-                        break;                                                                                                                                                                                                                                                                                                                                                         
-                }
-                break;
-            }
-            case Type::Int32:
-            {
-                switch(rhsDataType)
-                {
-                    case Type::Double:
-                        MathOperation::Multiply(reinterpret_cast<int32_t*>(lhs), reinterpret_cast<double*>(rhs));
-                        break;
-                    case Type::Int16:
-                        MathOperation::Multiply(reinterpret_cast<int32_t*>(lhs), reinterpret_cast<int16_t*>(rhs));
-                        break;
-                    case Type::Int32:
-                        MathOperation::Multiply(reinterpret_cast<int32_t*>(lhs), reinterpret_cast<int32_t*>(rhs));
-                        break;
-                    case Type::Int64:
-                        MathOperation::Multiply(reinterpret_cast<int32_t*>(lhs), reinterpret_cast<int64_t*>(rhs));
-                        break;       
-                    case Type::Int8:
-                        MathOperation::Multiply(reinterpret_cast<int32_t*>(lhs), reinterpret_cast<char*>(rhs));
-                        break;      
-                    case Type::Single:
-                        MathOperation::Multiply(reinterpret_cast<int32_t*>(lhs), reinterpret_cast<float*>(rhs));
-                        break;        
-                    case Type::UInt16:
-                        MathOperation::Multiply(reinterpret_cast<int32_t*>(lhs), reinterpret_cast<uint16_t*>(rhs));
-                        break;       
-                    case Type::UInt32:
-                        MathOperation::Multiply(reinterpret_cast<int32_t*>(lhs), reinterpret_cast<uint32_t*>(rhs));
-                        break;        
-                    case Type::UInt64:
-                        MathOperation::Multiply(reinterpret_cast<int32_t*>(lhs), reinterpret_cast<uint64_t*>(rhs));
-                        break;                            
-                    case Type::UInt8:
-                        MathOperation::Multiply(reinterpret_cast<int32_t*>(lhs), reinterpret_cast<unsigned char*>(rhs));
-                        break;                                                                                                                                                                                                                                                                                                                                                         
-                }
-                break;
-            }                                                                           
-            case Type::Int64:
-            {
-                switch(rhsDataType)
-                {
-                    case Type::Double:
-                        MathOperation::Multiply(reinterpret_cast<int64_t*>(lhs), reinterpret_cast<double*>(rhs));
-                        break;
-                    case Type::Int16:
-                        MathOperation::Multiply(reinterpret_cast<int64_t*>(lhs), reinterpret_cast<int16_t*>(rhs));
-                        break;
-                    case Type::Int32:
-                        MathOperation::Multiply(reinterpret_cast<int64_t*>(lhs), reinterpret_cast<int32_t*>(rhs));
-                        break;
-                    case Type::Int64:
-                        MathOperation::Multiply(reinterpret_cast<int64_t*>(lhs), reinterpret_cast<int64_t*>(rhs));
-                        break;       
-                    case Type::Int8:
-                        MathOperation::Multiply(reinterpret_cast<int64_t*>(lhs), reinterpret_cast<char*>(rhs));
-                        break;      
-                    case Type::Single:
-                        MathOperation::Multiply(reinterpret_cast<int64_t*>(lhs), reinterpret_cast<float*>(rhs));
-                        break;        
-                    case Type::UInt16:
-                        MathOperation::Multiply(reinterpret_cast<int64_t*>(lhs), reinterpret_cast<uint16_t*>(rhs));
-                        break;       
-                    case Type::UInt32:
-                        MathOperation::Multiply(reinterpret_cast<int64_t*>(lhs), reinterpret_cast<uint32_t*>(rhs));
-                        break;        
-                    case Type::UInt64:
-                        MathOperation::Multiply(reinterpret_cast<int64_t*>(lhs), reinterpret_cast<uint64_t*>(rhs));
-                        break;                            
-                    case Type::UInt8:
-                        MathOperation::Multiply(reinterpret_cast<int64_t*>(lhs), reinterpret_cast<unsigned char*>(rhs));
-                        break;                                                                                                                                                                                                                                                                                                                                                         
-                }
-                break;
-            }
-            case Type::Int8:
-            {
-                switch(rhsDataType)
-                {
-                    case Type::Double:
-                        MathOperation::Multiply(reinterpret_cast<char*>(lhs), reinterpret_cast<double*>(rhs));
-                        break;
-                    case Type::Int16:
-                        MathOperation::Multiply(reinterpret_cast<char*>(lhs), reinterpret_cast<int16_t*>(rhs));
-                        break;
-                    case Type::Int32:
-                        MathOperation::Multiply(reinterpret_cast<char*>(lhs), reinterpret_cast<int32_t*>(rhs));
-                        break;
-                    case Type::Int64:
-                        MathOperation::Multiply(reinterpret_cast<char*>(lhs), reinterpret_cast<int64_t*>(rhs));
-                        break;       
-                    case Type::Int8:
-                        MathOperation::Multiply(reinterpret_cast<char*>(lhs), reinterpret_cast<char*>(rhs));
-                        break;      
-                    case Type::Single:
-                        MathOperation::Multiply(reinterpret_cast<char*>(lhs), reinterpret_cast<float*>(rhs));
-                        break;        
-                    case Type::UInt16:
-                        MathOperation::Multiply(reinterpret_cast<char*>(lhs), reinterpret_cast<uint16_t*>(rhs));
-                        break;       
-                    case Type::UInt32:
-                        MathOperation::Multiply(reinterpret_cast<char*>(lhs), reinterpret_cast<uint32_t*>(rhs));
-                        break;        
-                    case Type::UInt64:
-                        MathOperation::Multiply(reinterpret_cast<char*>(lhs), reinterpret_cast<uint64_t*>(rhs));
-                        break;                            
-                    case Type::UInt8:
-                        MathOperation::Multiply(reinterpret_cast<char*>(lhs), reinterpret_cast<unsigned char*>(rhs));
-                        break;                                                                                                                                                                                                                                                                                                                                                         
-                }
-                break;
-            }
-            case Type::Single:
-            {
-                switch(rhsDataType)
-                {
-                    case Type::Double:
-                        MathOperation::Multiply(reinterpret_cast<float*>(lhs), reinterpret_cast<double*>(rhs));
-                        break;
-                    case Type::Int16:
-                        MathOperation::Multiply(reinterpret_cast<float*>(lhs), reinterpret_cast<int16_t*>(rhs));
-                        break;
-                    case Type::Int32:
-                        MathOperation::Multiply(reinterpret_cast<float*>(lhs), reinterpret_cast<int32_t*>(rhs));
-                        break;
-                    case Type::Int64:
-                        MathOperation::Multiply(reinterpret_cast<float*>(lhs), reinterpret_cast<int64_t*>(rhs));
-                        break;       
-                    case Type::Int8:
-                        MathOperation::Multiply(reinterpret_cast<float*>(lhs), reinterpret_cast<char*>(rhs));
-                        break;      
-                    case Type::Single:
-                        MathOperation::Multiply(reinterpret_cast<float*>(lhs), reinterpret_cast<float*>(rhs));
-                        break;        
-                    case Type::UInt16:
-                        MathOperation::Multiply(reinterpret_cast<float*>(lhs), reinterpret_cast<uint16_t*>(rhs));
-                        break;       
-                    case Type::UInt32:
-                        MathOperation::Multiply(reinterpret_cast<float*>(lhs), reinterpret_cast<uint32_t*>(rhs));
-                        break;        
-                    case Type::UInt64:
-                        MathOperation::Multiply(reinterpret_cast<float*>(lhs), reinterpret_cast<uint64_t*>(rhs));
-                        break;                            
-                    case Type::UInt8:
-                        MathOperation::Multiply(reinterpret_cast<float*>(lhs), reinterpret_cast<unsigned char*>(rhs));
-                        break;                                                                                                                                                                                                                                                                                                                                                         
-                }
-                break;
-            }               
-            case Type::UInt16:
-            {
-                switch(rhsDataType)
-                {
-                    case Type::Double:
-                        MathOperation::Multiply(reinterpret_cast<uint16_t*>(lhs), reinterpret_cast<double*>(rhs));
-                        break;
-                    case Type::Int16:
-                        MathOperation::Multiply(reinterpret_cast<uint16_t*>(lhs), reinterpret_cast<int16_t*>(rhs));
-                        break;
-                    case Type::Int32:
-                        MathOperation::Multiply(reinterpret_cast<uint16_t*>(lhs), reinterpret_cast<int32_t*>(rhs));
-                        break;
-                    case Type::Int64:
-                        MathOperation::Multiply(reinterpret_cast<uint16_t*>(lhs), reinterpret_cast<int64_t*>(rhs));
-                        break;       
-                    case Type::Int8:
-                        MathOperation::Multiply(reinterpret_cast<uint16_t*>(lhs), reinterpret_cast<char*>(rhs));
-                        break;      
-                    case Type::Single:
-                        MathOperation::Multiply(reinterpret_cast<uint16_t*>(lhs), reinterpret_cast<float*>(rhs));
-                        break;        
-                    case Type::UInt16:
-                        MathOperation::Multiply(reinterpret_cast<uint16_t*>(lhs), reinterpret_cast<uint16_t*>(rhs));
-                        break;       
-                    case Type::UInt32:
-                        MathOperation::Multiply(reinterpret_cast<uint16_t*>(lhs), reinterpret_cast<uint32_t*>(rhs));
-                        break;        
-                    case Type::UInt64:
-                        MathOperation::Multiply(reinterpret_cast<uint16_t*>(lhs), reinterpret_cast<uint64_t*>(rhs));
-                        break;                            
-                    case Type::UInt8:
-                        MathOperation::Multiply(reinterpret_cast<uint16_t*>(lhs), reinterpret_cast<unsigned char*>(rhs));
-                        break;                                                                                                                                                                                                                                                                                                                                                         
-                }
-                break;
-            }               
-            case Type::UInt32:
-            {
-                switch(rhsDataType)
-                {
-                    case Type::Double:
-                        MathOperation::Multiply(reinterpret_cast<uint32_t*>(lhs), reinterpret_cast<double*>(rhs));
-                        break;
-                    case Type::Int16:
-                        MathOperation::Multiply(reinterpret_cast<uint32_t*>(lhs), reinterpret_cast<int16_t*>(rhs));
-                        break;
-                    case Type::Int32:
-                        MathOperation::Multiply(reinterpret_cast<uint32_t*>(lhs), reinterpret_cast<int32_t*>(rhs));
-                        break;
-                    case Type::Int64:
-                        MathOperation::Multiply(reinterpret_cast<uint32_t*>(lhs), reinterpret_cast<int64_t*>(rhs));
-                        break;       
-                    case Type::Int8:
-                        MathOperation::Multiply(reinterpret_cast<uint32_t*>(lhs), reinterpret_cast<char*>(rhs));
-                        break;      
-                    case Type::Single:
-                        MathOperation::Multiply(reinterpret_cast<uint32_t*>(lhs), reinterpret_cast<float*>(rhs));
-                        break;        
-                    case Type::UInt16:
-                        MathOperation::Multiply(reinterpret_cast<uint32_t*>(lhs), reinterpret_cast<uint16_t*>(rhs));
-                        break;       
-                    case Type::UInt32:
-                        MathOperation::Multiply(reinterpret_cast<uint32_t*>(lhs), reinterpret_cast<uint32_t*>(rhs));
-                        break;        
-                    case Type::UInt64:
-                        MathOperation::Multiply(reinterpret_cast<uint32_t*>(lhs), reinterpret_cast<uint64_t*>(rhs));
-                        break;                            
-                    case Type::UInt8:
-                        MathOperation::Multiply(reinterpret_cast<uint32_t*>(lhs), reinterpret_cast<unsigned char*>(rhs));
-                        break;                                                                                                                                                                                                                                                                                                                                                         
-                }
-                break;
-            }               
-            case Type::UInt64:
-            {
-                switch(rhsDataType)
-                {
-                    case Type::Double:
-                        MathOperation::Multiply(reinterpret_cast<uint64_t*>(lhs), reinterpret_cast<double*>(rhs));
-                        break;
-                    case Type::Int16:
-                        MathOperation::Multiply(reinterpret_cast<uint64_t*>(lhs), reinterpret_cast<int16_t*>(rhs));
-                        break;
-                    case Type::Int32:
-                        MathOperation::Multiply(reinterpret_cast<uint64_t*>(lhs), reinterpret_cast<int32_t*>(rhs));
-                        break;
-                    case Type::Int64:
-                        MathOperation::Multiply(reinterpret_cast<uint64_t*>(lhs), reinterpret_cast<int64_t*>(rhs));
-                        break;       
-                    case Type::Int8:
-                        MathOperation::Multiply(reinterpret_cast<uint64_t*>(lhs), reinterpret_cast<char*>(rhs));
-                        break;      
-                    case Type::Single:
-                        MathOperation::Multiply(reinterpret_cast<uint64_t*>(lhs), reinterpret_cast<float*>(rhs));
-                        break;        
-                    case Type::UInt16:
-                        MathOperation::Multiply(reinterpret_cast<uint64_t*>(lhs), reinterpret_cast<uint16_t*>(rhs));
-                        break;       
-                    case Type::UInt32:
-                        MathOperation::Multiply(reinterpret_cast<uint64_t*>(lhs), reinterpret_cast<uint32_t*>(rhs));
-                        break;        
-                    case Type::UInt64:
-                        MathOperation::Multiply(reinterpret_cast<uint64_t*>(lhs), reinterpret_cast<uint64_t*>(rhs));
-                        break;                            
-                    case Type::UInt8:
-                        MathOperation::Multiply(reinterpret_cast<uint64_t*>(lhs), reinterpret_cast<unsigned char*>(rhs));
-                        break;                                                                                                                                                                                                                                                                                                                                                         
-                }
-                break;
-            }               
-            case Type::UInt8:
-            {
-                switch(rhsDataType)
-                {
-                    case Type::Double:
-                        MathOperation::Multiply(reinterpret_cast<unsigned char*>(lhs), reinterpret_cast<double*>(rhs));
-                        break;
-                    case Type::Int16:
-                        MathOperation::Multiply(reinterpret_cast<unsigned char*>(lhs), reinterpret_cast<int16_t*>(rhs));
-                        break;
-                    case Type::Int32:
-                        MathOperation::Multiply(reinterpret_cast<unsigned char*>(lhs), reinterpret_cast<int32_t*>(rhs));
-                        break;
-                    case Type::Int64:
-                        MathOperation::Multiply(reinterpret_cast<unsigned char*>(lhs), reinterpret_cast<int64_t*>(rhs));
-                        break;       
-                    case Type::Int8:
-                        MathOperation::Multiply(reinterpret_cast<unsigned char*>(lhs), reinterpret_cast<char*>(rhs));
-                        break;      
-                    case Type::Single:
-                        MathOperation::Multiply(reinterpret_cast<unsigned char*>(lhs), reinterpret_cast<float*>(rhs));
-                        break;        
-                    case Type::UInt16:
-                        MathOperation::Multiply(reinterpret_cast<unsigned char*>(lhs), reinterpret_cast<uint16_t*>(rhs));
-                        break;       
-                    case Type::UInt32:
-                        MathOperation::Multiply(reinterpret_cast<unsigned char*>(lhs), reinterpret_cast<uint32_t*>(rhs));
-                        break;        
-                    case Type::UInt64:
-                        MathOperation::Multiply(reinterpret_cast<unsigned char*>(lhs), reinterpret_cast<uint64_t*>(rhs));
-                        break;                            
-                    case Type::UInt8:
-                        MathOperation::Multiply(reinterpret_cast<unsigned char*>(lhs), reinterpret_cast<unsigned char*>(rhs));
-                        break;                                                                                                                                                                                                                                                                                                                                                         
-                }
-                break;
-            }
-        }            
-    }
-
-    void MathOperation::Divide(Instruction* instruction, byte* lhs, byte* rhs, Type lhsDataType, Type rhsDataType, byte* registers, byte* assemblyData)
-    {
-        if(debugOperations)
-            std::cout << "DIV: LHS type " << (int)lhsDataType << " RHS type " << (int)rhsDataType << std::endl;
-
-        switch(lhsDataType)
-        {
-            case Type::Double:
-            {
-                switch(rhsDataType)
-                {
-                    case Type::Double:
-                        MathOperation::Divide(reinterpret_cast<double*>(lhs), reinterpret_cast<double*>(rhs));
-                        break;
-                    case Type::Int16:
-                        MathOperation::Divide(reinterpret_cast<double*>(lhs), reinterpret_cast<int16_t*>(rhs));
-                        break;
-                    case Type::Int32:
-                        MathOperation::Divide(reinterpret_cast<double*>(lhs), reinterpret_cast<int32_t*>(rhs));
-                        break;
-                    case Type::Int64:
-                        MathOperation::Divide(reinterpret_cast<double*>(lhs), reinterpret_cast<int64_t*>(rhs));
-                        break;       
-                    case Type::Int8:
-                        MathOperation::Divide(reinterpret_cast<double*>(lhs), reinterpret_cast<char*>(rhs));
-                        break;      
-                    case Type::Single:
-                        MathOperation::Divide(reinterpret_cast<double*>(lhs), reinterpret_cast<float*>(rhs));
-                        break;        
-                    case Type::UInt16:
-                        MathOperation::Divide(reinterpret_cast<double*>(lhs), reinterpret_cast<uint16_t*>(rhs));
-                        break;       
-                    case Type::UInt32:
-                        MathOperation::Divide(reinterpret_cast<double*>(lhs), reinterpret_cast<uint32_t*>(rhs));
-                        break;        
-                    case Type::UInt64:
-                        MathOperation::Divide(reinterpret_cast<double*>(lhs), reinterpret_cast<uint64_t*>(rhs));
-                        break;                            
-                    case Type::UInt8:
-                        MathOperation::Divide(reinterpret_cast<double*>(lhs), reinterpret_cast<unsigned char*>(rhs));
-                        break;                                                                                                                                                                                                                                                                                                                                                         
-                }
-                break;
-            }
-            case Type::Int16:
-            {
-                switch(rhsDataType)
-                {
-                    case Type::Double:
-                        MathOperation::Divide(reinterpret_cast<int16_t*>(lhs), reinterpret_cast<double*>(rhs));
-                        break;
-                    case Type::Int16:
-                        MathOperation::Divide(reinterpret_cast<int16_t*>(lhs), reinterpret_cast<int16_t*>(rhs));
-                        break;
-                    case Type::Int32:
-                        MathOperation::Divide(reinterpret_cast<int16_t*>(lhs), reinterpret_cast<int32_t*>(rhs));
-                        break;
-                    case Type::Int64:
-                        MathOperation::Divide(reinterpret_cast<int16_t*>(lhs), reinterpret_cast<int64_t*>(rhs));
-                        break;       
-                    case Type::Int8:
-                        MathOperation::Divide(reinterpret_cast<int16_t*>(lhs), reinterpret_cast<char*>(rhs));
-                        break;      
-                    case Type::Single:
-                        MathOperation::Divide(reinterpret_cast<int16_t*>(lhs), reinterpret_cast<float*>(rhs));
-                        break;        
-                    case Type::UInt16:
-                        MathOperation::Divide(reinterpret_cast<int16_t*>(lhs), reinterpret_cast<uint16_t*>(rhs));
-                        break;       
-                    case Type::UInt32:
-                        MathOperation::Divide(reinterpret_cast<int16_t*>(lhs), reinterpret_cast<uint32_t*>(rhs));
-                        break;        
-                    case Type::UInt64:
-                        MathOperation::Divide(reinterpret_cast<int16_t*>(lhs), reinterpret_cast<uint64_t*>(rhs));
-                        break;                            
-                    case Type::UInt8:
-                        MathOperation::Divide(reinterpret_cast<int16_t*>(lhs), reinterpret_cast<unsigned char*>(rhs));
-                        break;                                                                                                                                                                                                                                                                                                                                                         
-                }
-                break;
-            }
-            case Type::Int32:
-            {
-                switch(rhsDataType)
-                {
-                    case Type::Double:
-                        MathOperation::Divide(reinterpret_cast<int32_t*>(lhs), reinterpret_cast<double*>(rhs));
-                        break;
-                    case Type::Int16:
-                        MathOperation::Divide(reinterpret_cast<int32_t*>(lhs), reinterpret_cast<int16_t*>(rhs));
-                        break;
-                    case Type::Int32:
-                        MathOperation::Divide(reinterpret_cast<int32_t*>(lhs), reinterpret_cast<int32_t*>(rhs));
-                        break;
-                    case Type::Int64:
-                        MathOperation::Divide(reinterpret_cast<int32_t*>(lhs), reinterpret_cast<int64_t*>(rhs));
-                        break;       
-                    case Type::Int8:
-                        MathOperation::Divide(reinterpret_cast<int32_t*>(lhs), reinterpret_cast<char*>(rhs));
-                        break;      
-                    case Type::Single:
-                        MathOperation::Divide(reinterpret_cast<int32_t*>(lhs), reinterpret_cast<float*>(rhs));
-                        break;        
-                    case Type::UInt16:
-                        MathOperation::Divide(reinterpret_cast<int32_t*>(lhs), reinterpret_cast<uint16_t*>(rhs));
-                        break;       
-                    case Type::UInt32:
-                        MathOperation::Divide(reinterpret_cast<int32_t*>(lhs), reinterpret_cast<uint32_t*>(rhs));
-                        break;        
-                    case Type::UInt64:
-                        MathOperation::Divide(reinterpret_cast<int32_t*>(lhs), reinterpret_cast<uint64_t*>(rhs));
-                        break;                            
-                    case Type::UInt8:
-                        MathOperation::Divide(reinterpret_cast<int32_t*>(lhs), reinterpret_cast<unsigned char*>(rhs));
-                        break;                                                                                                                                                                                                                                                                                                                                                         
-                }
-                break;
-            }                                                                           
-            case Type::Int64:
-            {
-                switch(rhsDataType)
-                {
-                    case Type::Double:
-                        MathOperation::Divide(reinterpret_cast<int64_t*>(lhs), reinterpret_cast<double*>(rhs));
-                        break;
-                    case Type::Int16:
-                        MathOperation::Divide(reinterpret_cast<int64_t*>(lhs), reinterpret_cast<int16_t*>(rhs));
-                        break;
-                    case Type::Int32:
-                        MathOperation::Divide(reinterpret_cast<int64_t*>(lhs), reinterpret_cast<int32_t*>(rhs));
-                        break;
-                    case Type::Int64:
-                        MathOperation::Divide(reinterpret_cast<int64_t*>(lhs), reinterpret_cast<int64_t*>(rhs));
-                        break;       
-                    case Type::Int8:
-                        MathOperation::Divide(reinterpret_cast<int64_t*>(lhs), reinterpret_cast<char*>(rhs));
-                        break;      
-                    case Type::Single:
-                        MathOperation::Divide(reinterpret_cast<int64_t*>(lhs), reinterpret_cast<float*>(rhs));
-                        break;        
-                    case Type::UInt16:
-                        MathOperation::Divide(reinterpret_cast<int64_t*>(lhs), reinterpret_cast<uint16_t*>(rhs));
-                        break;       
-                    case Type::UInt32:
-                        MathOperation::Divide(reinterpret_cast<int64_t*>(lhs), reinterpret_cast<uint32_t*>(rhs));
-                        break;        
-                    case Type::UInt64:
-                        MathOperation::Divide(reinterpret_cast<int64_t*>(lhs), reinterpret_cast<uint64_t*>(rhs));
-                        break;                            
-                    case Type::UInt8:
-                        MathOperation::Divide(reinterpret_cast<int64_t*>(lhs), reinterpret_cast<unsigned char*>(rhs));
-                        break;                                                                                                                                                                                                                                                                                                                                                         
-                }
-                break;
-            }
-            case Type::Int8:
-            {
-                switch(rhsDataType)
-                {
-                    case Type::Double:
-                        MathOperation::Divide(reinterpret_cast<char*>(lhs), reinterpret_cast<double*>(rhs));
-                        break;
-                    case Type::Int16:
-                        MathOperation::Divide(reinterpret_cast<char*>(lhs), reinterpret_cast<int16_t*>(rhs));
-                        break;
-                    case Type::Int32:
-                        MathOperation::Divide(reinterpret_cast<char*>(lhs), reinterpret_cast<int32_t*>(rhs));
-                        break;
-                    case Type::Int64:
-                        MathOperation::Divide(reinterpret_cast<char*>(lhs), reinterpret_cast<int64_t*>(rhs));
-                        break;       
-                    case Type::Int8:
-                        MathOperation::Divide(reinterpret_cast<char*>(lhs), reinterpret_cast<char*>(rhs));
-                        break;      
-                    case Type::Single:
-                        MathOperation::Divide(reinterpret_cast<char*>(lhs), reinterpret_cast<float*>(rhs));
-                        break;        
-                    case Type::UInt16:
-                        MathOperation::Divide(reinterpret_cast<char*>(lhs), reinterpret_cast<uint16_t*>(rhs));
-                        break;       
-                    case Type::UInt32:
-                        MathOperation::Divide(reinterpret_cast<char*>(lhs), reinterpret_cast<uint32_t*>(rhs));
-                        break;        
-                    case Type::UInt64:
-                        MathOperation::Divide(reinterpret_cast<char*>(lhs), reinterpret_cast<uint64_t*>(rhs));
-                        break;                            
-                    case Type::UInt8:
-                        MathOperation::Divide(reinterpret_cast<char*>(lhs), reinterpret_cast<unsigned char*>(rhs));
-                        break;                                                                                                                                                                                                                                                                                                                                                         
-                }
-                break;
-            }
-            case Type::Single:
-            {
-                switch(rhsDataType)
-                {
-                    case Type::Double:
-                        MathOperation::Divide(reinterpret_cast<float*>(lhs), reinterpret_cast<double*>(rhs));
-                        break;
-                    case Type::Int16:
-                        MathOperation::Divide(reinterpret_cast<float*>(lhs), reinterpret_cast<int16_t*>(rhs));
-                        break;
-                    case Type::Int32:
-                        MathOperation::Divide(reinterpret_cast<float*>(lhs), reinterpret_cast<int32_t*>(rhs));
-                        break;
-                    case Type::Int64:
-                        MathOperation::Divide(reinterpret_cast<float*>(lhs), reinterpret_cast<int64_t*>(rhs));
-                        break;       
-                    case Type::Int8:
-                        MathOperation::Divide(reinterpret_cast<float*>(lhs), reinterpret_cast<char*>(rhs));
-                        break;      
-                    case Type::Single:
-                        MathOperation::Divide(reinterpret_cast<float*>(lhs), reinterpret_cast<float*>(rhs));
-                        break;        
-                    case Type::UInt16:
-                        MathOperation::Divide(reinterpret_cast<float*>(lhs), reinterpret_cast<uint16_t*>(rhs));
-                        break;       
-                    case Type::UInt32:
-                        MathOperation::Divide(reinterpret_cast<float*>(lhs), reinterpret_cast<uint32_t*>(rhs));
-                        break;        
-                    case Type::UInt64:
-                        MathOperation::Divide(reinterpret_cast<float*>(lhs), reinterpret_cast<uint64_t*>(rhs));
-                        break;                            
-                    case Type::UInt8:
-                        MathOperation::Divide(reinterpret_cast<float*>(lhs), reinterpret_cast<unsigned char*>(rhs));
-                        break;                                                                                                                                                                                                                                                                                                                                                         
-                }
-                break;
-            }               
-            case Type::UInt16:
-            {
-                switch(rhsDataType)
-                {
-                    case Type::Double:
-                        MathOperation::Divide(reinterpret_cast<uint16_t*>(lhs), reinterpret_cast<double*>(rhs));
-                        break;
-                    case Type::Int16:
-                        MathOperation::Divide(reinterpret_cast<uint16_t*>(lhs), reinterpret_cast<int16_t*>(rhs));
-                        break;
-                    case Type::Int32:
-                        MathOperation::Divide(reinterpret_cast<uint16_t*>(lhs), reinterpret_cast<int32_t*>(rhs));
-                        break;
-                    case Type::Int64:
-                        MathOperation::Divide(reinterpret_cast<uint16_t*>(lhs), reinterpret_cast<int64_t*>(rhs));
-                        break;       
-                    case Type::Int8:
-                        MathOperation::Divide(reinterpret_cast<uint16_t*>(lhs), reinterpret_cast<char*>(rhs));
-                        break;      
-                    case Type::Single:
-                        MathOperation::Divide(reinterpret_cast<uint16_t*>(lhs), reinterpret_cast<float*>(rhs));
-                        break;        
-                    case Type::UInt16:
-                        MathOperation::Divide(reinterpret_cast<uint16_t*>(lhs), reinterpret_cast<uint16_t*>(rhs));
-                        break;       
-                    case Type::UInt32:
-                        MathOperation::Divide(reinterpret_cast<uint16_t*>(lhs), reinterpret_cast<uint32_t*>(rhs));
-                        break;        
-                    case Type::UInt64:
-                        MathOperation::Divide(reinterpret_cast<uint16_t*>(lhs), reinterpret_cast<uint64_t*>(rhs));
-                        break;                            
-                    case Type::UInt8:
-                        MathOperation::Divide(reinterpret_cast<uint16_t*>(lhs), reinterpret_cast<unsigned char*>(rhs));
-                        break;                                                                                                                                                                                                                                                                                                                                                         
-                }
-                break;
-            }               
-            case Type::UInt32:
-            {
-                switch(rhsDataType)
-                {
-                    case Type::Double:
-                        MathOperation::Divide(reinterpret_cast<uint32_t*>(lhs), reinterpret_cast<double*>(rhs));
-                        break;
-                    case Type::Int16:
-                        MathOperation::Divide(reinterpret_cast<uint32_t*>(lhs), reinterpret_cast<int16_t*>(rhs));
-                        break;
-                    case Type::Int32:
-                        MathOperation::Divide(reinterpret_cast<uint32_t*>(lhs), reinterpret_cast<int32_t*>(rhs));
-                        break;
-                    case Type::Int64:
-                        MathOperation::Divide(reinterpret_cast<uint32_t*>(lhs), reinterpret_cast<int64_t*>(rhs));
-                        break;       
-                    case Type::Int8:
-                        MathOperation::Divide(reinterpret_cast<uint32_t*>(lhs), reinterpret_cast<char*>(rhs));
-                        break;      
-                    case Type::Single:
-                        MathOperation::Divide(reinterpret_cast<uint32_t*>(lhs), reinterpret_cast<float*>(rhs));
-                        break;        
-                    case Type::UInt16:
-                        MathOperation::Divide(reinterpret_cast<uint32_t*>(lhs), reinterpret_cast<uint16_t*>(rhs));
-                        break;       
-                    case Type::UInt32:
-                        MathOperation::Divide(reinterpret_cast<uint32_t*>(lhs), reinterpret_cast<uint32_t*>(rhs));
-                        break;        
-                    case Type::UInt64:
-                        MathOperation::Divide(reinterpret_cast<uint32_t*>(lhs), reinterpret_cast<uint64_t*>(rhs));
-                        break;                            
-                    case Type::UInt8:
-                        MathOperation::Divide(reinterpret_cast<uint32_t*>(lhs), reinterpret_cast<unsigned char*>(rhs));
-                        break;                                                                                                                                                                                                                                                                                                                                                         
-                }
-                break;
-            }               
-            case Type::UInt64:
-            {
-                switch(rhsDataType)
-                {
-                    case Type::Double:
-                        MathOperation::Divide(reinterpret_cast<uint64_t*>(lhs), reinterpret_cast<double*>(rhs));
-                        break;
-                    case Type::Int16:
-                        MathOperation::Divide(reinterpret_cast<uint64_t*>(lhs), reinterpret_cast<int16_t*>(rhs));
-                        break;
-                    case Type::Int32:
-                        MathOperation::Divide(reinterpret_cast<uint64_t*>(lhs), reinterpret_cast<int32_t*>(rhs));
-                        break;
-                    case Type::Int64:
-                        MathOperation::Divide(reinterpret_cast<uint64_t*>(lhs), reinterpret_cast<int64_t*>(rhs));
-                        break;       
-                    case Type::Int8:
-                        MathOperation::Divide(reinterpret_cast<uint64_t*>(lhs), reinterpret_cast<char*>(rhs));
-                        break;      
-                    case Type::Single:
-                        MathOperation::Divide(reinterpret_cast<uint64_t*>(lhs), reinterpret_cast<float*>(rhs));
-                        break;        
-                    case Type::UInt16:
-                        MathOperation::Divide(reinterpret_cast<uint64_t*>(lhs), reinterpret_cast<uint16_t*>(rhs));
-                        break;       
-                    case Type::UInt32:
-                        MathOperation::Divide(reinterpret_cast<uint64_t*>(lhs), reinterpret_cast<uint32_t*>(rhs));
-                        break;        
-                    case Type::UInt64:
-                        MathOperation::Divide(reinterpret_cast<uint64_t*>(lhs), reinterpret_cast<uint64_t*>(rhs));
-                        break;                            
-                    case Type::UInt8:
-                        MathOperation::Divide(reinterpret_cast<uint64_t*>(lhs), reinterpret_cast<unsigned char*>(rhs));
-                        break;                                                                                                                                                                                                                                                                                                                                                         
-                }
-                break;
-            }               
-            case Type::UInt8:
-            {
-                switch(rhsDataType)
-                {
-                    case Type::Double:
-                        MathOperation::Divide(reinterpret_cast<unsigned char*>(lhs), reinterpret_cast<double*>(rhs));
-                        break;
-                    case Type::Int16:
-                        MathOperation::Divide(reinterpret_cast<unsigned char*>(lhs), reinterpret_cast<int16_t*>(rhs));
-                        break;
-                    case Type::Int32:
-                        MathOperation::Divide(reinterpret_cast<unsigned char*>(lhs), reinterpret_cast<int32_t*>(rhs));
-                        break;
-                    case Type::Int64:
-                        MathOperation::Divide(reinterpret_cast<unsigned char*>(lhs), reinterpret_cast<int64_t*>(rhs));
-                        break;       
-                    case Type::Int8:
-                        MathOperation::Divide(reinterpret_cast<unsigned char*>(lhs), reinterpret_cast<char*>(rhs));
-                        break;      
-                    case Type::Single:
-                        MathOperation::Divide(reinterpret_cast<unsigned char*>(lhs), reinterpret_cast<float*>(rhs));
-                        break;        
-                    case Type::UInt16:
-                        MathOperation::Divide(reinterpret_cast<unsigned char*>(lhs), reinterpret_cast<uint16_t*>(rhs));
-                        break;       
-                    case Type::UInt32:
-                        MathOperation::Divide(reinterpret_cast<unsigned char*>(lhs), reinterpret_cast<uint32_t*>(rhs));
-                        break;        
-                    case Type::UInt64:
-                        MathOperation::Divide(reinterpret_cast<unsigned char*>(lhs), reinterpret_cast<uint64_t*>(rhs));
-                        break;                            
-                    case Type::UInt8:
-                        MathOperation::Divide(reinterpret_cast<unsigned char*>(lhs), reinterpret_cast<unsigned char*>(rhs));
-                        break;                                                                                                                                                                                                                                                                                                                                                         
-                }
-                break;
-            }
-        }            
-    }
-
-    void MathOperation::Compare(Instruction* instruction, byte* lhs, byte* rhs, Type lhsDataType, Type rhsDataType, byte* registers, byte* assemblyData)
-    {
-        if(debugOperations)
-            std::cout << "CMP: LHS type " << (int)lhsDataType << " RHS type " << (int)rhsDataType << std::endl;
-
-        int64_t result = 0;
-
-        switch(lhsDataType)
-        {
-            case Type::Double:
-            {
-                switch(rhsDataType)
-                {
-                    case Type::Double:
-                        result = MathOperation::Compare(reinterpret_cast<double*>(lhs), reinterpret_cast<double*>(rhs));
-                        break;
-                    case Type::Int16:
-                        result = MathOperation::Compare(reinterpret_cast<double*>(lhs), reinterpret_cast<int16_t*>(rhs));
-                        break;
-                    case Type::Int32:
-                        result = MathOperation::Compare(reinterpret_cast<double*>(lhs), reinterpret_cast<int32_t*>(rhs));
-                        break;
-                    case Type::Int64:
-                        result = MathOperation::Compare(reinterpret_cast<double*>(lhs), reinterpret_cast<int64_t*>(rhs));
-                        break;       
-                    case Type::Int8:
-                        result = MathOperation::Compare(reinterpret_cast<double*>(lhs), reinterpret_cast<char*>(rhs));
-                        break;      
-                    case Type::Single:
-                        result = MathOperation::Compare(reinterpret_cast<double*>(lhs), reinterpret_cast<float*>(rhs));
-                        break;        
-                    case Type::UInt16:
-                        result = MathOperation::Compare(reinterpret_cast<double*>(lhs), reinterpret_cast<uint16_t*>(rhs));
-                        break;       
-                    case Type::UInt32:
-                        result = MathOperation::Compare(reinterpret_cast<double*>(lhs), reinterpret_cast<uint32_t*>(rhs));
-                        break;        
-                    case Type::UInt64:
-                        result = MathOperation::Compare(reinterpret_cast<double*>(lhs), reinterpret_cast<uint64_t*>(rhs));
-                        break;                            
-                    case Type::UInt8:
-                        result = MathOperation::Compare(reinterpret_cast<double*>(lhs), reinterpret_cast<unsigned char*>(rhs));
-                        break;                                                                                                                                                                                                                                                                                                                                                         
-                }
-                break;
-            }
-            case Type::Int16:
-            {
-                switch(rhsDataType)
-                {
-                    case Type::Double:
-                        result = MathOperation::Compare(reinterpret_cast<int16_t*>(lhs), reinterpret_cast<double*>(rhs));
-                        break;
-                    case Type::Int16:
-                        result = MathOperation::Compare(reinterpret_cast<int16_t*>(lhs), reinterpret_cast<int16_t*>(rhs));
-                        break;
-                    case Type::Int32:
-                        result = MathOperation::Compare(reinterpret_cast<int16_t*>(lhs), reinterpret_cast<int32_t*>(rhs));
-                        break;
-                    case Type::Int64:
-                        result = MathOperation::Compare(reinterpret_cast<int16_t*>(lhs), reinterpret_cast<int64_t*>(rhs));
-                        break;       
-                    case Type::Int8:
-                        result = MathOperation::Compare(reinterpret_cast<int16_t*>(lhs), reinterpret_cast<char*>(rhs));
-                        break;      
-                    case Type::Single:
-                        result = MathOperation::Compare(reinterpret_cast<int16_t*>(lhs), reinterpret_cast<float*>(rhs));
-                        break;        
-                    case Type::UInt16:
-                        result = MathOperation::Compare(reinterpret_cast<int16_t*>(lhs), reinterpret_cast<uint16_t*>(rhs));
-                        break;       
-                    case Type::UInt32:
-                        result = MathOperation::Compare(reinterpret_cast<int16_t*>(lhs), reinterpret_cast<uint32_t*>(rhs));
-                        break;        
-                    case Type::UInt64:
-                        result = MathOperation::Compare(reinterpret_cast<int16_t*>(lhs), reinterpret_cast<uint64_t*>(rhs));
-                        break;                            
-                    case Type::UInt8:
-                        result = MathOperation::Compare(reinterpret_cast<int16_t*>(lhs), reinterpret_cast<unsigned char*>(rhs));
-                        break;                                                                                                                                                                                                                                                                                                                                                         
-                }
-                break;
-            }
-            case Type::Int32:
-            {
-                switch(rhsDataType)
-                {
-                    case Type::Double:
-                        result = MathOperation::Compare(reinterpret_cast<int32_t*>(lhs), reinterpret_cast<double*>(rhs));
-                        break;
-                    case Type::Int16:
-                        result = MathOperation::Compare(reinterpret_cast<int32_t*>(lhs), reinterpret_cast<int16_t*>(rhs));
-                        break;
-                    case Type::Int32:
-                        result = MathOperation::Compare(reinterpret_cast<int32_t*>(lhs), reinterpret_cast<int32_t*>(rhs));
-                        break;
-                    case Type::Int64:
-                        result = MathOperation::Compare(reinterpret_cast<int32_t*>(lhs), reinterpret_cast<int64_t*>(rhs));
-                        break;       
-                    case Type::Int8:
-                        result = MathOperation::Compare(reinterpret_cast<int32_t*>(lhs), reinterpret_cast<char*>(rhs));
-                        break;      
-                    case Type::Single:
-                        result = MathOperation::Compare(reinterpret_cast<int32_t*>(lhs), reinterpret_cast<float*>(rhs));
-                        break;        
-                    case Type::UInt16:
-                        result = MathOperation::Compare(reinterpret_cast<int32_t*>(lhs), reinterpret_cast<uint16_t*>(rhs));
-                        break;       
-                    case Type::UInt32:
-                        result = MathOperation::Compare(reinterpret_cast<int32_t*>(lhs), reinterpret_cast<uint32_t*>(rhs));
-                        break;        
-                    case Type::UInt64:
-                        result = MathOperation::Compare(reinterpret_cast<int32_t*>(lhs), reinterpret_cast<uint64_t*>(rhs));
-                        break;                            
-                    case Type::UInt8:
-                        result = MathOperation::Compare(reinterpret_cast<int32_t*>(lhs), reinterpret_cast<unsigned char*>(rhs));
-                        break;                                                                                                                                                                                                                                                                                                                                                         
-                }
-                break;
-            }                                                                           
-            case Type::Int64:
-            {
-                switch(rhsDataType)
-                {
-                    case Type::Double:
-                        result = MathOperation::Compare(reinterpret_cast<int64_t*>(lhs), reinterpret_cast<double*>(rhs));
-                        break;
-                    case Type::Int16:
-                        result = MathOperation::Compare(reinterpret_cast<int64_t*>(lhs), reinterpret_cast<int16_t*>(rhs));
-                        break;
-                    case Type::Int32:
-                        result = MathOperation::Compare(reinterpret_cast<int64_t*>(lhs), reinterpret_cast<int32_t*>(rhs));
-                        break;
-                    case Type::Int64:
-                        result = MathOperation::Compare(reinterpret_cast<int64_t*>(lhs), reinterpret_cast<int64_t*>(rhs));
-                        break;       
-                    case Type::Int8:
-                        result = MathOperation::Compare(reinterpret_cast<int64_t*>(lhs), reinterpret_cast<char*>(rhs));
-                        break;      
-                    case Type::Single:
-                        result = MathOperation::Compare(reinterpret_cast<int64_t*>(lhs), reinterpret_cast<float*>(rhs));
-                        break;        
-                    case Type::UInt16:
-                        result = MathOperation::Compare(reinterpret_cast<int64_t*>(lhs), reinterpret_cast<uint16_t*>(rhs));
-                        break;       
-                    case Type::UInt32:
-                        result = MathOperation::Compare(reinterpret_cast<int64_t*>(lhs), reinterpret_cast<uint32_t*>(rhs));
-                        break;        
-                    case Type::UInt64:
-                        result = MathOperation::Compare(reinterpret_cast<int64_t*>(lhs), reinterpret_cast<uint64_t*>(rhs));
-                        break;                            
-                    case Type::UInt8:
-                        result = MathOperation::Compare(reinterpret_cast<int64_t*>(lhs), reinterpret_cast<unsigned char*>(rhs));
-                        break;                                                                                                                                                                                                                                                                                                                                                         
-                }
-                break;
-            }
-            case Type::Int8:
-            {
-                switch(rhsDataType)
-                {
-                    case Type::Double:
-                        result = MathOperation::Compare(reinterpret_cast<char*>(lhs), reinterpret_cast<double*>(rhs));
-                        break;
-                    case Type::Int16:
-                        result = MathOperation::Compare(reinterpret_cast<char*>(lhs), reinterpret_cast<int16_t*>(rhs));
-                        break;
-                    case Type::Int32:
-                        result = MathOperation::Compare(reinterpret_cast<char*>(lhs), reinterpret_cast<int32_t*>(rhs));
-                        break;
-                    case Type::Int64:
-                        result = MathOperation::Compare(reinterpret_cast<char*>(lhs), reinterpret_cast<int64_t*>(rhs));
-                        break;       
-                    case Type::Int8:
-                        result = MathOperation::Compare(reinterpret_cast<char*>(lhs), reinterpret_cast<char*>(rhs));
-                        break;      
-                    case Type::Single:
-                        result = MathOperation::Compare(reinterpret_cast<char*>(lhs), reinterpret_cast<float*>(rhs));
-                        break;        
-                    case Type::UInt16:
-                        result = MathOperation::Compare(reinterpret_cast<char*>(lhs), reinterpret_cast<uint16_t*>(rhs));
-                        break;       
-                    case Type::UInt32:
-                        result = MathOperation::Compare(reinterpret_cast<char*>(lhs), reinterpret_cast<uint32_t*>(rhs));
-                        break;        
-                    case Type::UInt64:
-                        result = MathOperation::Compare(reinterpret_cast<char*>(lhs), reinterpret_cast<uint64_t*>(rhs));
-                        break;                            
-                    case Type::UInt8:
-                        result = MathOperation::Compare(reinterpret_cast<char*>(lhs), reinterpret_cast<unsigned char*>(rhs));
-                        break;                                                                                                                                                                                                                                                                                                                                                         
-                }
-                break;
-            }
-            case Type::Single:
-            {
-                switch(rhsDataType)
-                {
-                    case Type::Double:
-                        result = MathOperation::Compare(reinterpret_cast<float*>(lhs), reinterpret_cast<double*>(rhs));
-                        break;
-                    case Type::Int16:
-                        result = MathOperation::Compare(reinterpret_cast<float*>(lhs), reinterpret_cast<int16_t*>(rhs));
-                        break;
-                    case Type::Int32:
-                        result = MathOperation::Compare(reinterpret_cast<float*>(lhs), reinterpret_cast<int32_t*>(rhs));
-                        break;
-                    case Type::Int64:
-                        result = MathOperation::Compare(reinterpret_cast<float*>(lhs), reinterpret_cast<int64_t*>(rhs));
-                        break;       
-                    case Type::Int8:
-                        result = MathOperation::Compare(reinterpret_cast<float*>(lhs), reinterpret_cast<char*>(rhs));
-                        break;      
-                    case Type::Single:
-                        result = MathOperation::Compare(reinterpret_cast<float*>(lhs), reinterpret_cast<float*>(rhs));
-                        break;        
-                    case Type::UInt16:
-                        result = MathOperation::Compare(reinterpret_cast<float*>(lhs), reinterpret_cast<uint16_t*>(rhs));
-                        break;       
-                    case Type::UInt32:
-                        result = MathOperation::Compare(reinterpret_cast<float*>(lhs), reinterpret_cast<uint32_t*>(rhs));
-                        break;        
-                    case Type::UInt64:
-                        result = MathOperation::Compare(reinterpret_cast<float*>(lhs), reinterpret_cast<uint64_t*>(rhs));
-                        break;                            
-                    case Type::UInt8:
-                        result = MathOperation::Compare(reinterpret_cast<float*>(lhs), reinterpret_cast<unsigned char*>(rhs));
-                        break;                                                                                                                                                                                                                                                                                                                                                         
-                }
-                break;
-            }               
-            case Type::UInt16:
-            {
-                switch(rhsDataType)
-                {
-                    case Type::Double:
-                        result = MathOperation::Compare(reinterpret_cast<uint16_t*>(lhs), reinterpret_cast<double*>(rhs));
-                        break;
-                    case Type::Int16:
-                        result = MathOperation::Compare(reinterpret_cast<uint16_t*>(lhs), reinterpret_cast<int16_t*>(rhs));
-                        break;
-                    case Type::Int32:
-                        result = MathOperation::Compare(reinterpret_cast<uint16_t*>(lhs), reinterpret_cast<int32_t*>(rhs));
-                        break;
-                    case Type::Int64:
-                        result = MathOperation::Compare(reinterpret_cast<uint16_t*>(lhs), reinterpret_cast<int64_t*>(rhs));
-                        break;       
-                    case Type::Int8:
-                        result = MathOperation::Compare(reinterpret_cast<uint16_t*>(lhs), reinterpret_cast<char*>(rhs));
-                        break;      
-                    case Type::Single:
-                        result = MathOperation::Compare(reinterpret_cast<uint16_t*>(lhs), reinterpret_cast<float*>(rhs));
-                        break;        
-                    case Type::UInt16:
-                        result = MathOperation::Compare(reinterpret_cast<uint16_t*>(lhs), reinterpret_cast<uint16_t*>(rhs));
-                        break;       
-                    case Type::UInt32:
-                        result = MathOperation::Compare(reinterpret_cast<uint16_t*>(lhs), reinterpret_cast<uint32_t*>(rhs));
-                        break;        
-                    case Type::UInt64:
-                        result = MathOperation::Compare(reinterpret_cast<uint16_t*>(lhs), reinterpret_cast<uint64_t*>(rhs));
-                        break;                            
-                    case Type::UInt8:
-                        result = MathOperation::Compare(reinterpret_cast<uint16_t*>(lhs), reinterpret_cast<unsigned char*>(rhs));
-                        break;                                                                                                                                                                                                                                                                                                                                                         
-                }
-                break;
-            }               
-            case Type::UInt32:
-            {
-                switch(rhsDataType)
-                {
-                    case Type::Double:
-                        result = MathOperation::Compare(reinterpret_cast<uint32_t*>(lhs), reinterpret_cast<double*>(rhs));
-                        break;
-                    case Type::Int16:
-                        result = MathOperation::Compare(reinterpret_cast<uint32_t*>(lhs), reinterpret_cast<int16_t*>(rhs));
-                        break;
-                    case Type::Int32:
-                        result = MathOperation::Compare(reinterpret_cast<uint32_t*>(lhs), reinterpret_cast<int32_t*>(rhs));
-                        break;
-                    case Type::Int64:
-                        result = MathOperation::Compare(reinterpret_cast<uint32_t*>(lhs), reinterpret_cast<int64_t*>(rhs));
-                        break;       
-                    case Type::Int8:
-                        result = MathOperation::Compare(reinterpret_cast<uint32_t*>(lhs), reinterpret_cast<char*>(rhs));
-                        break;      
-                    case Type::Single:
-                        result = MathOperation::Compare(reinterpret_cast<uint32_t*>(lhs), reinterpret_cast<float*>(rhs));
-                        break;        
-                    case Type::UInt16:
-                        result = MathOperation::Compare(reinterpret_cast<uint32_t*>(lhs), reinterpret_cast<uint16_t*>(rhs));
-                        break;       
-                    case Type::UInt32:
-                        result = MathOperation::Compare(reinterpret_cast<uint32_t*>(lhs), reinterpret_cast<uint32_t*>(rhs));
-                        break;        
-                    case Type::UInt64:
-                        result = MathOperation::Compare(reinterpret_cast<uint32_t*>(lhs), reinterpret_cast<uint64_t*>(rhs));
-                        break;                            
-                    case Type::UInt8:
-                        result = MathOperation::Compare(reinterpret_cast<uint32_t*>(lhs), reinterpret_cast<unsigned char*>(rhs));
-                        break;                                                                                                                                                                                                                                                                                                                                                         
-                }
-                break;
-            }               
-            case Type::UInt64:
-            {
-                switch(rhsDataType)
-                {
-                    case Type::Double:
-                        result = MathOperation::Compare(reinterpret_cast<uint64_t*>(lhs), reinterpret_cast<double*>(rhs));
-                        break;
-                    case Type::Int16:
-                        result = MathOperation::Compare(reinterpret_cast<uint64_t*>(lhs), reinterpret_cast<int16_t*>(rhs));
-                        break;
-                    case Type::Int32:
-                        result = MathOperation::Compare(reinterpret_cast<uint64_t*>(lhs), reinterpret_cast<int32_t*>(rhs));
-                        break;
-                    case Type::Int64:
-                        result = MathOperation::Compare(reinterpret_cast<uint64_t*>(lhs), reinterpret_cast<int64_t*>(rhs));
-                        break;       
-                    case Type::Int8:
-                        result = MathOperation::Compare(reinterpret_cast<uint64_t*>(lhs), reinterpret_cast<char*>(rhs));
-                        break;      
-                    case Type::Single:
-                        result = MathOperation::Compare(reinterpret_cast<uint64_t*>(lhs), reinterpret_cast<float*>(rhs));
-                        break;        
-                    case Type::UInt16:
-                        result = MathOperation::Compare(reinterpret_cast<uint64_t*>(lhs), reinterpret_cast<uint16_t*>(rhs));
-                        break;       
-                    case Type::UInt32:
-                        result = MathOperation::Compare(reinterpret_cast<uint64_t*>(lhs), reinterpret_cast<uint32_t*>(rhs));
-                        break;        
-                    case Type::UInt64:
-                        result = MathOperation::Compare(reinterpret_cast<uint64_t*>(lhs), reinterpret_cast<uint64_t*>(rhs));
-                        break;                            
-                    case Type::UInt8:
-                        result = MathOperation::Compare(reinterpret_cast<uint64_t*>(lhs), reinterpret_cast<unsigned char*>(rhs));
-                        break;                                                                                                                                                                                                                                                                                                                                                         
-                }
-                break;
-            }               
-            case Type::UInt8:
-            {
-                switch(rhsDataType)
-                {
-                    case Type::Double:
-                        result = MathOperation::Compare(reinterpret_cast<unsigned char*>(lhs), reinterpret_cast<double*>(rhs));
-                        break;
-                    case Type::Int16:
-                        result = MathOperation::Compare(reinterpret_cast<unsigned char*>(lhs), reinterpret_cast<int16_t*>(rhs));
-                        break;
-                    case Type::Int32:
-                        result = MathOperation::Compare(reinterpret_cast<unsigned char*>(lhs), reinterpret_cast<int32_t*>(rhs));
-                        break;
-                    case Type::Int64:
-                        result = MathOperation::Compare(reinterpret_cast<unsigned char*>(lhs), reinterpret_cast<int64_t*>(rhs));
-                        break;       
-                    case Type::Int8:
-                        result = MathOperation::Compare(reinterpret_cast<unsigned char*>(lhs), reinterpret_cast<char*>(rhs));
-                        break;      
-                    case Type::Single:
-                        result = MathOperation::Compare(reinterpret_cast<unsigned char*>(lhs), reinterpret_cast<float*>(rhs));
-                        break;        
-                    case Type::UInt16:
-                        result = MathOperation::Compare(reinterpret_cast<unsigned char*>(lhs), reinterpret_cast<uint16_t*>(rhs));
-                        break;       
-                    case Type::UInt32:
-                        result = MathOperation::Compare(reinterpret_cast<unsigned char*>(lhs), reinterpret_cast<uint32_t*>(rhs));
-                        break;        
-                    case Type::UInt64:
-                        result = MathOperation::Compare(reinterpret_cast<unsigned char*>(lhs), reinterpret_cast<uint64_t*>(rhs));
-                        break;                            
-                    case Type::UInt8:
-                        result = MathOperation::Compare(reinterpret_cast<unsigned char*>(lhs), reinterpret_cast<unsigned char*>(rhs));
-                        break;                                                                                                                                                                                                                                                                                                                                                         
-                }
-                break;
-            }
-        }  
+        uint64_t result = cmpFunctions[lhsDataType][rhsDataType](lhs, rhs);
 
         if(result == 0)
             compareFlag = 0;
@@ -1937,4127 +112,4052 @@ namespace StackVM
             compareFlag = 1;
     }
 
-    //////////////////////////////////////////////////////////////////////////////////////////
-    //////////////////////////////////////////////////////////////////////////////////////////
-    //Add
-    //////////////////////////////////////////////////////////////////////////////////////////
-    //////////////////////////////////////////////////////////////////////////////////////////
-
-    void MathOperation::Add(unsigned char* lhs, unsigned char* rhs)
+    void MathOperation::Add(byte* lhs, byte* rhs, Type lhsDataType, Type rhsDataType)
     {
-	    *lhs += *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Add" << " " << "unsigned char" << "," << "unsigned char" << " " << *lhs << std::endl;
+        addFunctions[lhsDataType][rhsDataType](lhs, rhs);
     }
 
-    void MathOperation::Add(unsigned char* lhs, char* rhs)
+    void MathOperation::Subtract(byte* lhs, byte* rhs, Type lhsDataType, Type rhsDataType)
     {
-	    *lhs += *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Add" << " " << "unsigned char" << "," << "char" << " " << *lhs << std::endl;
+        subFunctions[lhsDataType][rhsDataType](lhs, rhs);
     }
 
-    void MathOperation::Add(unsigned char* lhs, uint16_t* rhs)
+    void MathOperation::Multiply(byte* lhs, byte* rhs, Type lhsDataType, Type rhsDataType)
     {
-	    *lhs += *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Add" << " " << "unsigned char" << "," << "uint16_t" << " " << *lhs << std::endl;
+        mulFunctions[lhsDataType][rhsDataType](lhs, rhs);
     }
 
-    void MathOperation::Add(unsigned char* lhs, int16_t* rhs)
+    void MathOperation::Divide(byte* lhs, byte* rhs, Type lhsDataType, Type rhsDataType)
     {
-	    *lhs += *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Add" << " " << "unsigned char" << "," << "int16_t" << " " << *lhs << std::endl;
+        divFunctions[lhsDataType][rhsDataType](lhs, rhs);
     }
 
-    void MathOperation::Add(unsigned char* lhs, uint32_t* rhs)
+    //Compare--------------------------
+    //---------------------------------
+    //---------------------------------
+    //---------------------------------
+
+    uint64_t MathOperation::CompareUInt8UInt8(byte* lhs, byte* rhs)
     {
-	    *lhs += *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Add" << " " << "unsigned char" << "," << "uint32_t" << " " << *lhs << std::endl;
+	    uint8_t* ptrLhs = reinterpret_cast<uint8_t*>(lhs);
+	    uint8_t* ptrRhs = reinterpret_cast<uint8_t*>(rhs);
+	    int64_t result = (*ptrLhs - *ptrRhs);
+	    return result;
     }
 
-    void MathOperation::Add(unsigned char* lhs, int32_t* rhs)
+    uint64_t MathOperation::CompareUInt8Int8(byte* lhs, byte* rhs)
     {
-	    *lhs += *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Add" << " " << "unsigned char" << "," << "int32_t" << " " << *lhs << std::endl;
+	    uint8_t* ptrLhs = reinterpret_cast<uint8_t*>(lhs);
+	    int8_t* ptrRhs = reinterpret_cast<int8_t*>(rhs);
+	    int64_t result = (*ptrLhs - *ptrRhs);
+	    return result;
     }
 
-    void MathOperation::Add(unsigned char* lhs, uint64_t* rhs)
+    uint64_t MathOperation::CompareUInt8UInt16(byte* lhs, byte* rhs)
     {
-	    *lhs += *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Add" << " " << "unsigned char" << "," << "uint64_t" << " " << *lhs << std::endl;
+	    uint8_t* ptrLhs = reinterpret_cast<uint8_t*>(lhs);
+	    uint16_t* ptrRhs = reinterpret_cast<uint16_t*>(rhs);
+	    int64_t result = (*ptrLhs - *ptrRhs);
+	    return result;
     }
 
-    void MathOperation::Add(unsigned char* lhs, int64_t* rhs)
+    uint64_t MathOperation::CompareUInt8Int16(byte* lhs, byte* rhs)
     {
-	    *lhs += *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Add" << " " << "unsigned char" << "," << "int64_t" << " " << *lhs << std::endl;
+	    uint8_t* ptrLhs = reinterpret_cast<uint8_t*>(lhs);
+	    int16_t* ptrRhs = reinterpret_cast<int16_t*>(rhs);
+	    int64_t result = (*ptrLhs - *ptrRhs);
+	    return result;
     }
 
-    void MathOperation::Add(unsigned char* lhs, float* rhs)
+    uint64_t MathOperation::CompareUInt8UInt32(byte* lhs, byte* rhs)
     {
-	    *lhs += *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Add" << " " << "unsigned char" << "," << "float" << " " << *lhs << std::endl;
+	    uint8_t* ptrLhs = reinterpret_cast<uint8_t*>(lhs);
+	    uint32_t* ptrRhs = reinterpret_cast<uint32_t*>(rhs);
+	    int64_t result = (*ptrLhs - *ptrRhs);
+	    return result;
     }
 
-    void MathOperation::Add(unsigned char* lhs, double* rhs)
+    uint64_t MathOperation::CompareUInt8Int32(byte* lhs, byte* rhs)
     {
-	    *lhs += *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Add" << " " << "unsigned char" << "," << "double" << " " << *lhs << std::endl;
+	    uint8_t* ptrLhs = reinterpret_cast<uint8_t*>(lhs);
+	    int32_t* ptrRhs = reinterpret_cast<int32_t*>(rhs);
+	    int64_t result = (*ptrLhs - *ptrRhs);
+	    return result;
     }
 
-    void MathOperation::Add(char* lhs, unsigned char* rhs)
+    uint64_t MathOperation::CompareUInt8UInt64(byte* lhs, byte* rhs)
     {
-	    *lhs += *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Add" << " " << "char" << "," << "unsigned char" << " " << *lhs << std::endl;
+	    uint8_t* ptrLhs = reinterpret_cast<uint8_t*>(lhs);
+	    uint64_t* ptrRhs = reinterpret_cast<uint64_t*>(rhs);
+	    int64_t result = (*ptrLhs - *ptrRhs);
+	    return result;
     }
 
-    void MathOperation::Add(char* lhs, char* rhs)
+    uint64_t MathOperation::CompareUInt8Int64(byte* lhs, byte* rhs)
     {
-	    *lhs += *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Add" << " " << "char" << "," << "char" << " " << *lhs << std::endl;
+	    uint8_t* ptrLhs = reinterpret_cast<uint8_t*>(lhs);
+	    int64_t* ptrRhs = reinterpret_cast<int64_t*>(rhs);
+	    int64_t result = (*ptrLhs - *ptrRhs);
+	    return result;
     }
 
-    void MathOperation::Add(char* lhs, uint16_t* rhs)
+    uint64_t MathOperation::CompareUInt8Single(byte* lhs, byte* rhs)
     {
-	    *lhs += *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Add" << " " << "char" << "," << "uint16_t" << " " << *lhs << std::endl;
+	    uint8_t* ptrLhs = reinterpret_cast<uint8_t*>(lhs);
+	    float* ptrRhs = reinterpret_cast<float*>(rhs);
+	    int64_t result = (*ptrLhs - *ptrRhs);
+	    return result;
     }
 
-    void MathOperation::Add(char* lhs, int16_t* rhs)
+    uint64_t MathOperation::CompareUInt8Double(byte* lhs, byte* rhs)
     {
-	    *lhs += *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Add" << " " << "char" << "," << "int16_t" << " " << *lhs << std::endl;
+	    uint8_t* ptrLhs = reinterpret_cast<uint8_t*>(lhs);
+	    double* ptrRhs = reinterpret_cast<double*>(rhs);
+	    int64_t result = (*ptrLhs - *ptrRhs);
+	    return result;
     }
 
-    void MathOperation::Add(char* lhs, uint32_t* rhs)
+    uint64_t MathOperation::CompareInt8UInt8(byte* lhs, byte* rhs)
     {
-	    *lhs += *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Add" << " " << "char" << "," << "uint32_t" << " " << *lhs << std::endl;
+	    int8_t* ptrLhs = reinterpret_cast<int8_t*>(lhs);
+	    uint8_t* ptrRhs = reinterpret_cast<uint8_t*>(rhs);
+	    int64_t result = (*ptrLhs - *ptrRhs);
+	    return result;
     }
 
-    void MathOperation::Add(char* lhs, int32_t* rhs)
+    uint64_t MathOperation::CompareInt8Int8(byte* lhs, byte* rhs)
     {
-	    *lhs += *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Add" << " " << "char" << "," << "int32_t" << " " << *lhs << std::endl;
+	    int8_t* ptrLhs = reinterpret_cast<int8_t*>(lhs);
+	    int8_t* ptrRhs = reinterpret_cast<int8_t*>(rhs);
+	    int64_t result = (*ptrLhs - *ptrRhs);
+	    return result;
     }
 
-    void MathOperation::Add(char* lhs, uint64_t* rhs)
+    uint64_t MathOperation::CompareInt8UInt16(byte* lhs, byte* rhs)
     {
-	    *lhs += *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Add" << " " << "char" << "," << "uint64_t" << " " << *lhs << std::endl;
+	    int8_t* ptrLhs = reinterpret_cast<int8_t*>(lhs);
+	    uint16_t* ptrRhs = reinterpret_cast<uint16_t*>(rhs);
+	    int64_t result = (*ptrLhs - *ptrRhs);
+	    return result;
     }
 
-    void MathOperation::Add(char* lhs, int64_t* rhs)
+    uint64_t MathOperation::CompareInt8Int16(byte* lhs, byte* rhs)
     {
-	    *lhs += *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Add" << " " << "char" << "," << "int64_t" << " " << *lhs << std::endl;
+	    int8_t* ptrLhs = reinterpret_cast<int8_t*>(lhs);
+	    int16_t* ptrRhs = reinterpret_cast<int16_t*>(rhs);
+	    int64_t result = (*ptrLhs - *ptrRhs);
+	    return result;
     }
 
-    void MathOperation::Add(char* lhs, float* rhs)
+    uint64_t MathOperation::CompareInt8UInt32(byte* lhs, byte* rhs)
     {
-	    *lhs += *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Add" << " " << "char" << "," << "float" << " " << *lhs << std::endl;
+	    int8_t* ptrLhs = reinterpret_cast<int8_t*>(lhs);
+	    uint32_t* ptrRhs = reinterpret_cast<uint32_t*>(rhs);
+	    int64_t result = (*ptrLhs - *ptrRhs);
+	    return result;
     }
 
-    void MathOperation::Add(char* lhs, double* rhs)
+    uint64_t MathOperation::CompareInt8Int32(byte* lhs, byte* rhs)
     {
-	    *lhs += *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Add" << " " << "char" << "," << "double" << " " << *lhs << std::endl;
+	    int8_t* ptrLhs = reinterpret_cast<int8_t*>(lhs);
+	    int32_t* ptrRhs = reinterpret_cast<int32_t*>(rhs);
+	    int64_t result = (*ptrLhs - *ptrRhs);
+	    return result;
     }
 
-    void MathOperation::Add(uint16_t* lhs, unsigned char* rhs)
+    uint64_t MathOperation::CompareInt8UInt64(byte* lhs, byte* rhs)
     {
-	    *lhs += *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Add" << " " << "uint16_t" << "," << "unsigned char" << " " << *lhs << std::endl;
+	    int8_t* ptrLhs = reinterpret_cast<int8_t*>(lhs);
+	    uint64_t* ptrRhs = reinterpret_cast<uint64_t*>(rhs);
+	    int64_t result = (*ptrLhs - *ptrRhs);
+	    return result;
     }
 
-    void MathOperation::Add(uint16_t* lhs, char* rhs)
+    uint64_t MathOperation::CompareInt8Int64(byte* lhs, byte* rhs)
     {
-	    *lhs += *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Add" << " " << "uint16_t" << "," << "char" << " " << *lhs << std::endl;
+	    int8_t* ptrLhs = reinterpret_cast<int8_t*>(lhs);
+	    int64_t* ptrRhs = reinterpret_cast<int64_t*>(rhs);
+	    int64_t result = (*ptrLhs - *ptrRhs);
+	    return result;
     }
 
-    void MathOperation::Add(uint16_t* lhs, uint16_t* rhs)
+    uint64_t MathOperation::CompareInt8Single(byte* lhs, byte* rhs)
     {
-	    *lhs += *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Add" << " " << "uint16_t" << "," << "uint16_t" << " " << *lhs << std::endl;
+	    int8_t* ptrLhs = reinterpret_cast<int8_t*>(lhs);
+	    float* ptrRhs = reinterpret_cast<float*>(rhs);
+	    int64_t result = (*ptrLhs - *ptrRhs);
+	    return result;
     }
 
-    void MathOperation::Add(uint16_t* lhs, int16_t* rhs)
+    uint64_t MathOperation::CompareInt8Double(byte* lhs, byte* rhs)
     {
-	    *lhs += *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Add" << " " << "uint16_t" << "," << "int16_t" << " " << *lhs << std::endl;
+	    int8_t* ptrLhs = reinterpret_cast<int8_t*>(lhs);
+	    double* ptrRhs = reinterpret_cast<double*>(rhs);
+	    int64_t result = (*ptrLhs - *ptrRhs);
+	    return result;
     }
 
-    void MathOperation::Add(uint16_t* lhs, uint32_t* rhs)
+    uint64_t MathOperation::CompareUInt16UInt8(byte* lhs, byte* rhs)
     {
-	    *lhs += *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Add" << " " << "uint16_t" << "," << "uint32_t" << " " << *lhs << std::endl;
+	    uint16_t* ptrLhs = reinterpret_cast<uint16_t*>(lhs);
+	    uint8_t* ptrRhs = reinterpret_cast<uint8_t*>(rhs);
+	    int64_t result = (*ptrLhs - *ptrRhs);
+	    return result;
     }
 
-    void MathOperation::Add(uint16_t* lhs, int32_t* rhs)
+    uint64_t MathOperation::CompareUInt16Int8(byte* lhs, byte* rhs)
     {
-	    *lhs += *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Add" << " " << "uint16_t" << "," << "int32_t" << " " << *lhs << std::endl;
+	    uint16_t* ptrLhs = reinterpret_cast<uint16_t*>(lhs);
+	    int8_t* ptrRhs = reinterpret_cast<int8_t*>(rhs);
+	    int64_t result = (*ptrLhs - *ptrRhs);
+	    return result;
     }
 
-    void MathOperation::Add(uint16_t* lhs, uint64_t* rhs)
+    uint64_t MathOperation::CompareUInt16UInt16(byte* lhs, byte* rhs)
     {
-	    *lhs += *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Add" << " " << "uint16_t" << "," << "uint64_t" << " " << *lhs << std::endl;
+	    uint16_t* ptrLhs = reinterpret_cast<uint16_t*>(lhs);
+	    uint16_t* ptrRhs = reinterpret_cast<uint16_t*>(rhs);
+	    int64_t result = (*ptrLhs - *ptrRhs);
+	    return result;
     }
 
-    void MathOperation::Add(uint16_t* lhs, int64_t* rhs)
+    uint64_t MathOperation::CompareUInt16Int16(byte* lhs, byte* rhs)
     {
-	    *lhs += *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Add" << " " << "uint16_t" << "," << "int64_t" << " " << *lhs << std::endl;
+	    uint16_t* ptrLhs = reinterpret_cast<uint16_t*>(lhs);
+	    int16_t* ptrRhs = reinterpret_cast<int16_t*>(rhs);
+	    int64_t result = (*ptrLhs - *ptrRhs);
+	    return result;
     }
 
-    void MathOperation::Add(uint16_t* lhs, float* rhs)
+    uint64_t MathOperation::CompareUInt16UInt32(byte* lhs, byte* rhs)
     {
-	    *lhs += *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Add" << " " << "uint16_t" << "," << "float" << " " << *lhs << std::endl;
+	    uint16_t* ptrLhs = reinterpret_cast<uint16_t*>(lhs);
+	    uint32_t* ptrRhs = reinterpret_cast<uint32_t*>(rhs);
+	    int64_t result = (*ptrLhs - *ptrRhs);
+	    return result;
     }
 
-    void MathOperation::Add(uint16_t* lhs, double* rhs)
+    uint64_t MathOperation::CompareUInt16Int32(byte* lhs, byte* rhs)
     {
-	    *lhs += *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Add" << " " << "uint16_t" << "," << "double" << " " << *lhs << std::endl;
+	    uint16_t* ptrLhs = reinterpret_cast<uint16_t*>(lhs);
+	    int32_t* ptrRhs = reinterpret_cast<int32_t*>(rhs);
+	    int64_t result = (*ptrLhs - *ptrRhs);
+	    return result;
     }
 
-    void MathOperation::Add(int16_t* lhs, unsigned char* rhs)
+    uint64_t MathOperation::CompareUInt16UInt64(byte* lhs, byte* rhs)
     {
-	    *lhs += *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Add" << " " << "int16_t" << "," << "unsigned char" << " " << *lhs << std::endl;
+	    uint16_t* ptrLhs = reinterpret_cast<uint16_t*>(lhs);
+	    uint64_t* ptrRhs = reinterpret_cast<uint64_t*>(rhs);
+	    int64_t result = (*ptrLhs - *ptrRhs);
+	    return result;
     }
 
-    void MathOperation::Add(int16_t* lhs, char* rhs)
+    uint64_t MathOperation::CompareUInt16Int64(byte* lhs, byte* rhs)
     {
-	    *lhs += *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Add" << " " << "int16_t" << "," << "char" << " " << *lhs << std::endl;
+	    uint16_t* ptrLhs = reinterpret_cast<uint16_t*>(lhs);
+	    int64_t* ptrRhs = reinterpret_cast<int64_t*>(rhs);
+	    int64_t result = (*ptrLhs - *ptrRhs);
+	    return result;
     }
 
-    void MathOperation::Add(int16_t* lhs, uint16_t* rhs)
+    uint64_t MathOperation::CompareUInt16Single(byte* lhs, byte* rhs)
     {
-	    *lhs += *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Add" << " " << "int16_t" << "," << "uint16_t" << " " << *lhs << std::endl;
+	    uint16_t* ptrLhs = reinterpret_cast<uint16_t*>(lhs);
+	    float* ptrRhs = reinterpret_cast<float*>(rhs);
+	    int64_t result = (*ptrLhs - *ptrRhs);
+	    return result;
     }
 
-    void MathOperation::Add(int16_t* lhs, int16_t* rhs)
+    uint64_t MathOperation::CompareUInt16Double(byte* lhs, byte* rhs)
     {
-	    *lhs += *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Add" << " " << "int16_t" << "," << "int16_t" << " " << *lhs << std::endl;
+	    uint16_t* ptrLhs = reinterpret_cast<uint16_t*>(lhs);
+	    double* ptrRhs = reinterpret_cast<double*>(rhs);
+	    int64_t result = (*ptrLhs - *ptrRhs);
+	    return result;
     }
 
-    void MathOperation::Add(int16_t* lhs, uint32_t* rhs)
+    uint64_t MathOperation::CompareInt16UInt8(byte* lhs, byte* rhs)
     {
-	    *lhs += *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Add" << " " << "int16_t" << "," << "uint32_t" << " " << *lhs << std::endl;
+	    int16_t* ptrLhs = reinterpret_cast<int16_t*>(lhs);
+	    uint8_t* ptrRhs = reinterpret_cast<uint8_t*>(rhs);
+	    int64_t result = (*ptrLhs - *ptrRhs);
+	    return result;
     }
 
-    void MathOperation::Add(int16_t* lhs, int32_t* rhs)
+    uint64_t MathOperation::CompareInt16Int8(byte* lhs, byte* rhs)
     {
-	    *lhs += *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Add" << " " << "int16_t" << "," << "int32_t" << " " << *lhs << std::endl;
+	    int16_t* ptrLhs = reinterpret_cast<int16_t*>(lhs);
+	    int8_t* ptrRhs = reinterpret_cast<int8_t*>(rhs);
+	    int64_t result = (*ptrLhs - *ptrRhs);
+	    return result;
     }
 
-    void MathOperation::Add(int16_t* lhs, uint64_t* rhs)
+    uint64_t MathOperation::CompareInt16UInt16(byte* lhs, byte* rhs)
     {
-	    *lhs += *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Add" << " " << "int16_t" << "," << "uint64_t" << " " << *lhs << std::endl;
+	    int16_t* ptrLhs = reinterpret_cast<int16_t*>(lhs);
+	    uint16_t* ptrRhs = reinterpret_cast<uint16_t*>(rhs);
+	    int64_t result = (*ptrLhs - *ptrRhs);
+	    return result;
     }
 
-    void MathOperation::Add(int16_t* lhs, int64_t* rhs)
+    uint64_t MathOperation::CompareInt16Int16(byte* lhs, byte* rhs)
     {
-	    *lhs += *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Add" << " " << "int16_t" << "," << "int64_t" << " " << *lhs << std::endl;
+	    int16_t* ptrLhs = reinterpret_cast<int16_t*>(lhs);
+	    int16_t* ptrRhs = reinterpret_cast<int16_t*>(rhs);
+	    int64_t result = (*ptrLhs - *ptrRhs);
+	    return result;
     }
 
-    void MathOperation::Add(int16_t* lhs, float* rhs)
+    uint64_t MathOperation::CompareInt16UInt32(byte* lhs, byte* rhs)
     {
-	    *lhs += *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Add" << " " << "int16_t" << "," << "float" << " " << *lhs << std::endl;
+	    int16_t* ptrLhs = reinterpret_cast<int16_t*>(lhs);
+	    uint32_t* ptrRhs = reinterpret_cast<uint32_t*>(rhs);
+	    int64_t result = (*ptrLhs - *ptrRhs);
+	    return result;
     }
 
-    void MathOperation::Add(int16_t* lhs, double* rhs)
+    uint64_t MathOperation::CompareInt16Int32(byte* lhs, byte* rhs)
     {
-	    *lhs += *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Add" << " " << "int16_t" << "," << "double" << " " << *lhs << std::endl;
+	    int16_t* ptrLhs = reinterpret_cast<int16_t*>(lhs);
+	    int32_t* ptrRhs = reinterpret_cast<int32_t*>(rhs);
+	    int64_t result = (*ptrLhs - *ptrRhs);
+	    return result;
     }
 
-    void MathOperation::Add(uint32_t* lhs, unsigned char* rhs)
+    uint64_t MathOperation::CompareInt16UInt64(byte* lhs, byte* rhs)
     {
-	    *lhs += *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Add" << " " << "uint32_t" << "," << "unsigned char" << " " << *lhs << std::endl;
+	    int16_t* ptrLhs = reinterpret_cast<int16_t*>(lhs);
+	    uint64_t* ptrRhs = reinterpret_cast<uint64_t*>(rhs);
+	    int64_t result = (*ptrLhs - *ptrRhs);
+	    return result;
     }
 
-    void MathOperation::Add(uint32_t* lhs, char* rhs)
+    uint64_t MathOperation::CompareInt16Int64(byte* lhs, byte* rhs)
     {
-	    *lhs += *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Add" << " " << "uint32_t" << "," << "char" << " " << *lhs << std::endl;
+	    int16_t* ptrLhs = reinterpret_cast<int16_t*>(lhs);
+	    int64_t* ptrRhs = reinterpret_cast<int64_t*>(rhs);
+	    int64_t result = (*ptrLhs - *ptrRhs);
+	    return result;
     }
 
-    void MathOperation::Add(uint32_t* lhs, uint16_t* rhs)
+    uint64_t MathOperation::CompareInt16Single(byte* lhs, byte* rhs)
     {
-	    *lhs += *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Add" << " " << "uint32_t" << "," << "uint16_t" << " " << *lhs << std::endl;
+	    int16_t* ptrLhs = reinterpret_cast<int16_t*>(lhs);
+	    float* ptrRhs = reinterpret_cast<float*>(rhs);
+	    int64_t result = (*ptrLhs - *ptrRhs);
+	    return result;
     }
 
-    void MathOperation::Add(uint32_t* lhs, int16_t* rhs)
+    uint64_t MathOperation::CompareInt16Double(byte* lhs, byte* rhs)
     {
-	    *lhs += *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Add" << " " << "uint32_t" << "," << "int16_t" << " " << *lhs << std::endl;
+	    int16_t* ptrLhs = reinterpret_cast<int16_t*>(lhs);
+	    double* ptrRhs = reinterpret_cast<double*>(rhs);
+	    int64_t result = (*ptrLhs - *ptrRhs);
+	    return result;
     }
 
-    void MathOperation::Add(uint32_t* lhs, uint32_t* rhs)
+    uint64_t MathOperation::CompareUInt32UInt8(byte* lhs, byte* rhs)
     {
-	    *lhs += *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Add" << " " << "uint32_t" << "," << "uint32_t" << " " << *lhs << std::endl;
+	    uint32_t* ptrLhs = reinterpret_cast<uint32_t*>(lhs);
+	    uint8_t* ptrRhs = reinterpret_cast<uint8_t*>(rhs);
+	    int64_t result = (*ptrLhs - *ptrRhs);
+	    return result;
     }
 
-    void MathOperation::Add(uint32_t* lhs, int32_t* rhs)
+    uint64_t MathOperation::CompareUInt32Int8(byte* lhs, byte* rhs)
     {
-	    *lhs += *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Add" << " " << "uint32_t" << "," << "int32_t" << " " << *lhs << std::endl;
+	    uint32_t* ptrLhs = reinterpret_cast<uint32_t*>(lhs);
+	    int8_t* ptrRhs = reinterpret_cast<int8_t*>(rhs);
+	    int64_t result = (*ptrLhs - *ptrRhs);
+	    return result;
     }
 
-    void MathOperation::Add(uint32_t* lhs, uint64_t* rhs)
+    uint64_t MathOperation::CompareUInt32UInt16(byte* lhs, byte* rhs)
     {
-	    *lhs += *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Add" << " " << "uint32_t" << "," << "uint64_t" << " " << *lhs << std::endl;
+	    uint32_t* ptrLhs = reinterpret_cast<uint32_t*>(lhs);
+	    uint16_t* ptrRhs = reinterpret_cast<uint16_t*>(rhs);
+	    int64_t result = (*ptrLhs - *ptrRhs);
+	    return result;
     }
 
-    void MathOperation::Add(uint32_t* lhs, int64_t* rhs)
+    uint64_t MathOperation::CompareUInt32Int16(byte* lhs, byte* rhs)
     {
-	    *lhs += *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Add" << " " << "uint32_t" << "," << "int64_t" << " " << *lhs << std::endl;
+	    uint32_t* ptrLhs = reinterpret_cast<uint32_t*>(lhs);
+	    int16_t* ptrRhs = reinterpret_cast<int16_t*>(rhs);
+	    int64_t result = (*ptrLhs - *ptrRhs);
+	    return result;
     }
 
-    void MathOperation::Add(uint32_t* lhs, float* rhs)
+    uint64_t MathOperation::CompareUInt32UInt32(byte* lhs, byte* rhs)
     {
-	    *lhs += *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Add" << " " << "uint32_t" << "," << "float" << " " << *lhs << std::endl;
+	    uint32_t* ptrLhs = reinterpret_cast<uint32_t*>(lhs);
+	    uint32_t* ptrRhs = reinterpret_cast<uint32_t*>(rhs);
+	    int64_t result = (*ptrLhs - *ptrRhs);
+	    return result;
     }
 
-    void MathOperation::Add(uint32_t* lhs, double* rhs)
+    uint64_t MathOperation::CompareUInt32Int32(byte* lhs, byte* rhs)
     {
-	    *lhs += *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Add" << " " << "uint32_t" << "," << "double" << " " << *lhs << std::endl;
+	    uint32_t* ptrLhs = reinterpret_cast<uint32_t*>(lhs);
+	    int32_t* ptrRhs = reinterpret_cast<int32_t*>(rhs);
+	    int64_t result = (*ptrLhs - *ptrRhs);
+	    return result;
     }
 
-    void MathOperation::Add(int32_t* lhs, unsigned char* rhs)
+    uint64_t MathOperation::CompareUInt32UInt64(byte* lhs, byte* rhs)
     {
-	    *lhs += *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Add" << " " << "int32_t" << "," << "unsigned char" << " " << *lhs << std::endl;
+	    uint32_t* ptrLhs = reinterpret_cast<uint32_t*>(lhs);
+	    uint64_t* ptrRhs = reinterpret_cast<uint64_t*>(rhs);
+	    int64_t result = (*ptrLhs - *ptrRhs);
+	    return result;
     }
 
-    void MathOperation::Add(int32_t* lhs, char* rhs)
+    uint64_t MathOperation::CompareUInt32Int64(byte* lhs, byte* rhs)
     {
-	    *lhs += *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Add" << " " << "int32_t" << "," << "char" << " " << *lhs << std::endl;
+	    uint32_t* ptrLhs = reinterpret_cast<uint32_t*>(lhs);
+	    int64_t* ptrRhs = reinterpret_cast<int64_t*>(rhs);
+	    int64_t result = (*ptrLhs - *ptrRhs);
+	    return result;
     }
 
-    void MathOperation::Add(int32_t* lhs, uint16_t* rhs)
+    uint64_t MathOperation::CompareUInt32Single(byte* lhs, byte* rhs)
     {
-	    *lhs += *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Add" << " " << "int32_t" << "," << "uint16_t" << " " << *lhs << std::endl;
+	    uint32_t* ptrLhs = reinterpret_cast<uint32_t*>(lhs);
+	    float* ptrRhs = reinterpret_cast<float*>(rhs);
+	    int64_t result = (*ptrLhs - *ptrRhs);
+	    return result;
     }
 
-    void MathOperation::Add(int32_t* lhs, int16_t* rhs)
+    uint64_t MathOperation::CompareUInt32Double(byte* lhs, byte* rhs)
     {
-	    *lhs += *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Add" << " " << "int32_t" << "," << "int16_t" << " " << *lhs << std::endl;
+	    uint32_t* ptrLhs = reinterpret_cast<uint32_t*>(lhs);
+	    double* ptrRhs = reinterpret_cast<double*>(rhs);
+	    int64_t result = (*ptrLhs - *ptrRhs);
+	    return result;
     }
 
-    void MathOperation::Add(int32_t* lhs, uint32_t* rhs)
+    uint64_t MathOperation::CompareInt32UInt8(byte* lhs, byte* rhs)
     {
-	    *lhs += *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Add" << " " << "int32_t" << "," << "uint32_t" << " " << *lhs << std::endl;
+	    int32_t* ptrLhs = reinterpret_cast<int32_t*>(lhs);
+	    uint8_t* ptrRhs = reinterpret_cast<uint8_t*>(rhs);
+	    int64_t result = (*ptrLhs - *ptrRhs);
+	    return result;
     }
 
-    void MathOperation::Add(int32_t* lhs, int32_t* rhs)
+    uint64_t MathOperation::CompareInt32Int8(byte* lhs, byte* rhs)
     {
-	    *lhs += *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Add" << " " << "int32_t" << "," << "int32_t" << " " << *lhs << std::endl;
+	    int32_t* ptrLhs = reinterpret_cast<int32_t*>(lhs);
+	    int8_t* ptrRhs = reinterpret_cast<int8_t*>(rhs);
+	    int64_t result = (*ptrLhs - *ptrRhs);
+	    return result;
     }
 
-    void MathOperation::Add(int32_t* lhs, uint64_t* rhs)
+    uint64_t MathOperation::CompareInt32UInt16(byte* lhs, byte* rhs)
     {
-	    *lhs += *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Add" << " " << "int32_t" << "," << "uint64_t" << " " << *lhs << std::endl;
+	    int32_t* ptrLhs = reinterpret_cast<int32_t*>(lhs);
+	    uint16_t* ptrRhs = reinterpret_cast<uint16_t*>(rhs);
+	    int64_t result = (*ptrLhs - *ptrRhs);
+	    return result;
     }
 
-    void MathOperation::Add(int32_t* lhs, int64_t* rhs)
+    uint64_t MathOperation::CompareInt32Int16(byte* lhs, byte* rhs)
     {
-	    *lhs += *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Add" << " " << "int32_t" << "," << "int64_t" << " " << *lhs << std::endl;
+	    int32_t* ptrLhs = reinterpret_cast<int32_t*>(lhs);
+	    int16_t* ptrRhs = reinterpret_cast<int16_t*>(rhs);
+	    int64_t result = (*ptrLhs - *ptrRhs);
+	    return result;
     }
 
-    void MathOperation::Add(int32_t* lhs, float* rhs)
+    uint64_t MathOperation::CompareInt32UInt32(byte* lhs, byte* rhs)
     {
-	    *lhs += *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Add" << " " << "int32_t" << "," << "float" << " " << *lhs << std::endl;
+	    int32_t* ptrLhs = reinterpret_cast<int32_t*>(lhs);
+	    uint32_t* ptrRhs = reinterpret_cast<uint32_t*>(rhs);
+	    int64_t result = (*ptrLhs - *ptrRhs);
+	    return result;
     }
 
-    void MathOperation::Add(int32_t* lhs, double* rhs)
+    uint64_t MathOperation::CompareInt32Int32(byte* lhs, byte* rhs)
     {
-	    *lhs += *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Add" << " " << "int32_t" << "," << "double" << " " << *lhs << std::endl;
+	    int32_t* ptrLhs = reinterpret_cast<int32_t*>(lhs);
+	    int32_t* ptrRhs = reinterpret_cast<int32_t*>(rhs);
+	    int64_t result = (*ptrLhs - *ptrRhs);
+	    return result;
     }
 
-    void MathOperation::Add(uint64_t* lhs, unsigned char* rhs)
+    uint64_t MathOperation::CompareInt32UInt64(byte* lhs, byte* rhs)
     {
-	    *lhs += *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Add" << " " << "uint64_t" << "," << "unsigned char" << " " << *lhs << std::endl;
+	    int32_t* ptrLhs = reinterpret_cast<int32_t*>(lhs);
+	    uint64_t* ptrRhs = reinterpret_cast<uint64_t*>(rhs);
+	    int64_t result = (*ptrLhs - *ptrRhs);
+	    return result;
     }
 
-    void MathOperation::Add(uint64_t* lhs, char* rhs)
+    uint64_t MathOperation::CompareInt32Int64(byte* lhs, byte* rhs)
     {
-	    *lhs += *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Add" << " " << "uint64_t" << "," << "char" << " " << *lhs << std::endl;
+	    int32_t* ptrLhs = reinterpret_cast<int32_t*>(lhs);
+	    int64_t* ptrRhs = reinterpret_cast<int64_t*>(rhs);
+	    int64_t result = (*ptrLhs - *ptrRhs);
+	    return result;
     }
 
-    void MathOperation::Add(uint64_t* lhs, uint16_t* rhs)
+    uint64_t MathOperation::CompareInt32Single(byte* lhs, byte* rhs)
     {
-	    *lhs += *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Add" << " " << "uint64_t" << "," << "uint16_t" << " " << *lhs << std::endl;
+	    int32_t* ptrLhs = reinterpret_cast<int32_t*>(lhs);
+	    float* ptrRhs = reinterpret_cast<float*>(rhs);
+	    int64_t result = (*ptrLhs - *ptrRhs);
+	    return result;
     }
 
-    void MathOperation::Add(uint64_t* lhs, int16_t* rhs)
+    uint64_t MathOperation::CompareInt32Double(byte* lhs, byte* rhs)
     {
-	    *lhs += *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Add" << " " << "uint64_t" << "," << "int16_t" << " " << *lhs << std::endl;
+	    int32_t* ptrLhs = reinterpret_cast<int32_t*>(lhs);
+	    double* ptrRhs = reinterpret_cast<double*>(rhs);
+	    int64_t result = (*ptrLhs - *ptrRhs);
+	    return result;
     }
 
-    void MathOperation::Add(uint64_t* lhs, uint32_t* rhs)
+    uint64_t MathOperation::CompareUInt64UInt8(byte* lhs, byte* rhs)
     {
-	    *lhs += *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Add" << " " << "uint64_t" << "," << "uint32_t" << " " << *lhs << std::endl;
+	    uint64_t* ptrLhs = reinterpret_cast<uint64_t*>(lhs);
+	    uint8_t* ptrRhs = reinterpret_cast<uint8_t*>(rhs);
+	    int64_t result = (*ptrLhs - *ptrRhs);
+	    return result;
     }
 
-    void MathOperation::Add(uint64_t* lhs, int32_t* rhs)
+    uint64_t MathOperation::CompareUInt64Int8(byte* lhs, byte* rhs)
     {
-	    *lhs += *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Add" << " " << "uint64_t" << "," << "int32_t" << " " << *lhs << std::endl;
+	    uint64_t* ptrLhs = reinterpret_cast<uint64_t*>(lhs);
+	    int8_t* ptrRhs = reinterpret_cast<int8_t*>(rhs);
+	    int64_t result = (*ptrLhs - *ptrRhs);
+	    return result;
     }
 
-    void MathOperation::Add(uint64_t* lhs, uint64_t* rhs)
+    uint64_t MathOperation::CompareUInt64UInt16(byte* lhs, byte* rhs)
     {
-	    *lhs += *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Add" << " " << "uint64_t" << "," << "uint64_t" << " " << *lhs << std::endl;
+	    uint64_t* ptrLhs = reinterpret_cast<uint64_t*>(lhs);
+	    uint16_t* ptrRhs = reinterpret_cast<uint16_t*>(rhs);
+	    int64_t result = (*ptrLhs - *ptrRhs);
+	    return result;
     }
 
-    void MathOperation::Add(uint64_t* lhs, int64_t* rhs)
+    uint64_t MathOperation::CompareUInt64Int16(byte* lhs, byte* rhs)
     {
-	    *lhs += *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Add" << " " << "uint64_t" << "," << "int64_t" << " " << *lhs << std::endl;
+	    uint64_t* ptrLhs = reinterpret_cast<uint64_t*>(lhs);
+	    int16_t* ptrRhs = reinterpret_cast<int16_t*>(rhs);
+	    int64_t result = (*ptrLhs - *ptrRhs);
+	    return result;
     }
 
-    void MathOperation::Add(uint64_t* lhs, float* rhs)
+    uint64_t MathOperation::CompareUInt64UInt32(byte* lhs, byte* rhs)
     {
-	    *lhs += *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Add" << " " << "uint64_t" << "," << "float" << " " << *lhs << std::endl;
+	    uint64_t* ptrLhs = reinterpret_cast<uint64_t*>(lhs);
+	    uint32_t* ptrRhs = reinterpret_cast<uint32_t*>(rhs);
+	    int64_t result = (*ptrLhs - *ptrRhs);
+	    return result;
     }
 
-    void MathOperation::Add(uint64_t* lhs, double* rhs)
+    uint64_t MathOperation::CompareUInt64Int32(byte* lhs, byte* rhs)
     {
-	    *lhs += *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Add" << " " << "uint64_t" << "," << "double" << " " << *lhs << std::endl;
+	    uint64_t* ptrLhs = reinterpret_cast<uint64_t*>(lhs);
+	    int32_t* ptrRhs = reinterpret_cast<int32_t*>(rhs);
+	    int64_t result = (*ptrLhs - *ptrRhs);
+	    return result;
     }
 
-    void MathOperation::Add(int64_t* lhs, unsigned char* rhs)
+    uint64_t MathOperation::CompareUInt64UInt64(byte* lhs, byte* rhs)
     {
-	    *lhs += *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Add" << " " << "int64_t" << "," << "unsigned char" << " " << *lhs << std::endl;
+	    uint64_t* ptrLhs = reinterpret_cast<uint64_t*>(lhs);
+	    uint64_t* ptrRhs = reinterpret_cast<uint64_t*>(rhs);
+	    int64_t result = (*ptrLhs - *ptrRhs);
+	    return result;
     }
 
-    void MathOperation::Add(int64_t* lhs, char* rhs)
+    uint64_t MathOperation::CompareUInt64Int64(byte* lhs, byte* rhs)
     {
-	    *lhs += *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Add" << " " << "int64_t" << "," << "char" << " " << *lhs << std::endl;
+	    uint64_t* ptrLhs = reinterpret_cast<uint64_t*>(lhs);
+	    int64_t* ptrRhs = reinterpret_cast<int64_t*>(rhs);
+	    int64_t result = (*ptrLhs - *ptrRhs);
+	    return result;
     }
 
-    void MathOperation::Add(int64_t* lhs, uint16_t* rhs)
+    uint64_t MathOperation::CompareUInt64Single(byte* lhs, byte* rhs)
     {
-	    *lhs += *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Add" << " " << "int64_t" << "," << "uint16_t" << " " << *lhs << std::endl;
+	    uint64_t* ptrLhs = reinterpret_cast<uint64_t*>(lhs);
+	    float* ptrRhs = reinterpret_cast<float*>(rhs);
+	    int64_t result = (*ptrLhs - *ptrRhs);
+	    return result;
     }
 
-    void MathOperation::Add(int64_t* lhs, int16_t* rhs)
+    uint64_t MathOperation::CompareUInt64Double(byte* lhs, byte* rhs)
     {
-	    *lhs += *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Add" << " " << "int64_t" << "," << "int16_t" << " " << *lhs << std::endl;
+	    uint64_t* ptrLhs = reinterpret_cast<uint64_t*>(lhs);
+	    double* ptrRhs = reinterpret_cast<double*>(rhs);
+	    int64_t result = (*ptrLhs - *ptrRhs);
+	    return result;
     }
 
-    void MathOperation::Add(int64_t* lhs, uint32_t* rhs)
+    uint64_t MathOperation::CompareInt64UInt8(byte* lhs, byte* rhs)
     {
-	    *lhs += *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Add" << " " << "int64_t" << "," << "uint32_t" << " " << *lhs << std::endl;
+	    int64_t* ptrLhs = reinterpret_cast<int64_t*>(lhs);
+	    uint8_t* ptrRhs = reinterpret_cast<uint8_t*>(rhs);
+	    int64_t result = (*ptrLhs - *ptrRhs);
+	    return result;
     }
 
-    void MathOperation::Add(int64_t* lhs, int32_t* rhs)
+    uint64_t MathOperation::CompareInt64Int8(byte* lhs, byte* rhs)
     {
-	    *lhs += *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Add" << " " << "int64_t" << "," << "int32_t" << " " << *lhs << std::endl;
+	    int64_t* ptrLhs = reinterpret_cast<int64_t*>(lhs);
+	    int8_t* ptrRhs = reinterpret_cast<int8_t*>(rhs);
+	    int64_t result = (*ptrLhs - *ptrRhs);
+	    return result;
     }
 
-    void MathOperation::Add(int64_t* lhs, uint64_t* rhs)
+    uint64_t MathOperation::CompareInt64UInt16(byte* lhs, byte* rhs)
     {
-	    *lhs += *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Add" << " " << "int64_t" << "," << "uint64_t" << " " << *lhs << std::endl;
+	    int64_t* ptrLhs = reinterpret_cast<int64_t*>(lhs);
+	    uint16_t* ptrRhs = reinterpret_cast<uint16_t*>(rhs);
+	    int64_t result = (*ptrLhs - *ptrRhs);
+	    return result;
     }
 
-    void MathOperation::Add(int64_t* lhs, int64_t* rhs)
+    uint64_t MathOperation::CompareInt64Int16(byte* lhs, byte* rhs)
     {
-	    *lhs += *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Add" << " " << "int64_t" << "," << "int64_t" << " " << *lhs << std::endl;
+	    int64_t* ptrLhs = reinterpret_cast<int64_t*>(lhs);
+	    int16_t* ptrRhs = reinterpret_cast<int16_t*>(rhs);
+	    int64_t result = (*ptrLhs - *ptrRhs);
+	    return result;
     }
 
-    void MathOperation::Add(int64_t* lhs, float* rhs)
+    uint64_t MathOperation::CompareInt64UInt32(byte* lhs, byte* rhs)
     {
-	    *lhs += *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Add" << " " << "int64_t" << "," << "float" << " " << *lhs << std::endl;
+	    int64_t* ptrLhs = reinterpret_cast<int64_t*>(lhs);
+	    uint32_t* ptrRhs = reinterpret_cast<uint32_t*>(rhs);
+	    int64_t result = (*ptrLhs - *ptrRhs);
+	    return result;
     }
 
-    void MathOperation::Add(int64_t* lhs, double* rhs)
+    uint64_t MathOperation::CompareInt64Int32(byte* lhs, byte* rhs)
     {
-	    *lhs += *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Add" << " " << "int64_t" << "," << "double" << " " << *lhs << std::endl;
+	    int64_t* ptrLhs = reinterpret_cast<int64_t*>(lhs);
+	    int32_t* ptrRhs = reinterpret_cast<int32_t*>(rhs);
+	    int64_t result = (*ptrLhs - *ptrRhs);
+	    return result;
     }
 
-    void MathOperation::Add(float* lhs, unsigned char* rhs)
+    uint64_t MathOperation::CompareInt64UInt64(byte* lhs, byte* rhs)
     {
-	    *lhs += *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Add" << " " << "float" << "," << "unsigned char" << " " << *lhs << std::endl;
+	    int64_t* ptrLhs = reinterpret_cast<int64_t*>(lhs);
+	    uint64_t* ptrRhs = reinterpret_cast<uint64_t*>(rhs);
+	    int64_t result = (*ptrLhs - *ptrRhs);
+	    return result;
     }
 
-    void MathOperation::Add(float* lhs, char* rhs)
+    uint64_t MathOperation::CompareInt64Int64(byte* lhs, byte* rhs)
     {
-	    *lhs += *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Add" << " " << "float" << "," << "char" << " " << *lhs << std::endl;
+	    int64_t* ptrLhs = reinterpret_cast<int64_t*>(lhs);
+	    int64_t* ptrRhs = reinterpret_cast<int64_t*>(rhs);
+	    int64_t result = (*ptrLhs - *ptrRhs);
+	    return result;
     }
 
-    void MathOperation::Add(float* lhs, uint16_t* rhs)
+    uint64_t MathOperation::CompareInt64Single(byte* lhs, byte* rhs)
     {
-	    *lhs += *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Add" << " " << "float" << "," << "uint16_t" << " " << *lhs << std::endl;
+	    int64_t* ptrLhs = reinterpret_cast<int64_t*>(lhs);
+	    float* ptrRhs = reinterpret_cast<float*>(rhs);
+	    int64_t result = (*ptrLhs - *ptrRhs);
+	    return result;
     }
 
-    void MathOperation::Add(float* lhs, int16_t* rhs)
+    uint64_t MathOperation::CompareInt64Double(byte* lhs, byte* rhs)
     {
-	    *lhs += *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Add" << " " << "float" << "," << "int16_t" << " " << *lhs << std::endl;
+	    int64_t* ptrLhs = reinterpret_cast<int64_t*>(lhs);
+	    double* ptrRhs = reinterpret_cast<double*>(rhs);
+	    int64_t result = (*ptrLhs - *ptrRhs);
+	    return result;
     }
 
-    void MathOperation::Add(float* lhs, uint32_t* rhs)
+    uint64_t MathOperation::CompareSingleUInt8(byte* lhs, byte* rhs)
     {
-	    *lhs += *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Add" << " " << "float" << "," << "uint32_t" << " " << *lhs << std::endl;
+	    float* ptrLhs = reinterpret_cast<float*>(lhs);
+	    uint8_t* ptrRhs = reinterpret_cast<uint8_t*>(rhs);
+	    int64_t result = (*ptrLhs - *ptrRhs);
+	    return result;
     }
 
-    void MathOperation::Add(float* lhs, int32_t* rhs)
+    uint64_t MathOperation::CompareSingleInt8(byte* lhs, byte* rhs)
     {
-	    *lhs += *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Add" << " " << "float" << "," << "int32_t" << " " << *lhs << std::endl;
+	    float* ptrLhs = reinterpret_cast<float*>(lhs);
+	    int8_t* ptrRhs = reinterpret_cast<int8_t*>(rhs);
+	    int64_t result = (*ptrLhs - *ptrRhs);
+	    return result;
     }
 
-    void MathOperation::Add(float* lhs, uint64_t* rhs)
+    uint64_t MathOperation::CompareSingleUInt16(byte* lhs, byte* rhs)
     {
-	    *lhs += *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Add" << " " << "float" << "," << "uint64_t" << " " << *lhs << std::endl;
+	    float* ptrLhs = reinterpret_cast<float*>(lhs);
+	    uint16_t* ptrRhs = reinterpret_cast<uint16_t*>(rhs);
+	    int64_t result = (*ptrLhs - *ptrRhs);
+	    return result;
     }
 
-    void MathOperation::Add(float* lhs, int64_t* rhs)
+    uint64_t MathOperation::CompareSingleInt16(byte* lhs, byte* rhs)
     {
-	    *lhs += *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Add" << " " << "float" << "," << "int64_t" << " " << *lhs << std::endl;
+	    float* ptrLhs = reinterpret_cast<float*>(lhs);
+	    int16_t* ptrRhs = reinterpret_cast<int16_t*>(rhs);
+	    int64_t result = (*ptrLhs - *ptrRhs);
+	    return result;
     }
 
-    void MathOperation::Add(float* lhs, float* rhs)
+    uint64_t MathOperation::CompareSingleUInt32(byte* lhs, byte* rhs)
     {
-	    *lhs += *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Add" << " " << "float" << "," << "float" << " " << *lhs << std::endl;
+	    float* ptrLhs = reinterpret_cast<float*>(lhs);
+	    uint32_t* ptrRhs = reinterpret_cast<uint32_t*>(rhs);
+	    int64_t result = (*ptrLhs - *ptrRhs);
+	    return result;
     }
 
-    void MathOperation::Add(float* lhs, double* rhs)
+    uint64_t MathOperation::CompareSingleInt32(byte* lhs, byte* rhs)
     {
-	    *lhs += *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Add" << " " << "float" << "," << "double" << " " << *lhs << std::endl;
+	    float* ptrLhs = reinterpret_cast<float*>(lhs);
+	    int32_t* ptrRhs = reinterpret_cast<int32_t*>(rhs);
+	    int64_t result = (*ptrLhs - *ptrRhs);
+	    return result;
     }
 
-    void MathOperation::Add(double* lhs, unsigned char* rhs)
+    uint64_t MathOperation::CompareSingleUInt64(byte* lhs, byte* rhs)
     {
-	    *lhs += *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Add" << " " << "double" << "," << "unsigned char" << " " << *lhs << std::endl;
+	    float* ptrLhs = reinterpret_cast<float*>(lhs);
+	    uint64_t* ptrRhs = reinterpret_cast<uint64_t*>(rhs);
+	    int64_t result = (*ptrLhs - *ptrRhs);
+	    return result;
     }
 
-    void MathOperation::Add(double* lhs, char* rhs)
+    uint64_t MathOperation::CompareSingleInt64(byte* lhs, byte* rhs)
     {
-	    *lhs += *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Add" << " " << "double" << "," << "char" << " " << *lhs << std::endl;
+	    float* ptrLhs = reinterpret_cast<float*>(lhs);
+	    int64_t* ptrRhs = reinterpret_cast<int64_t*>(rhs);
+	    int64_t result = (*ptrLhs - *ptrRhs);
+	    return result;
     }
 
-    void MathOperation::Add(double* lhs, uint16_t* rhs)
+    uint64_t MathOperation::CompareSingleSingle(byte* lhs, byte* rhs)
     {
-	    *lhs += *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Add" << " " << "double" << "," << "uint16_t" << " " << *lhs << std::endl;
+	    float* ptrLhs = reinterpret_cast<float*>(lhs);
+	    float* ptrRhs = reinterpret_cast<float*>(rhs);
+	    int64_t result = (*ptrLhs - *ptrRhs);
+	    return result;
     }
 
-    void MathOperation::Add(double* lhs, int16_t* rhs)
+    uint64_t MathOperation::CompareSingleDouble(byte* lhs, byte* rhs)
     {
-	    *lhs += *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Add" << " " << "double" << "," << "int16_t" << " " << *lhs << std::endl;
+	    float* ptrLhs = reinterpret_cast<float*>(lhs);
+	    double* ptrRhs = reinterpret_cast<double*>(rhs);
+	    int64_t result = (*ptrLhs - *ptrRhs);
+	    return result;
     }
 
-    void MathOperation::Add(double* lhs, uint32_t* rhs)
+    uint64_t MathOperation::CompareDoubleUInt8(byte* lhs, byte* rhs)
     {
-	    *lhs += *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Add" << " " << "double" << "," << "uint32_t" << " " << *lhs << std::endl;
+	    double* ptrLhs = reinterpret_cast<double*>(lhs);
+	    uint8_t* ptrRhs = reinterpret_cast<uint8_t*>(rhs);
+	    int64_t result = (*ptrLhs - *ptrRhs);
+	    return result;
     }
 
-    void MathOperation::Add(double* lhs, int32_t* rhs)
+    uint64_t MathOperation::CompareDoubleInt8(byte* lhs, byte* rhs)
     {
-	    *lhs += *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Add" << " " << "double" << "," << "int32_t" << " " << *lhs << std::endl;
+	    double* ptrLhs = reinterpret_cast<double*>(lhs);
+	    int8_t* ptrRhs = reinterpret_cast<int8_t*>(rhs);
+	    int64_t result = (*ptrLhs - *ptrRhs);
+	    return result;
     }
 
-    void MathOperation::Add(double* lhs, uint64_t* rhs)
+    uint64_t MathOperation::CompareDoubleUInt16(byte* lhs, byte* rhs)
     {
-	    *lhs += *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Add" << " " << "double" << "," << "uint64_t" << " " << *lhs << std::endl;
+	    double* ptrLhs = reinterpret_cast<double*>(lhs);
+	    uint16_t* ptrRhs = reinterpret_cast<uint16_t*>(rhs);
+	    int64_t result = (*ptrLhs - *ptrRhs);
+	    return result;
     }
 
-    void MathOperation::Add(double* lhs, int64_t* rhs)
+    uint64_t MathOperation::CompareDoubleInt16(byte* lhs, byte* rhs)
     {
-	    *lhs += *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Add" << " " << "double" << "," << "int64_t" << " " << *lhs << std::endl;
+	    double* ptrLhs = reinterpret_cast<double*>(lhs);
+	    int16_t* ptrRhs = reinterpret_cast<int16_t*>(rhs);
+	    int64_t result = (*ptrLhs - *ptrRhs);
+	    return result;
     }
 
-    void MathOperation::Add(double* lhs, float* rhs)
+    uint64_t MathOperation::CompareDoubleUInt32(byte* lhs, byte* rhs)
     {
-	    *lhs += *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Add" << " " << "double" << "," << "float" << " " << *lhs << std::endl;
+	    double* ptrLhs = reinterpret_cast<double*>(lhs);
+	    uint32_t* ptrRhs = reinterpret_cast<uint32_t*>(rhs);
+	    int64_t result = (*ptrLhs - *ptrRhs);
+	    return result;
     }
 
-    void MathOperation::Add(double* lhs, double* rhs)
+    uint64_t MathOperation::CompareDoubleInt32(byte* lhs, byte* rhs)
     {
-	    *lhs += *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Add" << " " << "double" << "," << "double" << " " << *lhs << std::endl;
+	    double* ptrLhs = reinterpret_cast<double*>(lhs);
+	    int32_t* ptrRhs = reinterpret_cast<int32_t*>(rhs);
+	    int64_t result = (*ptrLhs - *ptrRhs);
+	    return result;
     }
-
-    //////////////////////////////////////////////////////////////////////////////////////////
-    //////////////////////////////////////////////////////////////////////////////////////////
-    //Subtract
-    //////////////////////////////////////////////////////////////////////////////////////////
-    //////////////////////////////////////////////////////////////////////////////////////////
 
-    void MathOperation::Subtract(unsigned char* lhs, unsigned char* rhs)
+    uint64_t MathOperation::CompareDoubleUInt64(byte* lhs, byte* rhs)
     {
-	    *lhs -= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Subtract" << " " << "unsigned char" << "," << "unsigned char" << " " << *lhs << std::endl;
+	    double* ptrLhs = reinterpret_cast<double*>(lhs);
+	    uint64_t* ptrRhs = reinterpret_cast<uint64_t*>(rhs);
+	    int64_t result = (*ptrLhs - *ptrRhs);
+	    return result;
     }
 
-    void MathOperation::Subtract(unsigned char* lhs, char* rhs)
+    uint64_t MathOperation::CompareDoubleInt64(byte* lhs, byte* rhs)
     {
-	    *lhs -= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Subtract" << " " << "unsigned char" << "," << "char" << " " << *lhs << std::endl;
+	    double* ptrLhs = reinterpret_cast<double*>(lhs);
+	    int64_t* ptrRhs = reinterpret_cast<int64_t*>(rhs);
+	    int64_t result = (*ptrLhs - *ptrRhs);
+	    return result;
     }
 
-    void MathOperation::Subtract(unsigned char* lhs, uint16_t* rhs)
+    uint64_t MathOperation::CompareDoubleSingle(byte* lhs, byte* rhs)
     {
-	    *lhs -= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Subtract" << " " << "unsigned char" << "," << "uint16_t" << " " << *lhs << std::endl;
+	    double* ptrLhs = reinterpret_cast<double*>(lhs);
+	    float* ptrRhs = reinterpret_cast<float*>(rhs);
+	    int64_t result = (*ptrLhs - *ptrRhs);
+	    return result;
     }
 
-    void MathOperation::Subtract(unsigned char* lhs, int16_t* rhs)
+    uint64_t MathOperation::CompareDoubleDouble(byte* lhs, byte* rhs)
     {
-	    *lhs -= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Subtract" << " " << "unsigned char" << "," << "int16_t" << " " << *lhs << std::endl;
+	    double* ptrLhs = reinterpret_cast<double*>(lhs);
+	    double* ptrRhs = reinterpret_cast<double*>(rhs);
+	    int64_t result = (*ptrLhs - *ptrRhs);
+	    return result;
     }
 
-    void MathOperation::Subtract(unsigned char* lhs, uint32_t* rhs)
+
+    //Add------------------------------
+    //---------------------------------
+    //---------------------------------
+    //---------------------------------
+
+    void MathOperation::AddUInt8UInt8(byte* lhs, byte* rhs)
     {
-	    *lhs -= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Subtract" << " " << "unsigned char" << "," << "uint32_t" << " " << *lhs << std::endl;
+	    uint8_t* ptrLhs = reinterpret_cast<uint8_t*>(lhs);
+	    uint8_t* ptrRhs = reinterpret_cast<uint8_t*>(rhs);
+	    *ptrLhs += *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Subtract(unsigned char* lhs, int32_t* rhs)
+    void MathOperation::AddUInt8Int8(byte* lhs, byte* rhs)
     {
-	    *lhs -= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Subtract" << " " << "unsigned char" << "," << "int32_t" << " " << *lhs << std::endl;
+	    uint8_t* ptrLhs = reinterpret_cast<uint8_t*>(lhs);
+	    int8_t* ptrRhs = reinterpret_cast<int8_t*>(rhs);
+	    *ptrLhs += *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Subtract(unsigned char* lhs, uint64_t* rhs)
+    void MathOperation::AddUInt8UInt16(byte* lhs, byte* rhs)
     {
-	    *lhs -= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Subtract" << " " << "unsigned char" << "," << "uint64_t" << " " << *lhs << std::endl;
+	    uint8_t* ptrLhs = reinterpret_cast<uint8_t*>(lhs);
+	    uint16_t* ptrRhs = reinterpret_cast<uint16_t*>(rhs);
+	    *ptrLhs += *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Subtract(unsigned char* lhs, int64_t* rhs)
+    void MathOperation::AddUInt8Int16(byte* lhs, byte* rhs)
     {
-	    *lhs -= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Subtract" << " " << "unsigned char" << "," << "int64_t" << " " << *lhs << std::endl;
+	    uint8_t* ptrLhs = reinterpret_cast<uint8_t*>(lhs);
+	    int16_t* ptrRhs = reinterpret_cast<int16_t*>(rhs);
+	    *ptrLhs += *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Subtract(unsigned char* lhs, float* rhs)
+    void MathOperation::AddUInt8UInt32(byte* lhs, byte* rhs)
     {
-	    *lhs -= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Subtract" << " " << "unsigned char" << "," << "float" << " " << *lhs << std::endl;
+	    uint8_t* ptrLhs = reinterpret_cast<uint8_t*>(lhs);
+	    uint32_t* ptrRhs = reinterpret_cast<uint32_t*>(rhs);
+	    *ptrLhs += *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Subtract(unsigned char* lhs, double* rhs)
+    void MathOperation::AddUInt8Int32(byte* lhs, byte* rhs)
     {
-	    *lhs -= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Subtract" << " " << "unsigned char" << "," << "double" << " " << *lhs << std::endl;
+	    uint8_t* ptrLhs = reinterpret_cast<uint8_t*>(lhs);
+	    int32_t* ptrRhs = reinterpret_cast<int32_t*>(rhs);
+	    *ptrLhs += *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Subtract(char* lhs, unsigned char* rhs)
+    void MathOperation::AddUInt8UInt64(byte* lhs, byte* rhs)
     {
-	    *lhs -= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Subtract" << " " << "char" << "," << "unsigned char" << " " << *lhs << std::endl;
+	    uint8_t* ptrLhs = reinterpret_cast<uint8_t*>(lhs);
+	    uint64_t* ptrRhs = reinterpret_cast<uint64_t*>(rhs);
+	    *ptrLhs += *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Subtract(char* lhs, char* rhs)
+    void MathOperation::AddUInt8Int64(byte* lhs, byte* rhs)
     {
-	    *lhs -= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Subtract" << " " << "char" << "," << "char" << " " << *lhs << std::endl;
+	    uint8_t* ptrLhs = reinterpret_cast<uint8_t*>(lhs);
+	    int64_t* ptrRhs = reinterpret_cast<int64_t*>(rhs);
+	    *ptrLhs += *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Subtract(char* lhs, uint16_t* rhs)
+    void MathOperation::AddUInt8Single(byte* lhs, byte* rhs)
     {
-	    *lhs -= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Subtract" << " " << "char" << "," << "uint16_t" << " " << *lhs << std::endl;
+	    uint8_t* ptrLhs = reinterpret_cast<uint8_t*>(lhs);
+	    float* ptrRhs = reinterpret_cast<float*>(rhs);
+	    *ptrLhs += *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Subtract(char* lhs, int16_t* rhs)
+    void MathOperation::AddUInt8Double(byte* lhs, byte* rhs)
     {
-	    *lhs -= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Subtract" << " " << "char" << "," << "int16_t" << " " << *lhs << std::endl;
+	    uint8_t* ptrLhs = reinterpret_cast<uint8_t*>(lhs);
+	    double* ptrRhs = reinterpret_cast<double*>(rhs);
+	    *ptrLhs += *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Subtract(char* lhs, uint32_t* rhs)
+    void MathOperation::AddInt8UInt8(byte* lhs, byte* rhs)
     {
-	    *lhs -= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Subtract" << " " << "char" << "," << "uint32_t" << " " << *lhs << std::endl;
+	    int8_t* ptrLhs = reinterpret_cast<int8_t*>(lhs);
+	    uint8_t* ptrRhs = reinterpret_cast<uint8_t*>(rhs);
+	    *ptrLhs += *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Subtract(char* lhs, int32_t* rhs)
+    void MathOperation::AddInt8Int8(byte* lhs, byte* rhs)
     {
-	    *lhs -= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Subtract" << " " << "char" << "," << "int32_t" << " " << *lhs << std::endl;
+	    int8_t* ptrLhs = reinterpret_cast<int8_t*>(lhs);
+	    int8_t* ptrRhs = reinterpret_cast<int8_t*>(rhs);
+	    *ptrLhs += *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Subtract(char* lhs, uint64_t* rhs)
+    void MathOperation::AddInt8UInt16(byte* lhs, byte* rhs)
     {
-	    *lhs -= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Subtract" << " " << "char" << "," << "uint64_t" << " " << *lhs << std::endl;
+	    int8_t* ptrLhs = reinterpret_cast<int8_t*>(lhs);
+	    uint16_t* ptrRhs = reinterpret_cast<uint16_t*>(rhs);
+	    *ptrLhs += *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Subtract(char* lhs, int64_t* rhs)
+    void MathOperation::AddInt8Int16(byte* lhs, byte* rhs)
     {
-	    *lhs -= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Subtract" << " " << "char" << "," << "int64_t" << " " << *lhs << std::endl;
+	    int8_t* ptrLhs = reinterpret_cast<int8_t*>(lhs);
+	    int16_t* ptrRhs = reinterpret_cast<int16_t*>(rhs);
+	    *ptrLhs += *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Subtract(char* lhs, float* rhs)
+    void MathOperation::AddInt8UInt32(byte* lhs, byte* rhs)
     {
-	    *lhs -= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Subtract" << " " << "char" << "," << "float" << " " << *lhs << std::endl;
+	    int8_t* ptrLhs = reinterpret_cast<int8_t*>(lhs);
+	    uint32_t* ptrRhs = reinterpret_cast<uint32_t*>(rhs);
+	    *ptrLhs += *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Subtract(char* lhs, double* rhs)
+    void MathOperation::AddInt8Int32(byte* lhs, byte* rhs)
     {
-	    *lhs -= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Subtract" << " " << "char" << "," << "double" << " " << *lhs << std::endl;
+	    int8_t* ptrLhs = reinterpret_cast<int8_t*>(lhs);
+	    int32_t* ptrRhs = reinterpret_cast<int32_t*>(rhs);
+	    *ptrLhs += *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Subtract(uint16_t* lhs, unsigned char* rhs)
+    void MathOperation::AddInt8UInt64(byte* lhs, byte* rhs)
     {
-	    *lhs -= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Subtract" << " " << "uint16_t" << "," << "unsigned char" << " " << *lhs << std::endl;
+	    int8_t* ptrLhs = reinterpret_cast<int8_t*>(lhs);
+	    uint64_t* ptrRhs = reinterpret_cast<uint64_t*>(rhs);
+	    *ptrLhs += *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Subtract(uint16_t* lhs, char* rhs)
+    void MathOperation::AddInt8Int64(byte* lhs, byte* rhs)
     {
-	    *lhs -= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Subtract" << " " << "uint16_t" << "," << "char" << " " << *lhs << std::endl;
+	    int8_t* ptrLhs = reinterpret_cast<int8_t*>(lhs);
+	    int64_t* ptrRhs = reinterpret_cast<int64_t*>(rhs);
+	    *ptrLhs += *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Subtract(uint16_t* lhs, uint16_t* rhs)
+    void MathOperation::AddInt8Single(byte* lhs, byte* rhs)
     {
-	    *lhs -= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Subtract" << " " << "uint16_t" << "," << "uint16_t" << " " << *lhs << std::endl;
+	    int8_t* ptrLhs = reinterpret_cast<int8_t*>(lhs);
+	    float* ptrRhs = reinterpret_cast<float*>(rhs);
+	    *ptrLhs += *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Subtract(uint16_t* lhs, int16_t* rhs)
+    void MathOperation::AddInt8Double(byte* lhs, byte* rhs)
     {
-	    *lhs -= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Subtract" << " " << "uint16_t" << "," << "int16_t" << " " << *lhs << std::endl;
+	    int8_t* ptrLhs = reinterpret_cast<int8_t*>(lhs);
+	    double* ptrRhs = reinterpret_cast<double*>(rhs);
+	    *ptrLhs += *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Subtract(uint16_t* lhs, uint32_t* rhs)
+    void MathOperation::AddUInt16UInt8(byte* lhs, byte* rhs)
     {
-	    *lhs -= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Subtract" << " " << "uint16_t" << "," << "uint32_t" << " " << *lhs << std::endl;
+	    uint16_t* ptrLhs = reinterpret_cast<uint16_t*>(lhs);
+	    uint8_t* ptrRhs = reinterpret_cast<uint8_t*>(rhs);
+	    *ptrLhs += *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Subtract(uint16_t* lhs, int32_t* rhs)
+    void MathOperation::AddUInt16Int8(byte* lhs, byte* rhs)
     {
-	    *lhs -= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Subtract" << " " << "uint16_t" << "," << "int32_t" << " " << *lhs << std::endl;
+	    uint16_t* ptrLhs = reinterpret_cast<uint16_t*>(lhs);
+	    int8_t* ptrRhs = reinterpret_cast<int8_t*>(rhs);
+	    *ptrLhs += *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Subtract(uint16_t* lhs, uint64_t* rhs)
+    void MathOperation::AddUInt16UInt16(byte* lhs, byte* rhs)
     {
-	    *lhs -= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Subtract" << " " << "uint16_t" << "," << "uint64_t" << " " << *lhs << std::endl;
+	    uint16_t* ptrLhs = reinterpret_cast<uint16_t*>(lhs);
+	    uint16_t* ptrRhs = reinterpret_cast<uint16_t*>(rhs);
+	    *ptrLhs += *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Subtract(uint16_t* lhs, int64_t* rhs)
+    void MathOperation::AddUInt16Int16(byte* lhs, byte* rhs)
     {
-	    *lhs -= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Subtract" << " " << "uint16_t" << "," << "int64_t" << " " << *lhs << std::endl;
+	    uint16_t* ptrLhs = reinterpret_cast<uint16_t*>(lhs);
+	    int16_t* ptrRhs = reinterpret_cast<int16_t*>(rhs);
+	    *ptrLhs += *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Subtract(uint16_t* lhs, float* rhs)
+    void MathOperation::AddUInt16UInt32(byte* lhs, byte* rhs)
     {
-	    *lhs -= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Subtract" << " " << "uint16_t" << "," << "float" << " " << *lhs << std::endl;
+	    uint16_t* ptrLhs = reinterpret_cast<uint16_t*>(lhs);
+	    uint32_t* ptrRhs = reinterpret_cast<uint32_t*>(rhs);
+	    *ptrLhs += *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Subtract(uint16_t* lhs, double* rhs)
+    void MathOperation::AddUInt16Int32(byte* lhs, byte* rhs)
     {
-	    *lhs -= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Subtract" << " " << "uint16_t" << "," << "double" << " " << *lhs << std::endl;
+	    uint16_t* ptrLhs = reinterpret_cast<uint16_t*>(lhs);
+	    int32_t* ptrRhs = reinterpret_cast<int32_t*>(rhs);
+	    *ptrLhs += *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Subtract(int16_t* lhs, unsigned char* rhs)
+    void MathOperation::AddUInt16UInt64(byte* lhs, byte* rhs)
     {
-	    *lhs -= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Subtract" << " " << "int16_t" << "," << "unsigned char" << " " << *lhs << std::endl;
+	    uint16_t* ptrLhs = reinterpret_cast<uint16_t*>(lhs);
+	    uint64_t* ptrRhs = reinterpret_cast<uint64_t*>(rhs);
+	    *ptrLhs += *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Subtract(int16_t* lhs, char* rhs)
+    void MathOperation::AddUInt16Int64(byte* lhs, byte* rhs)
     {
-	    *lhs -= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Subtract" << " " << "int16_t" << "," << "char" << " " << *lhs << std::endl;
+	    uint16_t* ptrLhs = reinterpret_cast<uint16_t*>(lhs);
+	    int64_t* ptrRhs = reinterpret_cast<int64_t*>(rhs);
+	    *ptrLhs += *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Subtract(int16_t* lhs, uint16_t* rhs)
+    void MathOperation::AddUInt16Single(byte* lhs, byte* rhs)
     {
-	    *lhs -= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Subtract" << " " << "int16_t" << "," << "uint16_t" << " " << *lhs << std::endl;
+	    uint16_t* ptrLhs = reinterpret_cast<uint16_t*>(lhs);
+	    float* ptrRhs = reinterpret_cast<float*>(rhs);
+	    *ptrLhs += *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Subtract(int16_t* lhs, int16_t* rhs)
+    void MathOperation::AddUInt16Double(byte* lhs, byte* rhs)
     {
-	    *lhs -= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Subtract" << " " << "int16_t" << "," << "int16_t" << " " << *lhs << std::endl;
+	    uint16_t* ptrLhs = reinterpret_cast<uint16_t*>(lhs);
+	    double* ptrRhs = reinterpret_cast<double*>(rhs);
+	    *ptrLhs += *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Subtract(int16_t* lhs, uint32_t* rhs)
+    void MathOperation::AddInt16UInt8(byte* lhs, byte* rhs)
     {
-	    *lhs -= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Subtract" << " " << "int16_t" << "," << "uint32_t" << " " << *lhs << std::endl;
+	    int16_t* ptrLhs = reinterpret_cast<int16_t*>(lhs);
+	    uint8_t* ptrRhs = reinterpret_cast<uint8_t*>(rhs);
+	    *ptrLhs += *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Subtract(int16_t* lhs, int32_t* rhs)
+    void MathOperation::AddInt16Int8(byte* lhs, byte* rhs)
     {
-	    *lhs -= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Subtract" << " " << "int16_t" << "," << "int32_t" << " " << *lhs << std::endl;
+	    int16_t* ptrLhs = reinterpret_cast<int16_t*>(lhs);
+	    int8_t* ptrRhs = reinterpret_cast<int8_t*>(rhs);
+	    *ptrLhs += *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Subtract(int16_t* lhs, uint64_t* rhs)
+    void MathOperation::AddInt16UInt16(byte* lhs, byte* rhs)
     {
-	    *lhs -= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Subtract" << " " << "int16_t" << "," << "uint64_t" << " " << *lhs << std::endl;
+	    int16_t* ptrLhs = reinterpret_cast<int16_t*>(lhs);
+	    uint16_t* ptrRhs = reinterpret_cast<uint16_t*>(rhs);
+	    *ptrLhs += *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Subtract(int16_t* lhs, int64_t* rhs)
+    void MathOperation::AddInt16Int16(byte* lhs, byte* rhs)
     {
-	    *lhs -= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Subtract" << " " << "int16_t" << "," << "int64_t" << " " << *lhs << std::endl;
+	    int16_t* ptrLhs = reinterpret_cast<int16_t*>(lhs);
+	    int16_t* ptrRhs = reinterpret_cast<int16_t*>(rhs);
+	    *ptrLhs += *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Subtract(int16_t* lhs, float* rhs)
+    void MathOperation::AddInt16UInt32(byte* lhs, byte* rhs)
     {
-	    *lhs -= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Subtract" << " " << "int16_t" << "," << "float" << " " << *lhs << std::endl;
+	    int16_t* ptrLhs = reinterpret_cast<int16_t*>(lhs);
+	    uint32_t* ptrRhs = reinterpret_cast<uint32_t*>(rhs);
+	    *ptrLhs += *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Subtract(int16_t* lhs, double* rhs)
+    void MathOperation::AddInt16Int32(byte* lhs, byte* rhs)
     {
-	    *lhs -= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Subtract" << " " << "int16_t" << "," << "double" << " " << *lhs << std::endl;
+	    int16_t* ptrLhs = reinterpret_cast<int16_t*>(lhs);
+	    int32_t* ptrRhs = reinterpret_cast<int32_t*>(rhs);
+	    *ptrLhs += *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Subtract(uint32_t* lhs, unsigned char* rhs)
+    void MathOperation::AddInt16UInt64(byte* lhs, byte* rhs)
     {
-	    *lhs -= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Subtract" << " " << "uint32_t" << "," << "unsigned char" << " " << *lhs << std::endl;
+	    int16_t* ptrLhs = reinterpret_cast<int16_t*>(lhs);
+	    uint64_t* ptrRhs = reinterpret_cast<uint64_t*>(rhs);
+	    *ptrLhs += *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Subtract(uint32_t* lhs, char* rhs)
+    void MathOperation::AddInt16Int64(byte* lhs, byte* rhs)
     {
-	    *lhs -= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Subtract" << " " << "uint32_t" << "," << "char" << " " << *lhs << std::endl;
+	    int16_t* ptrLhs = reinterpret_cast<int16_t*>(lhs);
+	    int64_t* ptrRhs = reinterpret_cast<int64_t*>(rhs);
+	    *ptrLhs += *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Subtract(uint32_t* lhs, uint16_t* rhs)
+    void MathOperation::AddInt16Single(byte* lhs, byte* rhs)
     {
-	    *lhs -= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Subtract" << " " << "uint32_t" << "," << "uint16_t" << " " << *lhs << std::endl;
+	    int16_t* ptrLhs = reinterpret_cast<int16_t*>(lhs);
+	    float* ptrRhs = reinterpret_cast<float*>(rhs);
+	    *ptrLhs += *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Subtract(uint32_t* lhs, int16_t* rhs)
+    void MathOperation::AddInt16Double(byte* lhs, byte* rhs)
     {
-	    *lhs -= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Subtract" << " " << "uint32_t" << "," << "int16_t" << " " << *lhs << std::endl;
+	    int16_t* ptrLhs = reinterpret_cast<int16_t*>(lhs);
+	    double* ptrRhs = reinterpret_cast<double*>(rhs);
+	    *ptrLhs += *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Subtract(uint32_t* lhs, uint32_t* rhs)
+    void MathOperation::AddUInt32UInt8(byte* lhs, byte* rhs)
     {
-	    *lhs -= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Subtract" << " " << "uint32_t" << "," << "uint32_t" << " " << *lhs << std::endl;
+	    uint32_t* ptrLhs = reinterpret_cast<uint32_t*>(lhs);
+	    uint8_t* ptrRhs = reinterpret_cast<uint8_t*>(rhs);
+	    *ptrLhs += *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Subtract(uint32_t* lhs, int32_t* rhs)
+    void MathOperation::AddUInt32Int8(byte* lhs, byte* rhs)
     {
-	    *lhs -= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Subtract" << " " << "uint32_t" << "," << "int32_t" << " " << *lhs << std::endl;
+	    uint32_t* ptrLhs = reinterpret_cast<uint32_t*>(lhs);
+	    int8_t* ptrRhs = reinterpret_cast<int8_t*>(rhs);
+	    *ptrLhs += *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Subtract(uint32_t* lhs, uint64_t* rhs)
+    void MathOperation::AddUInt32UInt16(byte* lhs, byte* rhs)
     {
-	    *lhs -= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Subtract" << " " << "uint32_t" << "," << "uint64_t" << " " << *lhs << std::endl;
+	    uint32_t* ptrLhs = reinterpret_cast<uint32_t*>(lhs);
+	    uint16_t* ptrRhs = reinterpret_cast<uint16_t*>(rhs);
+	    *ptrLhs += *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Subtract(uint32_t* lhs, int64_t* rhs)
+    void MathOperation::AddUInt32Int16(byte* lhs, byte* rhs)
     {
-	    *lhs -= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Subtract" << " " << "uint32_t" << "," << "int64_t" << " " << *lhs << std::endl;
+	    uint32_t* ptrLhs = reinterpret_cast<uint32_t*>(lhs);
+	    int16_t* ptrRhs = reinterpret_cast<int16_t*>(rhs);
+	    *ptrLhs += *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Subtract(uint32_t* lhs, float* rhs)
+    void MathOperation::AddUInt32UInt32(byte* lhs, byte* rhs)
     {
-	    *lhs -= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Subtract" << " " << "uint32_t" << "," << "float" << " " << *lhs << std::endl;
+	    uint32_t* ptrLhs = reinterpret_cast<uint32_t*>(lhs);
+	    uint32_t* ptrRhs = reinterpret_cast<uint32_t*>(rhs);
+	    *ptrLhs += *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Subtract(uint32_t* lhs, double* rhs)
+    void MathOperation::AddUInt32Int32(byte* lhs, byte* rhs)
     {
-	    *lhs -= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Subtract" << " " << "uint32_t" << "," << "double" << " " << *lhs << std::endl;
+	    uint32_t* ptrLhs = reinterpret_cast<uint32_t*>(lhs);
+	    int32_t* ptrRhs = reinterpret_cast<int32_t*>(rhs);
+	    *ptrLhs += *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Subtract(int32_t* lhs, unsigned char* rhs)
+    void MathOperation::AddUInt32UInt64(byte* lhs, byte* rhs)
     {
-	    *lhs -= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Subtract" << " " << "int32_t" << "," << "unsigned char" << " " << *lhs << std::endl;
+	    uint32_t* ptrLhs = reinterpret_cast<uint32_t*>(lhs);
+	    uint64_t* ptrRhs = reinterpret_cast<uint64_t*>(rhs);
+	    *ptrLhs += *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Subtract(int32_t* lhs, char* rhs)
+    void MathOperation::AddUInt32Int64(byte* lhs, byte* rhs)
     {
-	    *lhs -= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Subtract" << " " << "int32_t" << "," << "char" << " " << *lhs << std::endl;
+	    uint32_t* ptrLhs = reinterpret_cast<uint32_t*>(lhs);
+	    int64_t* ptrRhs = reinterpret_cast<int64_t*>(rhs);
+	    *ptrLhs += *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Subtract(int32_t* lhs, uint16_t* rhs)
+    void MathOperation::AddUInt32Single(byte* lhs, byte* rhs)
     {
-	    *lhs -= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Subtract" << " " << "int32_t" << "," << "uint16_t" << " " << *lhs << std::endl;
+	    uint32_t* ptrLhs = reinterpret_cast<uint32_t*>(lhs);
+	    float* ptrRhs = reinterpret_cast<float*>(rhs);
+	    *ptrLhs += *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Subtract(int32_t* lhs, int16_t* rhs)
+    void MathOperation::AddUInt32Double(byte* lhs, byte* rhs)
     {
-	    *lhs -= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Subtract" << " " << "int32_t" << "," << "int16_t" << " " << *lhs << std::endl;
+	    uint32_t* ptrLhs = reinterpret_cast<uint32_t*>(lhs);
+	    double* ptrRhs = reinterpret_cast<double*>(rhs);
+	    *ptrLhs += *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Subtract(int32_t* lhs, uint32_t* rhs)
+    void MathOperation::AddInt32UInt8(byte* lhs, byte* rhs)
     {
-	    *lhs -= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Subtract" << " " << "int32_t" << "," << "uint32_t" << " " << *lhs << std::endl;
+	    int32_t* ptrLhs = reinterpret_cast<int32_t*>(lhs);
+	    uint8_t* ptrRhs = reinterpret_cast<uint8_t*>(rhs);
+	    *ptrLhs += *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Subtract(int32_t* lhs, int32_t* rhs)
+    void MathOperation::AddInt32Int8(byte* lhs, byte* rhs)
     {
-	    *lhs -= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Subtract" << " " << "int32_t" << "," << "int32_t" << " " << *lhs << std::endl;
+	    int32_t* ptrLhs = reinterpret_cast<int32_t*>(lhs);
+	    int8_t* ptrRhs = reinterpret_cast<int8_t*>(rhs);
+	    *ptrLhs += *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Subtract(int32_t* lhs, uint64_t* rhs)
+    void MathOperation::AddInt32UInt16(byte* lhs, byte* rhs)
     {
-	    *lhs -= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Subtract" << " " << "int32_t" << "," << "uint64_t" << " " << *lhs << std::endl;
+	    int32_t* ptrLhs = reinterpret_cast<int32_t*>(lhs);
+	    uint16_t* ptrRhs = reinterpret_cast<uint16_t*>(rhs);
+	    *ptrLhs += *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Subtract(int32_t* lhs, int64_t* rhs)
+    void MathOperation::AddInt32Int16(byte* lhs, byte* rhs)
     {
-	    *lhs -= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Subtract" << " " << "int32_t" << "," << "int64_t" << " " << *lhs << std::endl;
+	    int32_t* ptrLhs = reinterpret_cast<int32_t*>(lhs);
+	    int16_t* ptrRhs = reinterpret_cast<int16_t*>(rhs);
+	    *ptrLhs += *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Subtract(int32_t* lhs, float* rhs)
+    void MathOperation::AddInt32UInt32(byte* lhs, byte* rhs)
     {
-	    *lhs -= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Subtract" << " " << "int32_t" << "," << "float" << " " << *lhs << std::endl;
+	    int32_t* ptrLhs = reinterpret_cast<int32_t*>(lhs);
+	    uint32_t* ptrRhs = reinterpret_cast<uint32_t*>(rhs);
+	    *ptrLhs += *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Subtract(int32_t* lhs, double* rhs)
+    void MathOperation::AddInt32Int32(byte* lhs, byte* rhs)
     {
-	    *lhs -= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Subtract" << " " << "int32_t" << "," << "double" << " " << *lhs << std::endl;
+	    int32_t* ptrLhs = reinterpret_cast<int32_t*>(lhs);
+	    int32_t* ptrRhs = reinterpret_cast<int32_t*>(rhs);
+	    *ptrLhs += *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Subtract(uint64_t* lhs, unsigned char* rhs)
+    void MathOperation::AddInt32UInt64(byte* lhs, byte* rhs)
     {
-	    *lhs -= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Subtract" << " " << "uint64_t" << "," << "unsigned char" << " " << *lhs << std::endl;
+	    int32_t* ptrLhs = reinterpret_cast<int32_t*>(lhs);
+	    uint64_t* ptrRhs = reinterpret_cast<uint64_t*>(rhs);
+	    *ptrLhs += *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Subtract(uint64_t* lhs, char* rhs)
+    void MathOperation::AddInt32Int64(byte* lhs, byte* rhs)
     {
-	    *lhs -= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Subtract" << " " << "uint64_t" << "," << "char" << " " << *lhs << std::endl;
+	    int32_t* ptrLhs = reinterpret_cast<int32_t*>(lhs);
+	    int64_t* ptrRhs = reinterpret_cast<int64_t*>(rhs);
+	    *ptrLhs += *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Subtract(uint64_t* lhs, uint16_t* rhs)
+    void MathOperation::AddInt32Single(byte* lhs, byte* rhs)
     {
-	    *lhs -= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Subtract" << " " << "uint64_t" << "," << "uint16_t" << " " << *lhs << std::endl;
+	    int32_t* ptrLhs = reinterpret_cast<int32_t*>(lhs);
+	    float* ptrRhs = reinterpret_cast<float*>(rhs);
+	    *ptrLhs += *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Subtract(uint64_t* lhs, int16_t* rhs)
+    void MathOperation::AddInt32Double(byte* lhs, byte* rhs)
     {
-	    *lhs -= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Subtract" << " " << "uint64_t" << "," << "int16_t" << " " << *lhs << std::endl;
+	    int32_t* ptrLhs = reinterpret_cast<int32_t*>(lhs);
+	    double* ptrRhs = reinterpret_cast<double*>(rhs);
+	    *ptrLhs += *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Subtract(uint64_t* lhs, uint32_t* rhs)
+    void MathOperation::AddUInt64UInt8(byte* lhs, byte* rhs)
     {
-	    *lhs -= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Subtract" << " " << "uint64_t" << "," << "uint32_t" << " " << *lhs << std::endl;
+	    uint64_t* ptrLhs = reinterpret_cast<uint64_t*>(lhs);
+	    uint8_t* ptrRhs = reinterpret_cast<uint8_t*>(rhs);
+	    *ptrLhs += *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Subtract(uint64_t* lhs, int32_t* rhs)
+    void MathOperation::AddUInt64Int8(byte* lhs, byte* rhs)
     {
-	    *lhs -= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Subtract" << " " << "uint64_t" << "," << "int32_t" << " " << *lhs << std::endl;
+	    uint64_t* ptrLhs = reinterpret_cast<uint64_t*>(lhs);
+	    int8_t* ptrRhs = reinterpret_cast<int8_t*>(rhs);
+	    *ptrLhs += *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Subtract(uint64_t* lhs, uint64_t* rhs)
+    void MathOperation::AddUInt64UInt16(byte* lhs, byte* rhs)
     {
-	    *lhs -= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Subtract" << " " << "uint64_t" << "," << "uint64_t" << " " << *lhs << std::endl;
+	    uint64_t* ptrLhs = reinterpret_cast<uint64_t*>(lhs);
+	    uint16_t* ptrRhs = reinterpret_cast<uint16_t*>(rhs);
+	    *ptrLhs += *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Subtract(uint64_t* lhs, int64_t* rhs)
+    void MathOperation::AddUInt64Int16(byte* lhs, byte* rhs)
     {
-	    *lhs -= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Subtract" << " " << "uint64_t" << "," << "int64_t" << " " << *lhs << std::endl;
+	    uint64_t* ptrLhs = reinterpret_cast<uint64_t*>(lhs);
+	    int16_t* ptrRhs = reinterpret_cast<int16_t*>(rhs);
+	    *ptrLhs += *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Subtract(uint64_t* lhs, float* rhs)
+    void MathOperation::AddUInt64UInt32(byte* lhs, byte* rhs)
     {
-	    *lhs -= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Subtract" << " " << "uint64_t" << "," << "float" << " " << *lhs << std::endl;
+	    uint64_t* ptrLhs = reinterpret_cast<uint64_t*>(lhs);
+	    uint32_t* ptrRhs = reinterpret_cast<uint32_t*>(rhs);
+	    *ptrLhs += *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Subtract(uint64_t* lhs, double* rhs)
+    void MathOperation::AddUInt64Int32(byte* lhs, byte* rhs)
     {
-	    *lhs -= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Subtract" << " " << "uint64_t" << "," << "double" << " " << *lhs << std::endl;
+	    uint64_t* ptrLhs = reinterpret_cast<uint64_t*>(lhs);
+	    int32_t* ptrRhs = reinterpret_cast<int32_t*>(rhs);
+	    *ptrLhs += *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Subtract(int64_t* lhs, unsigned char* rhs)
+    void MathOperation::AddUInt64UInt64(byte* lhs, byte* rhs)
     {
-	    *lhs -= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Subtract" << " " << "int64_t" << "," << "unsigned char" << " " << *lhs << std::endl;
+	    uint64_t* ptrLhs = reinterpret_cast<uint64_t*>(lhs);
+	    uint64_t* ptrRhs = reinterpret_cast<uint64_t*>(rhs);
+	    *ptrLhs += *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Subtract(int64_t* lhs, char* rhs)
+    void MathOperation::AddUInt64Int64(byte* lhs, byte* rhs)
     {
-	    *lhs -= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Subtract" << " " << "int64_t" << "," << "char" << " " << *lhs << std::endl;
+	    uint64_t* ptrLhs = reinterpret_cast<uint64_t*>(lhs);
+	    int64_t* ptrRhs = reinterpret_cast<int64_t*>(rhs);
+	    *ptrLhs += *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Subtract(int64_t* lhs, uint16_t* rhs)
+    void MathOperation::AddUInt64Single(byte* lhs, byte* rhs)
     {
-	    *lhs -= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Subtract" << " " << "int64_t" << "," << "uint16_t" << " " << *lhs << std::endl;
+	    uint64_t* ptrLhs = reinterpret_cast<uint64_t*>(lhs);
+	    float* ptrRhs = reinterpret_cast<float*>(rhs);
+	    *ptrLhs += *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Subtract(int64_t* lhs, int16_t* rhs)
+    void MathOperation::AddUInt64Double(byte* lhs, byte* rhs)
     {
-	    *lhs -= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Subtract" << " " << "int64_t" << "," << "int16_t" << " " << *lhs << std::endl;
+	    uint64_t* ptrLhs = reinterpret_cast<uint64_t*>(lhs);
+	    double* ptrRhs = reinterpret_cast<double*>(rhs);
+	    *ptrLhs += *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Subtract(int64_t* lhs, uint32_t* rhs)
+    void MathOperation::AddInt64UInt8(byte* lhs, byte* rhs)
     {
-	    *lhs -= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Subtract" << " " << "int64_t" << "," << "uint32_t" << " " << *lhs << std::endl;
+	    int64_t* ptrLhs = reinterpret_cast<int64_t*>(lhs);
+	    uint8_t* ptrRhs = reinterpret_cast<uint8_t*>(rhs);
+	    *ptrLhs += *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Subtract(int64_t* lhs, int32_t* rhs)
+    void MathOperation::AddInt64Int8(byte* lhs, byte* rhs)
     {
-	    *lhs -= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Subtract" << " " << "int64_t" << "," << "int32_t" << " " << *lhs << std::endl;
+	    int64_t* ptrLhs = reinterpret_cast<int64_t*>(lhs);
+	    int8_t* ptrRhs = reinterpret_cast<int8_t*>(rhs);
+	    *ptrLhs += *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Subtract(int64_t* lhs, uint64_t* rhs)
+    void MathOperation::AddInt64UInt16(byte* lhs, byte* rhs)
     {
-	    *lhs -= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Subtract" << " " << "int64_t" << "," << "uint64_t" << " " << *lhs << std::endl;
+	    int64_t* ptrLhs = reinterpret_cast<int64_t*>(lhs);
+	    uint16_t* ptrRhs = reinterpret_cast<uint16_t*>(rhs);
+	    *ptrLhs += *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Subtract(int64_t* lhs, int64_t* rhs)
+    void MathOperation::AddInt64Int16(byte* lhs, byte* rhs)
     {
-	    *lhs -= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Subtract" << " " << "int64_t" << "," << "int64_t" << " " << *lhs << std::endl;
+	    int64_t* ptrLhs = reinterpret_cast<int64_t*>(lhs);
+	    int16_t* ptrRhs = reinterpret_cast<int16_t*>(rhs);
+	    *ptrLhs += *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Subtract(int64_t* lhs, float* rhs)
+    void MathOperation::AddInt64UInt32(byte* lhs, byte* rhs)
     {
-	    *lhs -= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Subtract" << " " << "int64_t" << "," << "float" << " " << *lhs << std::endl;
+	    int64_t* ptrLhs = reinterpret_cast<int64_t*>(lhs);
+	    uint32_t* ptrRhs = reinterpret_cast<uint32_t*>(rhs);
+	    *ptrLhs += *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Subtract(int64_t* lhs, double* rhs)
+    void MathOperation::AddInt64Int32(byte* lhs, byte* rhs)
     {
-	    *lhs -= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Subtract" << " " << "int64_t" << "," << "double" << " " << *lhs << std::endl;
+	    int64_t* ptrLhs = reinterpret_cast<int64_t*>(lhs);
+	    int32_t* ptrRhs = reinterpret_cast<int32_t*>(rhs);
+	    *ptrLhs += *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Subtract(float* lhs, unsigned char* rhs)
+    void MathOperation::AddInt64UInt64(byte* lhs, byte* rhs)
     {
-	    *lhs -= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Subtract" << " " << "float" << "," << "unsigned char" << " " << *lhs << std::endl;
+	    int64_t* ptrLhs = reinterpret_cast<int64_t*>(lhs);
+	    uint64_t* ptrRhs = reinterpret_cast<uint64_t*>(rhs);
+	    *ptrLhs += *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Subtract(float* lhs, char* rhs)
+    void MathOperation::AddInt64Int64(byte* lhs, byte* rhs)
     {
-	    *lhs -= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Subtract" << " " << "float" << "," << "char" << " " << *lhs << std::endl;
+	    int64_t* ptrLhs = reinterpret_cast<int64_t*>(lhs);
+	    int64_t* ptrRhs = reinterpret_cast<int64_t*>(rhs);
+	    *ptrLhs += *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Subtract(float* lhs, uint16_t* rhs)
+    void MathOperation::AddInt64Single(byte* lhs, byte* rhs)
     {
-	    *lhs -= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Subtract" << " " << "float" << "," << "uint16_t" << " " << *lhs << std::endl;
+	    int64_t* ptrLhs = reinterpret_cast<int64_t*>(lhs);
+	    float* ptrRhs = reinterpret_cast<float*>(rhs);
+	    *ptrLhs += *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Subtract(float* lhs, int16_t* rhs)
+    void MathOperation::AddInt64Double(byte* lhs, byte* rhs)
     {
-	    *lhs -= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Subtract" << " " << "float" << "," << "int16_t" << " " << *lhs << std::endl;
+	    int64_t* ptrLhs = reinterpret_cast<int64_t*>(lhs);
+	    double* ptrRhs = reinterpret_cast<double*>(rhs);
+	    *ptrLhs += *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Subtract(float* lhs, uint32_t* rhs)
+    void MathOperation::AddSingleUInt8(byte* lhs, byte* rhs)
     {
-	    *lhs -= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Subtract" << " " << "float" << "," << "uint32_t" << " " << *lhs << std::endl;
+	    float* ptrLhs = reinterpret_cast<float*>(lhs);
+	    uint8_t* ptrRhs = reinterpret_cast<uint8_t*>(rhs);
+	    *ptrLhs += *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Subtract(float* lhs, int32_t* rhs)
+    void MathOperation::AddSingleInt8(byte* lhs, byte* rhs)
     {
-	    *lhs -= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Subtract" << " " << "float" << "," << "int32_t" << " " << *lhs << std::endl;
+	    float* ptrLhs = reinterpret_cast<float*>(lhs);
+	    int8_t* ptrRhs = reinterpret_cast<int8_t*>(rhs);
+	    *ptrLhs += *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Subtract(float* lhs, uint64_t* rhs)
+    void MathOperation::AddSingleUInt16(byte* lhs, byte* rhs)
     {
-	    *lhs -= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Subtract" << " " << "float" << "," << "uint64_t" << " " << *lhs << std::endl;
+	    float* ptrLhs = reinterpret_cast<float*>(lhs);
+	    uint16_t* ptrRhs = reinterpret_cast<uint16_t*>(rhs);
+	    *ptrLhs += *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Subtract(float* lhs, int64_t* rhs)
+    void MathOperation::AddSingleInt16(byte* lhs, byte* rhs)
     {
-	    *lhs -= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Subtract" << " " << "float" << "," << "int64_t" << " " << *lhs << std::endl;
+	    float* ptrLhs = reinterpret_cast<float*>(lhs);
+	    int16_t* ptrRhs = reinterpret_cast<int16_t*>(rhs);
+	    *ptrLhs += *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Subtract(float* lhs, float* rhs)
+    void MathOperation::AddSingleUInt32(byte* lhs, byte* rhs)
     {
-	    *lhs -= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Subtract" << " " << "float" << "," << "float" << " " << *lhs << std::endl;
+	    float* ptrLhs = reinterpret_cast<float*>(lhs);
+	    uint32_t* ptrRhs = reinterpret_cast<uint32_t*>(rhs);
+	    *ptrLhs += *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Subtract(float* lhs, double* rhs)
+    void MathOperation::AddSingleInt32(byte* lhs, byte* rhs)
     {
-	    *lhs -= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Subtract" << " " << "float" << "," << "double" << " " << *lhs << std::endl;
+	    float* ptrLhs = reinterpret_cast<float*>(lhs);
+	    int32_t* ptrRhs = reinterpret_cast<int32_t*>(rhs);
+	    *ptrLhs += *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Subtract(double* lhs, unsigned char* rhs)
+    void MathOperation::AddSingleUInt64(byte* lhs, byte* rhs)
     {
-	    *lhs -= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Subtract" << " " << "double" << "," << "unsigned char" << " " << *lhs << std::endl;
+	    float* ptrLhs = reinterpret_cast<float*>(lhs);
+	    uint64_t* ptrRhs = reinterpret_cast<uint64_t*>(rhs);
+	    *ptrLhs += *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Subtract(double* lhs, char* rhs)
+    void MathOperation::AddSingleInt64(byte* lhs, byte* rhs)
     {
-	    *lhs -= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Subtract" << " " << "double" << "," << "char" << " " << *lhs << std::endl;
+	    float* ptrLhs = reinterpret_cast<float*>(lhs);
+	    int64_t* ptrRhs = reinterpret_cast<int64_t*>(rhs);
+	    *ptrLhs += *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Subtract(double* lhs, uint16_t* rhs)
+    void MathOperation::AddSingleSingle(byte* lhs, byte* rhs)
     {
-	    *lhs -= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Subtract" << " " << "double" << "," << "uint16_t" << " " << *lhs << std::endl;
+	    float* ptrLhs = reinterpret_cast<float*>(lhs);
+	    float* ptrRhs = reinterpret_cast<float*>(rhs);
+	    *ptrLhs += *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Subtract(double* lhs, int16_t* rhs)
+    void MathOperation::AddSingleDouble(byte* lhs, byte* rhs)
     {
-	    *lhs -= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Subtract" << " " << "double" << "," << "int16_t" << " " << *lhs << std::endl;
+	    float* ptrLhs = reinterpret_cast<float*>(lhs);
+	    double* ptrRhs = reinterpret_cast<double*>(rhs);
+	    *ptrLhs += *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Subtract(double* lhs, uint32_t* rhs)
+    void MathOperation::AddDoubleUInt8(byte* lhs, byte* rhs)
     {
-	    *lhs -= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Subtract" << " " << "double" << "," << "uint32_t" << " " << *lhs << std::endl;
+	    double* ptrLhs = reinterpret_cast<double*>(lhs);
+	    uint8_t* ptrRhs = reinterpret_cast<uint8_t*>(rhs);
+	    *ptrLhs += *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Subtract(double* lhs, int32_t* rhs)
+    void MathOperation::AddDoubleInt8(byte* lhs, byte* rhs)
     {
-	    *lhs -= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Subtract" << " " << "double" << "," << "int32_t" << " " << *lhs << std::endl;
+	    double* ptrLhs = reinterpret_cast<double*>(lhs);
+	    int8_t* ptrRhs = reinterpret_cast<int8_t*>(rhs);
+	    *ptrLhs += *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Subtract(double* lhs, uint64_t* rhs)
+    void MathOperation::AddDoubleUInt16(byte* lhs, byte* rhs)
     {
-	    *lhs -= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Subtract" << " " << "double" << "," << "uint64_t" << " " << *lhs << std::endl;
+	    double* ptrLhs = reinterpret_cast<double*>(lhs);
+	    uint16_t* ptrRhs = reinterpret_cast<uint16_t*>(rhs);
+	    *ptrLhs += *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Subtract(double* lhs, int64_t* rhs)
+    void MathOperation::AddDoubleInt16(byte* lhs, byte* rhs)
     {
-	    *lhs -= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Subtract" << " " << "double" << "," << "int64_t" << " " << *lhs << std::endl;
+	    double* ptrLhs = reinterpret_cast<double*>(lhs);
+	    int16_t* ptrRhs = reinterpret_cast<int16_t*>(rhs);
+	    *ptrLhs += *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Subtract(double* lhs, float* rhs)
+    void MathOperation::AddDoubleUInt32(byte* lhs, byte* rhs)
     {
-	    *lhs -= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Subtract" << " " << "double" << "," << "float" << " " << *lhs << std::endl;
+	    double* ptrLhs = reinterpret_cast<double*>(lhs);
+	    uint32_t* ptrRhs = reinterpret_cast<uint32_t*>(rhs);
+	    *ptrLhs += *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Subtract(double* lhs, double* rhs)
+    void MathOperation::AddDoubleInt32(byte* lhs, byte* rhs)
     {
-	    *lhs -= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Subtract" << " " << "double" << "," << "double" << " " << *lhs << std::endl;
+	    double* ptrLhs = reinterpret_cast<double*>(lhs);
+	    int32_t* ptrRhs = reinterpret_cast<int32_t*>(rhs);
+	    *ptrLhs += *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    //////////////////////////////////////////////////////////////////////////////////////////
-    //////////////////////////////////////////////////////////////////////////////////////////
-    //Multiply
-    //////////////////////////////////////////////////////////////////////////////////////////
-    //////////////////////////////////////////////////////////////////////////////////////////
-
-    void MathOperation::Multiply(unsigned char* lhs, unsigned char* rhs)
+    void MathOperation::AddDoubleUInt64(byte* lhs, byte* rhs)
     {
-	    *lhs *= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Multiply" << " " << "unsigned char" << "," << "unsigned char" << " " << *lhs << std::endl;
+	    double* ptrLhs = reinterpret_cast<double*>(lhs);
+	    uint64_t* ptrRhs = reinterpret_cast<uint64_t*>(rhs);
+	    *ptrLhs += *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Multiply(unsigned char* lhs, char* rhs)
+    void MathOperation::AddDoubleInt64(byte* lhs, byte* rhs)
     {
-	    *lhs *= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Multiply" << " " << "unsigned char" << "," << "char" << " " << *lhs << std::endl;
+	    double* ptrLhs = reinterpret_cast<double*>(lhs);
+	    int64_t* ptrRhs = reinterpret_cast<int64_t*>(rhs);
+	    *ptrLhs += *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Multiply(unsigned char* lhs, uint16_t* rhs)
+    void MathOperation::AddDoubleSingle(byte* lhs, byte* rhs)
     {
-	    *lhs *= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Multiply" << " " << "unsigned char" << "," << "uint16_t" << " " << *lhs << std::endl;
+	    double* ptrLhs = reinterpret_cast<double*>(lhs);
+	    float* ptrRhs = reinterpret_cast<float*>(rhs);
+	    *ptrLhs += *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Multiply(unsigned char* lhs, int16_t* rhs)
+    void MathOperation::AddDoubleDouble(byte* lhs, byte* rhs)
     {
-	    *lhs *= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Multiply" << " " << "unsigned char" << "," << "int16_t" << " " << *lhs << std::endl;
+	    double* ptrLhs = reinterpret_cast<double*>(lhs);
+	    double* ptrRhs = reinterpret_cast<double*>(rhs);
+	    *ptrLhs += *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
+
 
-    void MathOperation::Multiply(unsigned char* lhs, uint32_t* rhs)
+    //Subtract-------------------------
+    //---------------------------------
+    //---------------------------------
+    //---------------------------------
+
+    void MathOperation::SubtractUInt8UInt8(byte* lhs, byte* rhs)
     {
-	    *lhs *= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Multiply" << " " << "unsigned char" << "," << "uint32_t" << " " << *lhs << std::endl;
+	    uint8_t* ptrLhs = reinterpret_cast<uint8_t*>(lhs);
+	    uint8_t* ptrRhs = reinterpret_cast<uint8_t*>(rhs);
+	    *ptrLhs -= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Multiply(unsigned char* lhs, int32_t* rhs)
+    void MathOperation::SubtractUInt8Int8(byte* lhs, byte* rhs)
     {
-	    *lhs *= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Multiply" << " " << "unsigned char" << "," << "int32_t" << " " << *lhs << std::endl;
+	    uint8_t* ptrLhs = reinterpret_cast<uint8_t*>(lhs);
+	    int8_t* ptrRhs = reinterpret_cast<int8_t*>(rhs);
+	    *ptrLhs -= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Multiply(unsigned char* lhs, uint64_t* rhs)
+    void MathOperation::SubtractUInt8UInt16(byte* lhs, byte* rhs)
     {
-	    *lhs *= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Multiply" << " " << "unsigned char" << "," << "uint64_t" << " " << *lhs << std::endl;
+	    uint8_t* ptrLhs = reinterpret_cast<uint8_t*>(lhs);
+	    uint16_t* ptrRhs = reinterpret_cast<uint16_t*>(rhs);
+	    *ptrLhs -= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Multiply(unsigned char* lhs, int64_t* rhs)
+    void MathOperation::SubtractUInt8Int16(byte* lhs, byte* rhs)
     {
-	    *lhs *= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Multiply" << " " << "unsigned char" << "," << "int64_t" << " " << *lhs << std::endl;
+	    uint8_t* ptrLhs = reinterpret_cast<uint8_t*>(lhs);
+	    int16_t* ptrRhs = reinterpret_cast<int16_t*>(rhs);
+	    *ptrLhs -= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Multiply(unsigned char* lhs, float* rhs)
+    void MathOperation::SubtractUInt8UInt32(byte* lhs, byte* rhs)
     {
-	    *lhs *= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Multiply" << " " << "unsigned char" << "," << "float" << " " << *lhs << std::endl;
+	    uint8_t* ptrLhs = reinterpret_cast<uint8_t*>(lhs);
+	    uint32_t* ptrRhs = reinterpret_cast<uint32_t*>(rhs);
+	    *ptrLhs -= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Multiply(unsigned char* lhs, double* rhs)
+    void MathOperation::SubtractUInt8Int32(byte* lhs, byte* rhs)
     {
-	    *lhs *= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Multiply" << " " << "unsigned char" << "," << "double" << " " << *lhs << std::endl;
+	    uint8_t* ptrLhs = reinterpret_cast<uint8_t*>(lhs);
+	    int32_t* ptrRhs = reinterpret_cast<int32_t*>(rhs);
+	    *ptrLhs -= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Multiply(char* lhs, unsigned char* rhs)
+    void MathOperation::SubtractUInt8UInt64(byte* lhs, byte* rhs)
     {
-	    *lhs *= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Multiply" << " " << "char" << "," << "unsigned char" << " " << *lhs << std::endl;
+	    uint8_t* ptrLhs = reinterpret_cast<uint8_t*>(lhs);
+	    uint64_t* ptrRhs = reinterpret_cast<uint64_t*>(rhs);
+	    *ptrLhs -= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Multiply(char* lhs, char* rhs)
+    void MathOperation::SubtractUInt8Int64(byte* lhs, byte* rhs)
     {
-	    *lhs *= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Multiply" << " " << "char" << "," << "char" << " " << *lhs << std::endl;
+	    uint8_t* ptrLhs = reinterpret_cast<uint8_t*>(lhs);
+	    int64_t* ptrRhs = reinterpret_cast<int64_t*>(rhs);
+	    *ptrLhs -= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Multiply(char* lhs, uint16_t* rhs)
+    void MathOperation::SubtractUInt8Single(byte* lhs, byte* rhs)
     {
-	    *lhs *= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Multiply" << " " << "char" << "," << "uint16_t" << " " << *lhs << std::endl;
+	    uint8_t* ptrLhs = reinterpret_cast<uint8_t*>(lhs);
+	    float* ptrRhs = reinterpret_cast<float*>(rhs);
+	    *ptrLhs -= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Multiply(char* lhs, int16_t* rhs)
+    void MathOperation::SubtractUInt8Double(byte* lhs, byte* rhs)
     {
-	    *lhs *= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Multiply" << " " << "char" << "," << "int16_t" << " " << *lhs << std::endl;
+	    uint8_t* ptrLhs = reinterpret_cast<uint8_t*>(lhs);
+	    double* ptrRhs = reinterpret_cast<double*>(rhs);
+	    *ptrLhs -= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Multiply(char* lhs, uint32_t* rhs)
+    void MathOperation::SubtractInt8UInt8(byte* lhs, byte* rhs)
     {
-	    *lhs *= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Multiply" << " " << "char" << "," << "uint32_t" << " " << *lhs << std::endl;
+	    int8_t* ptrLhs = reinterpret_cast<int8_t*>(lhs);
+	    uint8_t* ptrRhs = reinterpret_cast<uint8_t*>(rhs);
+	    *ptrLhs -= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Multiply(char* lhs, int32_t* rhs)
+    void MathOperation::SubtractInt8Int8(byte* lhs, byte* rhs)
     {
-	    *lhs *= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Multiply" << " " << "char" << "," << "int32_t" << " " << *lhs << std::endl;
+	    int8_t* ptrLhs = reinterpret_cast<int8_t*>(lhs);
+	    int8_t* ptrRhs = reinterpret_cast<int8_t*>(rhs);
+	    *ptrLhs -= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Multiply(char* lhs, uint64_t* rhs)
+    void MathOperation::SubtractInt8UInt16(byte* lhs, byte* rhs)
     {
-	    *lhs *= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Multiply" << " " << "char" << "," << "uint64_t" << " " << *lhs << std::endl;
+	    int8_t* ptrLhs = reinterpret_cast<int8_t*>(lhs);
+	    uint16_t* ptrRhs = reinterpret_cast<uint16_t*>(rhs);
+	    *ptrLhs -= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Multiply(char* lhs, int64_t* rhs)
+    void MathOperation::SubtractInt8Int16(byte* lhs, byte* rhs)
     {
-	    *lhs *= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Multiply" << " " << "char" << "," << "int64_t" << " " << *lhs << std::endl;
+	    int8_t* ptrLhs = reinterpret_cast<int8_t*>(lhs);
+	    int16_t* ptrRhs = reinterpret_cast<int16_t*>(rhs);
+	    *ptrLhs -= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Multiply(char* lhs, float* rhs)
+    void MathOperation::SubtractInt8UInt32(byte* lhs, byte* rhs)
     {
-	    *lhs *= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Multiply" << " " << "char" << "," << "float" << " " << *lhs << std::endl;
+	    int8_t* ptrLhs = reinterpret_cast<int8_t*>(lhs);
+	    uint32_t* ptrRhs = reinterpret_cast<uint32_t*>(rhs);
+	    *ptrLhs -= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Multiply(char* lhs, double* rhs)
+    void MathOperation::SubtractInt8Int32(byte* lhs, byte* rhs)
     {
-	    *lhs *= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Multiply" << " " << "char" << "," << "double" << " " << *lhs << std::endl;
+	    int8_t* ptrLhs = reinterpret_cast<int8_t*>(lhs);
+	    int32_t* ptrRhs = reinterpret_cast<int32_t*>(rhs);
+	    *ptrLhs -= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Multiply(uint16_t* lhs, unsigned char* rhs)
+    void MathOperation::SubtractInt8UInt64(byte* lhs, byte* rhs)
     {
-	    *lhs *= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Multiply" << " " << "uint16_t" << "," << "unsigned char" << " " << *lhs << std::endl;
+	    int8_t* ptrLhs = reinterpret_cast<int8_t*>(lhs);
+	    uint64_t* ptrRhs = reinterpret_cast<uint64_t*>(rhs);
+	    *ptrLhs -= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Multiply(uint16_t* lhs, char* rhs)
+    void MathOperation::SubtractInt8Int64(byte* lhs, byte* rhs)
     {
-	    *lhs *= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Multiply" << " " << "uint16_t" << "," << "char" << " " << *lhs << std::endl;
+	    int8_t* ptrLhs = reinterpret_cast<int8_t*>(lhs);
+	    int64_t* ptrRhs = reinterpret_cast<int64_t*>(rhs);
+	    *ptrLhs -= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Multiply(uint16_t* lhs, uint16_t* rhs)
+    void MathOperation::SubtractInt8Single(byte* lhs, byte* rhs)
     {
-	    *lhs *= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Multiply" << " " << "uint16_t" << "," << "uint16_t" << " " << *lhs << std::endl;
+	    int8_t* ptrLhs = reinterpret_cast<int8_t*>(lhs);
+	    float* ptrRhs = reinterpret_cast<float*>(rhs);
+	    *ptrLhs -= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Multiply(uint16_t* lhs, int16_t* rhs)
+    void MathOperation::SubtractInt8Double(byte* lhs, byte* rhs)
     {
-	    *lhs *= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Multiply" << " " << "uint16_t" << "," << "int16_t" << " " << *lhs << std::endl;
+	    int8_t* ptrLhs = reinterpret_cast<int8_t*>(lhs);
+	    double* ptrRhs = reinterpret_cast<double*>(rhs);
+	    *ptrLhs -= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Multiply(uint16_t* lhs, uint32_t* rhs)
+    void MathOperation::SubtractUInt16UInt8(byte* lhs, byte* rhs)
     {
-	    *lhs *= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Multiply" << " " << "uint16_t" << "," << "uint32_t" << " " << *lhs << std::endl;
+	    uint16_t* ptrLhs = reinterpret_cast<uint16_t*>(lhs);
+	    uint8_t* ptrRhs = reinterpret_cast<uint8_t*>(rhs);
+	    *ptrLhs -= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Multiply(uint16_t* lhs, int32_t* rhs)
+    void MathOperation::SubtractUInt16Int8(byte* lhs, byte* rhs)
     {
-	    *lhs *= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Multiply" << " " << "uint16_t" << "," << "int32_t" << " " << *lhs << std::endl;
+	    uint16_t* ptrLhs = reinterpret_cast<uint16_t*>(lhs);
+	    int8_t* ptrRhs = reinterpret_cast<int8_t*>(rhs);
+	    *ptrLhs -= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Multiply(uint16_t* lhs, uint64_t* rhs)
+    void MathOperation::SubtractUInt16UInt16(byte* lhs, byte* rhs)
     {
-	    *lhs *= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Multiply" << " " << "uint16_t" << "," << "uint64_t" << " " << *lhs << std::endl;
+	    uint16_t* ptrLhs = reinterpret_cast<uint16_t*>(lhs);
+	    uint16_t* ptrRhs = reinterpret_cast<uint16_t*>(rhs);
+	    *ptrLhs -= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Multiply(uint16_t* lhs, int64_t* rhs)
+    void MathOperation::SubtractUInt16Int16(byte* lhs, byte* rhs)
     {
-	    *lhs *= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Multiply" << " " << "uint16_t" << "," << "int64_t" << " " << *lhs << std::endl;
+	    uint16_t* ptrLhs = reinterpret_cast<uint16_t*>(lhs);
+	    int16_t* ptrRhs = reinterpret_cast<int16_t*>(rhs);
+	    *ptrLhs -= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Multiply(uint16_t* lhs, float* rhs)
+    void MathOperation::SubtractUInt16UInt32(byte* lhs, byte* rhs)
     {
-	    *lhs *= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Multiply" << " " << "uint16_t" << "," << "float" << " " << *lhs << std::endl;
+	    uint16_t* ptrLhs = reinterpret_cast<uint16_t*>(lhs);
+	    uint32_t* ptrRhs = reinterpret_cast<uint32_t*>(rhs);
+	    *ptrLhs -= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Multiply(uint16_t* lhs, double* rhs)
+    void MathOperation::SubtractUInt16Int32(byte* lhs, byte* rhs)
     {
-	    *lhs *= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Multiply" << " " << "uint16_t" << "," << "double" << " " << *lhs << std::endl;
+	    uint16_t* ptrLhs = reinterpret_cast<uint16_t*>(lhs);
+	    int32_t* ptrRhs = reinterpret_cast<int32_t*>(rhs);
+	    *ptrLhs -= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Multiply(int16_t* lhs, unsigned char* rhs)
+    void MathOperation::SubtractUInt16UInt64(byte* lhs, byte* rhs)
     {
-	    *lhs *= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Multiply" << " " << "int16_t" << "," << "unsigned char" << " " << *lhs << std::endl;
+	    uint16_t* ptrLhs = reinterpret_cast<uint16_t*>(lhs);
+	    uint64_t* ptrRhs = reinterpret_cast<uint64_t*>(rhs);
+	    *ptrLhs -= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Multiply(int16_t* lhs, char* rhs)
+    void MathOperation::SubtractUInt16Int64(byte* lhs, byte* rhs)
     {
-	    *lhs *= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Multiply" << " " << "int16_t" << "," << "char" << " " << *lhs << std::endl;
+	    uint16_t* ptrLhs = reinterpret_cast<uint16_t*>(lhs);
+	    int64_t* ptrRhs = reinterpret_cast<int64_t*>(rhs);
+	    *ptrLhs -= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Multiply(int16_t* lhs, uint16_t* rhs)
+    void MathOperation::SubtractUInt16Single(byte* lhs, byte* rhs)
     {
-	    *lhs *= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Multiply" << " " << "int16_t" << "," << "uint16_t" << " " << *lhs << std::endl;
+	    uint16_t* ptrLhs = reinterpret_cast<uint16_t*>(lhs);
+	    float* ptrRhs = reinterpret_cast<float*>(rhs);
+	    *ptrLhs -= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Multiply(int16_t* lhs, int16_t* rhs)
+    void MathOperation::SubtractUInt16Double(byte* lhs, byte* rhs)
     {
-	    *lhs *= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Multiply" << " " << "int16_t" << "," << "int16_t" << " " << *lhs << std::endl;
+	    uint16_t* ptrLhs = reinterpret_cast<uint16_t*>(lhs);
+	    double* ptrRhs = reinterpret_cast<double*>(rhs);
+	    *ptrLhs -= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Multiply(int16_t* lhs, uint32_t* rhs)
+    void MathOperation::SubtractInt16UInt8(byte* lhs, byte* rhs)
     {
-	    *lhs *= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Multiply" << " " << "int16_t" << "," << "uint32_t" << " " << *lhs << std::endl;
+	    int16_t* ptrLhs = reinterpret_cast<int16_t*>(lhs);
+	    uint8_t* ptrRhs = reinterpret_cast<uint8_t*>(rhs);
+	    *ptrLhs -= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Multiply(int16_t* lhs, int32_t* rhs)
+    void MathOperation::SubtractInt16Int8(byte* lhs, byte* rhs)
     {
-	    *lhs *= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Multiply" << " " << "int16_t" << "," << "int32_t" << " " << *lhs << std::endl;
+	    int16_t* ptrLhs = reinterpret_cast<int16_t*>(lhs);
+	    int8_t* ptrRhs = reinterpret_cast<int8_t*>(rhs);
+	    *ptrLhs -= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Multiply(int16_t* lhs, uint64_t* rhs)
+    void MathOperation::SubtractInt16UInt16(byte* lhs, byte* rhs)
     {
-	    *lhs *= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Multiply" << " " << "int16_t" << "," << "uint64_t" << " " << *lhs << std::endl;
+	    int16_t* ptrLhs = reinterpret_cast<int16_t*>(lhs);
+	    uint16_t* ptrRhs = reinterpret_cast<uint16_t*>(rhs);
+	    *ptrLhs -= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Multiply(int16_t* lhs, int64_t* rhs)
+    void MathOperation::SubtractInt16Int16(byte* lhs, byte* rhs)
     {
-	    *lhs *= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Multiply" << " " << "int16_t" << "," << "int64_t" << " " << *lhs << std::endl;
+	    int16_t* ptrLhs = reinterpret_cast<int16_t*>(lhs);
+	    int16_t* ptrRhs = reinterpret_cast<int16_t*>(rhs);
+	    *ptrLhs -= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Multiply(int16_t* lhs, float* rhs)
+    void MathOperation::SubtractInt16UInt32(byte* lhs, byte* rhs)
     {
-	    *lhs *= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Multiply" << " " << "int16_t" << "," << "float" << " " << *lhs << std::endl;
+	    int16_t* ptrLhs = reinterpret_cast<int16_t*>(lhs);
+	    uint32_t* ptrRhs = reinterpret_cast<uint32_t*>(rhs);
+	    *ptrLhs -= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Multiply(int16_t* lhs, double* rhs)
+    void MathOperation::SubtractInt16Int32(byte* lhs, byte* rhs)
     {
-	    *lhs *= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Multiply" << " " << "int16_t" << "," << "double" << " " << *lhs << std::endl;
+	    int16_t* ptrLhs = reinterpret_cast<int16_t*>(lhs);
+	    int32_t* ptrRhs = reinterpret_cast<int32_t*>(rhs);
+	    *ptrLhs -= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Multiply(uint32_t* lhs, unsigned char* rhs)
+    void MathOperation::SubtractInt16UInt64(byte* lhs, byte* rhs)
     {
-	    *lhs *= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Multiply" << " " << "uint32_t" << "," << "unsigned char" << " " << *lhs << std::endl;
+	    int16_t* ptrLhs = reinterpret_cast<int16_t*>(lhs);
+	    uint64_t* ptrRhs = reinterpret_cast<uint64_t*>(rhs);
+	    *ptrLhs -= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Multiply(uint32_t* lhs, char* rhs)
+    void MathOperation::SubtractInt16Int64(byte* lhs, byte* rhs)
     {
-	    *lhs *= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Multiply" << " " << "uint32_t" << "," << "char" << " " << *lhs << std::endl;
+	    int16_t* ptrLhs = reinterpret_cast<int16_t*>(lhs);
+	    int64_t* ptrRhs = reinterpret_cast<int64_t*>(rhs);
+	    *ptrLhs -= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Multiply(uint32_t* lhs, uint16_t* rhs)
+    void MathOperation::SubtractInt16Single(byte* lhs, byte* rhs)
     {
-	    *lhs *= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Multiply" << " " << "uint32_t" << "," << "uint16_t" << " " << *lhs << std::endl;
+	    int16_t* ptrLhs = reinterpret_cast<int16_t*>(lhs);
+	    float* ptrRhs = reinterpret_cast<float*>(rhs);
+	    *ptrLhs -= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Multiply(uint32_t* lhs, int16_t* rhs)
+    void MathOperation::SubtractInt16Double(byte* lhs, byte* rhs)
     {
-	    *lhs *= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Multiply" << " " << "uint32_t" << "," << "int16_t" << " " << *lhs << std::endl;
+	    int16_t* ptrLhs = reinterpret_cast<int16_t*>(lhs);
+	    double* ptrRhs = reinterpret_cast<double*>(rhs);
+	    *ptrLhs -= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Multiply(uint32_t* lhs, uint32_t* rhs)
+    void MathOperation::SubtractUInt32UInt8(byte* lhs, byte* rhs)
     {
-	    *lhs *= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Multiply" << " " << "uint32_t" << "," << "uint32_t" << " " << *lhs << std::endl;
+	    uint32_t* ptrLhs = reinterpret_cast<uint32_t*>(lhs);
+	    uint8_t* ptrRhs = reinterpret_cast<uint8_t*>(rhs);
+	    *ptrLhs -= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Multiply(uint32_t* lhs, int32_t* rhs)
+    void MathOperation::SubtractUInt32Int8(byte* lhs, byte* rhs)
     {
-	    *lhs *= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Multiply" << " " << "uint32_t" << "," << "int32_t" << " " << *lhs << std::endl;
+	    uint32_t* ptrLhs = reinterpret_cast<uint32_t*>(lhs);
+	    int8_t* ptrRhs = reinterpret_cast<int8_t*>(rhs);
+	    *ptrLhs -= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Multiply(uint32_t* lhs, uint64_t* rhs)
+    void MathOperation::SubtractUInt32UInt16(byte* lhs, byte* rhs)
     {
-	    *lhs *= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Multiply" << " " << "uint32_t" << "," << "uint64_t" << " " << *lhs << std::endl;
+	    uint32_t* ptrLhs = reinterpret_cast<uint32_t*>(lhs);
+	    uint16_t* ptrRhs = reinterpret_cast<uint16_t*>(rhs);
+	    *ptrLhs -= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Multiply(uint32_t* lhs, int64_t* rhs)
+    void MathOperation::SubtractUInt32Int16(byte* lhs, byte* rhs)
     {
-	    *lhs *= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Multiply" << " " << "uint32_t" << "," << "int64_t" << " " << *lhs << std::endl;
+	    uint32_t* ptrLhs = reinterpret_cast<uint32_t*>(lhs);
+	    int16_t* ptrRhs = reinterpret_cast<int16_t*>(rhs);
+	    *ptrLhs -= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Multiply(uint32_t* lhs, float* rhs)
+    void MathOperation::SubtractUInt32UInt32(byte* lhs, byte* rhs)
     {
-	    *lhs *= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Multiply" << " " << "uint32_t" << "," << "float" << " " << *lhs << std::endl;
+	    uint32_t* ptrLhs = reinterpret_cast<uint32_t*>(lhs);
+	    uint32_t* ptrRhs = reinterpret_cast<uint32_t*>(rhs);
+	    *ptrLhs -= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Multiply(uint32_t* lhs, double* rhs)
+    void MathOperation::SubtractUInt32Int32(byte* lhs, byte* rhs)
     {
-	    *lhs *= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Multiply" << " " << "uint32_t" << "," << "double" << " " << *lhs << std::endl;
+	    uint32_t* ptrLhs = reinterpret_cast<uint32_t*>(lhs);
+	    int32_t* ptrRhs = reinterpret_cast<int32_t*>(rhs);
+	    *ptrLhs -= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Multiply(int32_t* lhs, unsigned char* rhs)
+    void MathOperation::SubtractUInt32UInt64(byte* lhs, byte* rhs)
     {
-	    *lhs *= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Multiply" << " " << "int32_t" << "," << "unsigned char" << " " << *lhs << std::endl;
+	    uint32_t* ptrLhs = reinterpret_cast<uint32_t*>(lhs);
+	    uint64_t* ptrRhs = reinterpret_cast<uint64_t*>(rhs);
+	    *ptrLhs -= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Multiply(int32_t* lhs, char* rhs)
+    void MathOperation::SubtractUInt32Int64(byte* lhs, byte* rhs)
     {
-	    *lhs *= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Multiply" << " " << "int32_t" << "," << "char" << " " << *lhs << std::endl;
+	    uint32_t* ptrLhs = reinterpret_cast<uint32_t*>(lhs);
+	    int64_t* ptrRhs = reinterpret_cast<int64_t*>(rhs);
+	    *ptrLhs -= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Multiply(int32_t* lhs, uint16_t* rhs)
+    void MathOperation::SubtractUInt32Single(byte* lhs, byte* rhs)
     {
-	    *lhs *= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Multiply" << " " << "int32_t" << "," << "uint16_t" << " " << *lhs << std::endl;
+	    uint32_t* ptrLhs = reinterpret_cast<uint32_t*>(lhs);
+	    float* ptrRhs = reinterpret_cast<float*>(rhs);
+	    *ptrLhs -= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Multiply(int32_t* lhs, int16_t* rhs)
+    void MathOperation::SubtractUInt32Double(byte* lhs, byte* rhs)
     {
-	    *lhs *= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Multiply" << " " << "int32_t" << "," << "int16_t" << " " << *lhs << std::endl;
+	    uint32_t* ptrLhs = reinterpret_cast<uint32_t*>(lhs);
+	    double* ptrRhs = reinterpret_cast<double*>(rhs);
+	    *ptrLhs -= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Multiply(int32_t* lhs, uint32_t* rhs)
+    void MathOperation::SubtractInt32UInt8(byte* lhs, byte* rhs)
     {
-	    *lhs *= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Multiply" << " " << "int32_t" << "," << "uint32_t" << " " << *lhs << std::endl;
+	    int32_t* ptrLhs = reinterpret_cast<int32_t*>(lhs);
+	    uint8_t* ptrRhs = reinterpret_cast<uint8_t*>(rhs);
+	    *ptrLhs -= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Multiply(int32_t* lhs, int32_t* rhs)
+    void MathOperation::SubtractInt32Int8(byte* lhs, byte* rhs)
     {
-	    *lhs *= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Multiply" << " " << "int32_t" << "," << "int32_t" << " " << *lhs << std::endl;
+	    int32_t* ptrLhs = reinterpret_cast<int32_t*>(lhs);
+	    int8_t* ptrRhs = reinterpret_cast<int8_t*>(rhs);
+	    *ptrLhs -= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Multiply(int32_t* lhs, uint64_t* rhs)
+    void MathOperation::SubtractInt32UInt16(byte* lhs, byte* rhs)
     {
-	    *lhs *= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Multiply" << " " << "int32_t" << "," << "uint64_t" << " " << *lhs << std::endl;
+	    int32_t* ptrLhs = reinterpret_cast<int32_t*>(lhs);
+	    uint16_t* ptrRhs = reinterpret_cast<uint16_t*>(rhs);
+	    *ptrLhs -= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Multiply(int32_t* lhs, int64_t* rhs)
+    void MathOperation::SubtractInt32Int16(byte* lhs, byte* rhs)
     {
-	    *lhs *= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Multiply" << " " << "int32_t" << "," << "int64_t" << " " << *lhs << std::endl;
+	    int32_t* ptrLhs = reinterpret_cast<int32_t*>(lhs);
+	    int16_t* ptrRhs = reinterpret_cast<int16_t*>(rhs);
+	    *ptrLhs -= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Multiply(int32_t* lhs, float* rhs)
+    void MathOperation::SubtractInt32UInt32(byte* lhs, byte* rhs)
     {
-	    *lhs *= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Multiply" << " " << "int32_t" << "," << "float" << " " << *lhs << std::endl;
+	    int32_t* ptrLhs = reinterpret_cast<int32_t*>(lhs);
+	    uint32_t* ptrRhs = reinterpret_cast<uint32_t*>(rhs);
+	    *ptrLhs -= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Multiply(int32_t* lhs, double* rhs)
+    void MathOperation::SubtractInt32Int32(byte* lhs, byte* rhs)
     {
-	    *lhs *= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Multiply" << " " << "int32_t" << "," << "double" << " " << *lhs << std::endl;
+	    int32_t* ptrLhs = reinterpret_cast<int32_t*>(lhs);
+	    int32_t* ptrRhs = reinterpret_cast<int32_t*>(rhs);
+	    *ptrLhs -= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Multiply(uint64_t* lhs, unsigned char* rhs)
+    void MathOperation::SubtractInt32UInt64(byte* lhs, byte* rhs)
     {
-	    *lhs *= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Multiply" << " " << "uint64_t" << "," << "unsigned char" << " " << *lhs << std::endl;
+	    int32_t* ptrLhs = reinterpret_cast<int32_t*>(lhs);
+	    uint64_t* ptrRhs = reinterpret_cast<uint64_t*>(rhs);
+	    *ptrLhs -= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Multiply(uint64_t* lhs, char* rhs)
+    void MathOperation::SubtractInt32Int64(byte* lhs, byte* rhs)
     {
-	    *lhs *= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Multiply" << " " << "uint64_t" << "," << "char" << " " << *lhs << std::endl;
+	    int32_t* ptrLhs = reinterpret_cast<int32_t*>(lhs);
+	    int64_t* ptrRhs = reinterpret_cast<int64_t*>(rhs);
+	    *ptrLhs -= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Multiply(uint64_t* lhs, uint16_t* rhs)
+    void MathOperation::SubtractInt32Single(byte* lhs, byte* rhs)
     {
-	    *lhs *= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Multiply" << " " << "uint64_t" << "," << "uint16_t" << " " << *lhs << std::endl;
+	    int32_t* ptrLhs = reinterpret_cast<int32_t*>(lhs);
+	    float* ptrRhs = reinterpret_cast<float*>(rhs);
+	    *ptrLhs -= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Multiply(uint64_t* lhs, int16_t* rhs)
+    void MathOperation::SubtractInt32Double(byte* lhs, byte* rhs)
     {
-	    *lhs *= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Multiply" << " " << "uint64_t" << "," << "int16_t" << " " << *lhs << std::endl;
+	    int32_t* ptrLhs = reinterpret_cast<int32_t*>(lhs);
+	    double* ptrRhs = reinterpret_cast<double*>(rhs);
+	    *ptrLhs -= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Multiply(uint64_t* lhs, uint32_t* rhs)
+    void MathOperation::SubtractUInt64UInt8(byte* lhs, byte* rhs)
     {
-	    *lhs *= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Multiply" << " " << "uint64_t" << "," << "uint32_t" << " " << *lhs << std::endl;
+	    uint64_t* ptrLhs = reinterpret_cast<uint64_t*>(lhs);
+	    uint8_t* ptrRhs = reinterpret_cast<uint8_t*>(rhs);
+	    *ptrLhs -= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Multiply(uint64_t* lhs, int32_t* rhs)
+    void MathOperation::SubtractUInt64Int8(byte* lhs, byte* rhs)
     {
-	    *lhs *= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Multiply" << " " << "uint64_t" << "," << "int32_t" << " " << *lhs << std::endl;
+	    uint64_t* ptrLhs = reinterpret_cast<uint64_t*>(lhs);
+	    int8_t* ptrRhs = reinterpret_cast<int8_t*>(rhs);
+	    *ptrLhs -= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Multiply(uint64_t* lhs, uint64_t* rhs)
+    void MathOperation::SubtractUInt64UInt16(byte* lhs, byte* rhs)
     {
-	    *lhs *= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Multiply" << " " << "uint64_t" << "," << "uint64_t" << " " << *lhs << std::endl;
+	    uint64_t* ptrLhs = reinterpret_cast<uint64_t*>(lhs);
+	    uint16_t* ptrRhs = reinterpret_cast<uint16_t*>(rhs);
+	    *ptrLhs -= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Multiply(uint64_t* lhs, int64_t* rhs)
+    void MathOperation::SubtractUInt64Int16(byte* lhs, byte* rhs)
     {
-	    *lhs *= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Multiply" << " " << "uint64_t" << "," << "int64_t" << " " << *lhs << std::endl;
+	    uint64_t* ptrLhs = reinterpret_cast<uint64_t*>(lhs);
+	    int16_t* ptrRhs = reinterpret_cast<int16_t*>(rhs);
+	    *ptrLhs -= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Multiply(uint64_t* lhs, float* rhs)
+    void MathOperation::SubtractUInt64UInt32(byte* lhs, byte* rhs)
     {
-	    *lhs *= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Multiply" << " " << "uint64_t" << "," << "float" << " " << *lhs << std::endl;
+	    uint64_t* ptrLhs = reinterpret_cast<uint64_t*>(lhs);
+	    uint32_t* ptrRhs = reinterpret_cast<uint32_t*>(rhs);
+	    *ptrLhs -= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Multiply(uint64_t* lhs, double* rhs)
+    void MathOperation::SubtractUInt64Int32(byte* lhs, byte* rhs)
     {
-	    *lhs *= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Multiply" << " " << "uint64_t" << "," << "double" << " " << *lhs << std::endl;
+	    uint64_t* ptrLhs = reinterpret_cast<uint64_t*>(lhs);
+	    int32_t* ptrRhs = reinterpret_cast<int32_t*>(rhs);
+	    *ptrLhs -= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Multiply(int64_t* lhs, unsigned char* rhs)
+    void MathOperation::SubtractUInt64UInt64(byte* lhs, byte* rhs)
     {
-	    *lhs *= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Multiply" << " " << "int64_t" << "," << "unsigned char" << " " << *lhs << std::endl;
+	    uint64_t* ptrLhs = reinterpret_cast<uint64_t*>(lhs);
+	    uint64_t* ptrRhs = reinterpret_cast<uint64_t*>(rhs);
+	    *ptrLhs -= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Multiply(int64_t* lhs, char* rhs)
+    void MathOperation::SubtractUInt64Int64(byte* lhs, byte* rhs)
     {
-	    *lhs *= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Multiply" << " " << "int64_t" << "," << "char" << " " << *lhs << std::endl;
+	    uint64_t* ptrLhs = reinterpret_cast<uint64_t*>(lhs);
+	    int64_t* ptrRhs = reinterpret_cast<int64_t*>(rhs);
+	    *ptrLhs -= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Multiply(int64_t* lhs, uint16_t* rhs)
+    void MathOperation::SubtractUInt64Single(byte* lhs, byte* rhs)
     {
-	    *lhs *= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Multiply" << " " << "int64_t" << "," << "uint16_t" << " " << *lhs << std::endl;
+	    uint64_t* ptrLhs = reinterpret_cast<uint64_t*>(lhs);
+	    float* ptrRhs = reinterpret_cast<float*>(rhs);
+	    *ptrLhs -= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Multiply(int64_t* lhs, int16_t* rhs)
+    void MathOperation::SubtractUInt64Double(byte* lhs, byte* rhs)
     {
-	    *lhs *= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Multiply" << " " << "int64_t" << "," << "int16_t" << " " << *lhs << std::endl;
+	    uint64_t* ptrLhs = reinterpret_cast<uint64_t*>(lhs);
+	    double* ptrRhs = reinterpret_cast<double*>(rhs);
+	    *ptrLhs -= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Multiply(int64_t* lhs, uint32_t* rhs)
+    void MathOperation::SubtractInt64UInt8(byte* lhs, byte* rhs)
     {
-	    *lhs *= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Multiply" << " " << "int64_t" << "," << "uint32_t" << " " << *lhs << std::endl;
+	    int64_t* ptrLhs = reinterpret_cast<int64_t*>(lhs);
+	    uint8_t* ptrRhs = reinterpret_cast<uint8_t*>(rhs);
+	    *ptrLhs -= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Multiply(int64_t* lhs, int32_t* rhs)
+    void MathOperation::SubtractInt64Int8(byte* lhs, byte* rhs)
     {
-	    *lhs *= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Multiply" << " " << "int64_t" << "," << "int32_t" << " " << *lhs << std::endl;
+	    int64_t* ptrLhs = reinterpret_cast<int64_t*>(lhs);
+	    int8_t* ptrRhs = reinterpret_cast<int8_t*>(rhs);
+	    *ptrLhs -= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Multiply(int64_t* lhs, uint64_t* rhs)
+    void MathOperation::SubtractInt64UInt16(byte* lhs, byte* rhs)
     {
-	    *lhs *= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Multiply" << " " << "int64_t" << "," << "uint64_t" << " " << *lhs << std::endl;
+	    int64_t* ptrLhs = reinterpret_cast<int64_t*>(lhs);
+	    uint16_t* ptrRhs = reinterpret_cast<uint16_t*>(rhs);
+	    *ptrLhs -= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Multiply(int64_t* lhs, int64_t* rhs)
+    void MathOperation::SubtractInt64Int16(byte* lhs, byte* rhs)
     {
-	    *lhs *= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Multiply" << " " << "int64_t" << "," << "int64_t" << " " << *lhs << std::endl;
+	    int64_t* ptrLhs = reinterpret_cast<int64_t*>(lhs);
+	    int16_t* ptrRhs = reinterpret_cast<int16_t*>(rhs);
+	    *ptrLhs -= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Multiply(int64_t* lhs, float* rhs)
+    void MathOperation::SubtractInt64UInt32(byte* lhs, byte* rhs)
     {
-	    *lhs *= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Multiply" << " " << "int64_t" << "," << "float" << " " << *lhs << std::endl;
+	    int64_t* ptrLhs = reinterpret_cast<int64_t*>(lhs);
+	    uint32_t* ptrRhs = reinterpret_cast<uint32_t*>(rhs);
+	    *ptrLhs -= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Multiply(int64_t* lhs, double* rhs)
+    void MathOperation::SubtractInt64Int32(byte* lhs, byte* rhs)
     {
-	    *lhs *= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Multiply" << " " << "int64_t" << "," << "double" << " " << *lhs << std::endl;
+	    int64_t* ptrLhs = reinterpret_cast<int64_t*>(lhs);
+	    int32_t* ptrRhs = reinterpret_cast<int32_t*>(rhs);
+	    *ptrLhs -= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Multiply(float* lhs, unsigned char* rhs)
+    void MathOperation::SubtractInt64UInt64(byte* lhs, byte* rhs)
     {
-	    *lhs *= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Multiply" << " " << "float" << "," << "unsigned char" << " " << *lhs << std::endl;
+	    int64_t* ptrLhs = reinterpret_cast<int64_t*>(lhs);
+	    uint64_t* ptrRhs = reinterpret_cast<uint64_t*>(rhs);
+	    *ptrLhs -= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Multiply(float* lhs, char* rhs)
+    void MathOperation::SubtractInt64Int64(byte* lhs, byte* rhs)
     {
-	    *lhs *= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Multiply" << " " << "float" << "," << "char" << " " << *lhs << std::endl;
+	    int64_t* ptrLhs = reinterpret_cast<int64_t*>(lhs);
+	    int64_t* ptrRhs = reinterpret_cast<int64_t*>(rhs);
+	    *ptrLhs -= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Multiply(float* lhs, uint16_t* rhs)
+    void MathOperation::SubtractInt64Single(byte* lhs, byte* rhs)
     {
-	    *lhs *= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Multiply" << " " << "float" << "," << "uint16_t" << " " << *lhs << std::endl;
+	    int64_t* ptrLhs = reinterpret_cast<int64_t*>(lhs);
+	    float* ptrRhs = reinterpret_cast<float*>(rhs);
+	    *ptrLhs -= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Multiply(float* lhs, int16_t* rhs)
+    void MathOperation::SubtractInt64Double(byte* lhs, byte* rhs)
     {
-	    *lhs *= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Multiply" << " " << "float" << "," << "int16_t" << " " << *lhs << std::endl;
+	    int64_t* ptrLhs = reinterpret_cast<int64_t*>(lhs);
+	    double* ptrRhs = reinterpret_cast<double*>(rhs);
+	    *ptrLhs -= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Multiply(float* lhs, uint32_t* rhs)
+    void MathOperation::SubtractSingleUInt8(byte* lhs, byte* rhs)
     {
-	    *lhs *= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Multiply" << " " << "float" << "," << "uint32_t" << " " << *lhs << std::endl;
+	    float* ptrLhs = reinterpret_cast<float*>(lhs);
+	    uint8_t* ptrRhs = reinterpret_cast<uint8_t*>(rhs);
+	    *ptrLhs -= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Multiply(float* lhs, int32_t* rhs)
+    void MathOperation::SubtractSingleInt8(byte* lhs, byte* rhs)
     {
-	    *lhs *= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Multiply" << " " << "float" << "," << "int32_t" << " " << *lhs << std::endl;
+	    float* ptrLhs = reinterpret_cast<float*>(lhs);
+	    int8_t* ptrRhs = reinterpret_cast<int8_t*>(rhs);
+	    *ptrLhs -= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Multiply(float* lhs, uint64_t* rhs)
+    void MathOperation::SubtractSingleUInt16(byte* lhs, byte* rhs)
     {
-	    *lhs *= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Multiply" << " " << "float" << "," << "uint64_t" << " " << *lhs << std::endl;
+	    float* ptrLhs = reinterpret_cast<float*>(lhs);
+	    uint16_t* ptrRhs = reinterpret_cast<uint16_t*>(rhs);
+	    *ptrLhs -= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Multiply(float* lhs, int64_t* rhs)
+    void MathOperation::SubtractSingleInt16(byte* lhs, byte* rhs)
     {
-	    *lhs *= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Multiply" << " " << "float" << "," << "int64_t" << " " << *lhs << std::endl;
+	    float* ptrLhs = reinterpret_cast<float*>(lhs);
+	    int16_t* ptrRhs = reinterpret_cast<int16_t*>(rhs);
+	    *ptrLhs -= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Multiply(float* lhs, float* rhs)
+    void MathOperation::SubtractSingleUInt32(byte* lhs, byte* rhs)
     {
-	    *lhs *= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Multiply" << " " << "float" << "," << "float" << " " << *lhs << std::endl;
+	    float* ptrLhs = reinterpret_cast<float*>(lhs);
+	    uint32_t* ptrRhs = reinterpret_cast<uint32_t*>(rhs);
+	    *ptrLhs -= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Multiply(float* lhs, double* rhs)
+    void MathOperation::SubtractSingleInt32(byte* lhs, byte* rhs)
     {
-	    *lhs *= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Multiply" << " " << "float" << "," << "double" << " " << *lhs << std::endl;
+	    float* ptrLhs = reinterpret_cast<float*>(lhs);
+	    int32_t* ptrRhs = reinterpret_cast<int32_t*>(rhs);
+	    *ptrLhs -= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Multiply(double* lhs, unsigned char* rhs)
+    void MathOperation::SubtractSingleUInt64(byte* lhs, byte* rhs)
     {
-	    *lhs *= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Multiply" << " " << "double" << "," << "unsigned char" << " " << *lhs << std::endl;
+	    float* ptrLhs = reinterpret_cast<float*>(lhs);
+	    uint64_t* ptrRhs = reinterpret_cast<uint64_t*>(rhs);
+	    *ptrLhs -= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Multiply(double* lhs, char* rhs)
+    void MathOperation::SubtractSingleInt64(byte* lhs, byte* rhs)
     {
-	    *lhs *= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Multiply" << " " << "double" << "," << "char" << " " << *lhs << std::endl;
+	    float* ptrLhs = reinterpret_cast<float*>(lhs);
+	    int64_t* ptrRhs = reinterpret_cast<int64_t*>(rhs);
+	    *ptrLhs -= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Multiply(double* lhs, uint16_t* rhs)
+    void MathOperation::SubtractSingleSingle(byte* lhs, byte* rhs)
     {
-	    *lhs *= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Multiply" << " " << "double" << "," << "uint16_t" << " " << *lhs << std::endl;
+	    float* ptrLhs = reinterpret_cast<float*>(lhs);
+	    float* ptrRhs = reinterpret_cast<float*>(rhs);
+	    *ptrLhs -= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Multiply(double* lhs, int16_t* rhs)
+    void MathOperation::SubtractSingleDouble(byte* lhs, byte* rhs)
     {
-	    *lhs *= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Multiply" << " " << "double" << "," << "int16_t" << " " << *lhs << std::endl;
+	    float* ptrLhs = reinterpret_cast<float*>(lhs);
+	    double* ptrRhs = reinterpret_cast<double*>(rhs);
+	    *ptrLhs -= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Multiply(double* lhs, uint32_t* rhs)
+    void MathOperation::SubtractDoubleUInt8(byte* lhs, byte* rhs)
     {
-	    *lhs *= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Multiply" << " " << "double" << "," << "uint32_t" << " " << *lhs << std::endl;
+	    double* ptrLhs = reinterpret_cast<double*>(lhs);
+	    uint8_t* ptrRhs = reinterpret_cast<uint8_t*>(rhs);
+	    *ptrLhs -= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Multiply(double* lhs, int32_t* rhs)
+    void MathOperation::SubtractDoubleInt8(byte* lhs, byte* rhs)
     {
-	    *lhs *= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Multiply" << " " << "double" << "," << "int32_t" << " " << *lhs << std::endl;
+	    double* ptrLhs = reinterpret_cast<double*>(lhs);
+	    int8_t* ptrRhs = reinterpret_cast<int8_t*>(rhs);
+	    *ptrLhs -= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Multiply(double* lhs, uint64_t* rhs)
+    void MathOperation::SubtractDoubleUInt16(byte* lhs, byte* rhs)
     {
-	    *lhs *= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Multiply" << " " << "double" << "," << "uint64_t" << " " << *lhs << std::endl;
+	    double* ptrLhs = reinterpret_cast<double*>(lhs);
+	    uint16_t* ptrRhs = reinterpret_cast<uint16_t*>(rhs);
+	    *ptrLhs -= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Multiply(double* lhs, int64_t* rhs)
+    void MathOperation::SubtractDoubleInt16(byte* lhs, byte* rhs)
     {
-	    *lhs *= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Multiply" << " " << "double" << "," << "int64_t" << " " << *lhs << std::endl;
+	    double* ptrLhs = reinterpret_cast<double*>(lhs);
+	    int16_t* ptrRhs = reinterpret_cast<int16_t*>(rhs);
+	    *ptrLhs -= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Multiply(double* lhs, float* rhs)
+    void MathOperation::SubtractDoubleUInt32(byte* lhs, byte* rhs)
     {
-	    *lhs *= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Multiply" << " " << "double" << "," << "float" << " " << *lhs << std::endl;
+	    double* ptrLhs = reinterpret_cast<double*>(lhs);
+	    uint32_t* ptrRhs = reinterpret_cast<uint32_t*>(rhs);
+	    *ptrLhs -= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Multiply(double* lhs, double* rhs)
+    void MathOperation::SubtractDoubleInt32(byte* lhs, byte* rhs)
     {
-	    *lhs *= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Multiply" << " " << "double" << "," << "double" << " " << *lhs << std::endl;
+	    double* ptrLhs = reinterpret_cast<double*>(lhs);
+	    int32_t* ptrRhs = reinterpret_cast<int32_t*>(rhs);
+	    *ptrLhs -= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    //////////////////////////////////////////////////////////////////////////////////////////
-    //////////////////////////////////////////////////////////////////////////////////////////
-    //Divide
-    //////////////////////////////////////////////////////////////////////////////////////////
-    //////////////////////////////////////////////////////////////////////////////////////////
-
-    void MathOperation::Divide(unsigned char* lhs, unsigned char* rhs)
+    void MathOperation::SubtractDoubleUInt64(byte* lhs, byte* rhs)
     {
-	    *lhs /= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Divide" << " " << "unsigned char" << "," << "unsigned char" << " " << *lhs << std::endl;
+	    double* ptrLhs = reinterpret_cast<double*>(lhs);
+	    uint64_t* ptrRhs = reinterpret_cast<uint64_t*>(rhs);
+	    *ptrLhs -= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Divide(unsigned char* lhs, char* rhs)
+    void MathOperation::SubtractDoubleInt64(byte* lhs, byte* rhs)
     {
-	    *lhs /= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Divide" << " " << "unsigned char" << "," << "char" << " " << *lhs << std::endl;
+	    double* ptrLhs = reinterpret_cast<double*>(lhs);
+	    int64_t* ptrRhs = reinterpret_cast<int64_t*>(rhs);
+	    *ptrLhs -= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Divide(unsigned char* lhs, uint16_t* rhs)
+    void MathOperation::SubtractDoubleSingle(byte* lhs, byte* rhs)
     {
-	    *lhs /= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Divide" << " " << "unsigned char" << "," << "uint16_t" << " " << *lhs << std::endl;
+	    double* ptrLhs = reinterpret_cast<double*>(lhs);
+	    float* ptrRhs = reinterpret_cast<float*>(rhs);
+	    *ptrLhs -= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Divide(unsigned char* lhs, int16_t* rhs)
+    void MathOperation::SubtractDoubleDouble(byte* lhs, byte* rhs)
     {
-	    *lhs /= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Divide" << " " << "unsigned char" << "," << "int16_t" << " " << *lhs << std::endl;
+	    double* ptrLhs = reinterpret_cast<double*>(lhs);
+	    double* ptrRhs = reinterpret_cast<double*>(rhs);
+	    *ptrLhs -= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
+
 
-    void MathOperation::Divide(unsigned char* lhs, uint32_t* rhs)
+    //Multiply-------------------------
+    //---------------------------------
+    //---------------------------------
+    //---------------------------------
+
+    void MathOperation::MultiplyUInt8UInt8(byte* lhs, byte* rhs)
     {
-	    *lhs /= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Divide" << " " << "unsigned char" << "," << "uint32_t" << " " << *lhs << std::endl;
+	    uint8_t* ptrLhs = reinterpret_cast<uint8_t*>(lhs);
+	    uint8_t* ptrRhs = reinterpret_cast<uint8_t*>(rhs);
+	    *ptrLhs *= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Divide(unsigned char* lhs, int32_t* rhs)
+    void MathOperation::MultiplyUInt8Int8(byte* lhs, byte* rhs)
     {
-	    *lhs /= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Divide" << " " << "unsigned char" << "," << "int32_t" << " " << *lhs << std::endl;
+	    uint8_t* ptrLhs = reinterpret_cast<uint8_t*>(lhs);
+	    int8_t* ptrRhs = reinterpret_cast<int8_t*>(rhs);
+	    *ptrLhs *= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Divide(unsigned char* lhs, uint64_t* rhs)
+    void MathOperation::MultiplyUInt8UInt16(byte* lhs, byte* rhs)
     {
-	    *lhs /= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Divide" << " " << "unsigned char" << "," << "uint64_t" << " " << *lhs << std::endl;
+	    uint8_t* ptrLhs = reinterpret_cast<uint8_t*>(lhs);
+	    uint16_t* ptrRhs = reinterpret_cast<uint16_t*>(rhs);
+	    *ptrLhs *= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Divide(unsigned char* lhs, int64_t* rhs)
+    void MathOperation::MultiplyUInt8Int16(byte* lhs, byte* rhs)
     {
-	    *lhs /= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Divide" << " " << "unsigned char" << "," << "int64_t" << " " << *lhs << std::endl;
+	    uint8_t* ptrLhs = reinterpret_cast<uint8_t*>(lhs);
+	    int16_t* ptrRhs = reinterpret_cast<int16_t*>(rhs);
+	    *ptrLhs *= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Divide(unsigned char* lhs, float* rhs)
+    void MathOperation::MultiplyUInt8UInt32(byte* lhs, byte* rhs)
     {
-	    *lhs /= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Divide" << " " << "unsigned char" << "," << "float" << " " << *lhs << std::endl;
+	    uint8_t* ptrLhs = reinterpret_cast<uint8_t*>(lhs);
+	    uint32_t* ptrRhs = reinterpret_cast<uint32_t*>(rhs);
+	    *ptrLhs *= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Divide(unsigned char* lhs, double* rhs)
+    void MathOperation::MultiplyUInt8Int32(byte* lhs, byte* rhs)
     {
-	    *lhs /= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Divide" << " " << "unsigned char" << "," << "double" << " " << *lhs << std::endl;
+	    uint8_t* ptrLhs = reinterpret_cast<uint8_t*>(lhs);
+	    int32_t* ptrRhs = reinterpret_cast<int32_t*>(rhs);
+	    *ptrLhs *= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Divide(char* lhs, unsigned char* rhs)
+    void MathOperation::MultiplyUInt8UInt64(byte* lhs, byte* rhs)
     {
-	    *lhs /= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Divide" << " " << "char" << "," << "unsigned char" << " " << *lhs << std::endl;
+	    uint8_t* ptrLhs = reinterpret_cast<uint8_t*>(lhs);
+	    uint64_t* ptrRhs = reinterpret_cast<uint64_t*>(rhs);
+	    *ptrLhs *= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Divide(char* lhs, char* rhs)
+    void MathOperation::MultiplyUInt8Int64(byte* lhs, byte* rhs)
     {
-	    *lhs /= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Divide" << " " << "char" << "," << "char" << " " << *lhs << std::endl;
+	    uint8_t* ptrLhs = reinterpret_cast<uint8_t*>(lhs);
+	    int64_t* ptrRhs = reinterpret_cast<int64_t*>(rhs);
+	    *ptrLhs *= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Divide(char* lhs, uint16_t* rhs)
+    void MathOperation::MultiplyUInt8Single(byte* lhs, byte* rhs)
     {
-	    *lhs /= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Divide" << " " << "char" << "," << "uint16_t" << " " << *lhs << std::endl;
+	    uint8_t* ptrLhs = reinterpret_cast<uint8_t*>(lhs);
+	    float* ptrRhs = reinterpret_cast<float*>(rhs);
+	    *ptrLhs *= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Divide(char* lhs, int16_t* rhs)
+    void MathOperation::MultiplyUInt8Double(byte* lhs, byte* rhs)
     {
-	    *lhs /= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Divide" << " " << "char" << "," << "int16_t" << " " << *lhs << std::endl;
+	    uint8_t* ptrLhs = reinterpret_cast<uint8_t*>(lhs);
+	    double* ptrRhs = reinterpret_cast<double*>(rhs);
+	    *ptrLhs *= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Divide(char* lhs, uint32_t* rhs)
+    void MathOperation::MultiplyInt8UInt8(byte* lhs, byte* rhs)
     {
-	    *lhs /= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Divide" << " " << "char" << "," << "uint32_t" << " " << *lhs << std::endl;
+	    int8_t* ptrLhs = reinterpret_cast<int8_t*>(lhs);
+	    uint8_t* ptrRhs = reinterpret_cast<uint8_t*>(rhs);
+	    *ptrLhs *= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Divide(char* lhs, int32_t* rhs)
+    void MathOperation::MultiplyInt8Int8(byte* lhs, byte* rhs)
     {
-	    *lhs /= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Divide" << " " << "char" << "," << "int32_t" << " " << *lhs << std::endl;
+	    int8_t* ptrLhs = reinterpret_cast<int8_t*>(lhs);
+	    int8_t* ptrRhs = reinterpret_cast<int8_t*>(rhs);
+	    *ptrLhs *= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Divide(char* lhs, uint64_t* rhs)
+    void MathOperation::MultiplyInt8UInt16(byte* lhs, byte* rhs)
     {
-	    *lhs /= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Divide" << " " << "char" << "," << "uint64_t" << " " << *lhs << std::endl;
+	    int8_t* ptrLhs = reinterpret_cast<int8_t*>(lhs);
+	    uint16_t* ptrRhs = reinterpret_cast<uint16_t*>(rhs);
+	    *ptrLhs *= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Divide(char* lhs, int64_t* rhs)
+    void MathOperation::MultiplyInt8Int16(byte* lhs, byte* rhs)
     {
-	    *lhs /= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Divide" << " " << "char" << "," << "int64_t" << " " << *lhs << std::endl;
+	    int8_t* ptrLhs = reinterpret_cast<int8_t*>(lhs);
+	    int16_t* ptrRhs = reinterpret_cast<int16_t*>(rhs);
+	    *ptrLhs *= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Divide(char* lhs, float* rhs)
+    void MathOperation::MultiplyInt8UInt32(byte* lhs, byte* rhs)
     {
-	    *lhs /= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Divide" << " " << "char" << "," << "float" << " " << *lhs << std::endl;
+	    int8_t* ptrLhs = reinterpret_cast<int8_t*>(lhs);
+	    uint32_t* ptrRhs = reinterpret_cast<uint32_t*>(rhs);
+	    *ptrLhs *= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Divide(char* lhs, double* rhs)
+    void MathOperation::MultiplyInt8Int32(byte* lhs, byte* rhs)
     {
-	    *lhs /= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Divide" << " " << "char" << "," << "double" << " " << *lhs << std::endl;
+	    int8_t* ptrLhs = reinterpret_cast<int8_t*>(lhs);
+	    int32_t* ptrRhs = reinterpret_cast<int32_t*>(rhs);
+	    *ptrLhs *= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Divide(uint16_t* lhs, unsigned char* rhs)
+    void MathOperation::MultiplyInt8UInt64(byte* lhs, byte* rhs)
     {
-	    *lhs /= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Divide" << " " << "uint16_t" << "," << "unsigned char" << " " << *lhs << std::endl;
+	    int8_t* ptrLhs = reinterpret_cast<int8_t*>(lhs);
+	    uint64_t* ptrRhs = reinterpret_cast<uint64_t*>(rhs);
+	    *ptrLhs *= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Divide(uint16_t* lhs, char* rhs)
+    void MathOperation::MultiplyInt8Int64(byte* lhs, byte* rhs)
     {
-	    *lhs /= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Divide" << " " << "uint16_t" << "," << "char" << " " << *lhs << std::endl;
+	    int8_t* ptrLhs = reinterpret_cast<int8_t*>(lhs);
+	    int64_t* ptrRhs = reinterpret_cast<int64_t*>(rhs);
+	    *ptrLhs *= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Divide(uint16_t* lhs, uint16_t* rhs)
+    void MathOperation::MultiplyInt8Single(byte* lhs, byte* rhs)
     {
-	    *lhs /= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Divide" << " " << "uint16_t" << "," << "uint16_t" << " " << *lhs << std::endl;
+	    int8_t* ptrLhs = reinterpret_cast<int8_t*>(lhs);
+	    float* ptrRhs = reinterpret_cast<float*>(rhs);
+	    *ptrLhs *= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Divide(uint16_t* lhs, int16_t* rhs)
+    void MathOperation::MultiplyInt8Double(byte* lhs, byte* rhs)
     {
-	    *lhs /= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Divide" << " " << "uint16_t" << "," << "int16_t" << " " << *lhs << std::endl;
+	    int8_t* ptrLhs = reinterpret_cast<int8_t*>(lhs);
+	    double* ptrRhs = reinterpret_cast<double*>(rhs);
+	    *ptrLhs *= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Divide(uint16_t* lhs, uint32_t* rhs)
+    void MathOperation::MultiplyUInt16UInt8(byte* lhs, byte* rhs)
     {
-	    *lhs /= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Divide" << " " << "uint16_t" << "," << "uint32_t" << " " << *lhs << std::endl;
+	    uint16_t* ptrLhs = reinterpret_cast<uint16_t*>(lhs);
+	    uint8_t* ptrRhs = reinterpret_cast<uint8_t*>(rhs);
+	    *ptrLhs *= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Divide(uint16_t* lhs, int32_t* rhs)
+    void MathOperation::MultiplyUInt16Int8(byte* lhs, byte* rhs)
     {
-	    *lhs /= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Divide" << " " << "uint16_t" << "," << "int32_t" << " " << *lhs << std::endl;
+	    uint16_t* ptrLhs = reinterpret_cast<uint16_t*>(lhs);
+	    int8_t* ptrRhs = reinterpret_cast<int8_t*>(rhs);
+	    *ptrLhs *= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Divide(uint16_t* lhs, uint64_t* rhs)
+    void MathOperation::MultiplyUInt16UInt16(byte* lhs, byte* rhs)
     {
-	    *lhs /= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Divide" << " " << "uint16_t" << "," << "uint64_t" << " " << *lhs << std::endl;
+	    uint16_t* ptrLhs = reinterpret_cast<uint16_t*>(lhs);
+	    uint16_t* ptrRhs = reinterpret_cast<uint16_t*>(rhs);
+	    *ptrLhs *= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Divide(uint16_t* lhs, int64_t* rhs)
+    void MathOperation::MultiplyUInt16Int16(byte* lhs, byte* rhs)
     {
-	    *lhs /= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Divide" << " " << "uint16_t" << "," << "int64_t" << " " << *lhs << std::endl;
+	    uint16_t* ptrLhs = reinterpret_cast<uint16_t*>(lhs);
+	    int16_t* ptrRhs = reinterpret_cast<int16_t*>(rhs);
+	    *ptrLhs *= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Divide(uint16_t* lhs, float* rhs)
+    void MathOperation::MultiplyUInt16UInt32(byte* lhs, byte* rhs)
     {
-	    *lhs /= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Divide" << " " << "uint16_t" << "," << "float" << " " << *lhs << std::endl;
+	    uint16_t* ptrLhs = reinterpret_cast<uint16_t*>(lhs);
+	    uint32_t* ptrRhs = reinterpret_cast<uint32_t*>(rhs);
+	    *ptrLhs *= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Divide(uint16_t* lhs, double* rhs)
+    void MathOperation::MultiplyUInt16Int32(byte* lhs, byte* rhs)
     {
-	    *lhs /= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Divide" << " " << "uint16_t" << "," << "double" << " " << *lhs << std::endl;
+	    uint16_t* ptrLhs = reinterpret_cast<uint16_t*>(lhs);
+	    int32_t* ptrRhs = reinterpret_cast<int32_t*>(rhs);
+	    *ptrLhs *= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Divide(int16_t* lhs, unsigned char* rhs)
+    void MathOperation::MultiplyUInt16UInt64(byte* lhs, byte* rhs)
     {
-	    *lhs /= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Divide" << " " << "int16_t" << "," << "unsigned char" << " " << *lhs << std::endl;
+	    uint16_t* ptrLhs = reinterpret_cast<uint16_t*>(lhs);
+	    uint64_t* ptrRhs = reinterpret_cast<uint64_t*>(rhs);
+	    *ptrLhs *= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Divide(int16_t* lhs, char* rhs)
+    void MathOperation::MultiplyUInt16Int64(byte* lhs, byte* rhs)
     {
-	    *lhs /= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Divide" << " " << "int16_t" << "," << "char" << " " << *lhs << std::endl;
+	    uint16_t* ptrLhs = reinterpret_cast<uint16_t*>(lhs);
+	    int64_t* ptrRhs = reinterpret_cast<int64_t*>(rhs);
+	    *ptrLhs *= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Divide(int16_t* lhs, uint16_t* rhs)
+    void MathOperation::MultiplyUInt16Single(byte* lhs, byte* rhs)
     {
-	    *lhs /= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Divide" << " " << "int16_t" << "," << "uint16_t" << " " << *lhs << std::endl;
+	    uint16_t* ptrLhs = reinterpret_cast<uint16_t*>(lhs);
+	    float* ptrRhs = reinterpret_cast<float*>(rhs);
+	    *ptrLhs *= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Divide(int16_t* lhs, int16_t* rhs)
+    void MathOperation::MultiplyUInt16Double(byte* lhs, byte* rhs)
     {
-	    *lhs /= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Divide" << " " << "int16_t" << "," << "int16_t" << " " << *lhs << std::endl;
+	    uint16_t* ptrLhs = reinterpret_cast<uint16_t*>(lhs);
+	    double* ptrRhs = reinterpret_cast<double*>(rhs);
+	    *ptrLhs *= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Divide(int16_t* lhs, uint32_t* rhs)
+    void MathOperation::MultiplyInt16UInt8(byte* lhs, byte* rhs)
     {
-	    *lhs /= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Divide" << " " << "int16_t" << "," << "uint32_t" << " " << *lhs << std::endl;
+	    int16_t* ptrLhs = reinterpret_cast<int16_t*>(lhs);
+	    uint8_t* ptrRhs = reinterpret_cast<uint8_t*>(rhs);
+	    *ptrLhs *= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Divide(int16_t* lhs, int32_t* rhs)
+    void MathOperation::MultiplyInt16Int8(byte* lhs, byte* rhs)
     {
-	    *lhs /= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Divide" << " " << "int16_t" << "," << "int32_t" << " " << *lhs << std::endl;
+	    int16_t* ptrLhs = reinterpret_cast<int16_t*>(lhs);
+	    int8_t* ptrRhs = reinterpret_cast<int8_t*>(rhs);
+	    *ptrLhs *= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Divide(int16_t* lhs, uint64_t* rhs)
+    void MathOperation::MultiplyInt16UInt16(byte* lhs, byte* rhs)
     {
-	    *lhs /= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Divide" << " " << "int16_t" << "," << "uint64_t" << " " << *lhs << std::endl;
+	    int16_t* ptrLhs = reinterpret_cast<int16_t*>(lhs);
+	    uint16_t* ptrRhs = reinterpret_cast<uint16_t*>(rhs);
+	    *ptrLhs *= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Divide(int16_t* lhs, int64_t* rhs)
+    void MathOperation::MultiplyInt16Int16(byte* lhs, byte* rhs)
     {
-	    *lhs /= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Divide" << " " << "int16_t" << "," << "int64_t" << " " << *lhs << std::endl;
+	    int16_t* ptrLhs = reinterpret_cast<int16_t*>(lhs);
+	    int16_t* ptrRhs = reinterpret_cast<int16_t*>(rhs);
+	    *ptrLhs *= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Divide(int16_t* lhs, float* rhs)
+    void MathOperation::MultiplyInt16UInt32(byte* lhs, byte* rhs)
     {
-	    *lhs /= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Divide" << " " << "int16_t" << "," << "float" << " " << *lhs << std::endl;
+	    int16_t* ptrLhs = reinterpret_cast<int16_t*>(lhs);
+	    uint32_t* ptrRhs = reinterpret_cast<uint32_t*>(rhs);
+	    *ptrLhs *= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Divide(int16_t* lhs, double* rhs)
+    void MathOperation::MultiplyInt16Int32(byte* lhs, byte* rhs)
     {
-	    *lhs /= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Divide" << " " << "int16_t" << "," << "double" << " " << *lhs << std::endl;
+	    int16_t* ptrLhs = reinterpret_cast<int16_t*>(lhs);
+	    int32_t* ptrRhs = reinterpret_cast<int32_t*>(rhs);
+	    *ptrLhs *= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Divide(uint32_t* lhs, unsigned char* rhs)
+    void MathOperation::MultiplyInt16UInt64(byte* lhs, byte* rhs)
     {
-	    *lhs /= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Divide" << " " << "uint32_t" << "," << "unsigned char" << " " << *lhs << std::endl;
+	    int16_t* ptrLhs = reinterpret_cast<int16_t*>(lhs);
+	    uint64_t* ptrRhs = reinterpret_cast<uint64_t*>(rhs);
+	    *ptrLhs *= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Divide(uint32_t* lhs, char* rhs)
+    void MathOperation::MultiplyInt16Int64(byte* lhs, byte* rhs)
     {
-	    *lhs /= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Divide" << " " << "uint32_t" << "," << "char" << " " << *lhs << std::endl;
+	    int16_t* ptrLhs = reinterpret_cast<int16_t*>(lhs);
+	    int64_t* ptrRhs = reinterpret_cast<int64_t*>(rhs);
+	    *ptrLhs *= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Divide(uint32_t* lhs, uint16_t* rhs)
+    void MathOperation::MultiplyInt16Single(byte* lhs, byte* rhs)
     {
-	    *lhs /= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Divide" << " " << "uint32_t" << "," << "uint16_t" << " " << *lhs << std::endl;
+	    int16_t* ptrLhs = reinterpret_cast<int16_t*>(lhs);
+	    float* ptrRhs = reinterpret_cast<float*>(rhs);
+	    *ptrLhs *= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Divide(uint32_t* lhs, int16_t* rhs)
+    void MathOperation::MultiplyInt16Double(byte* lhs, byte* rhs)
     {
-	    *lhs /= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Divide" << " " << "uint32_t" << "," << "int16_t" << " " << *lhs << std::endl;
+	    int16_t* ptrLhs = reinterpret_cast<int16_t*>(lhs);
+	    double* ptrRhs = reinterpret_cast<double*>(rhs);
+	    *ptrLhs *= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Divide(uint32_t* lhs, uint32_t* rhs)
+    void MathOperation::MultiplyUInt32UInt8(byte* lhs, byte* rhs)
     {
-	    *lhs /= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Divide" << " " << "uint32_t" << "," << "uint32_t" << " " << *lhs << std::endl;
+	    uint32_t* ptrLhs = reinterpret_cast<uint32_t*>(lhs);
+	    uint8_t* ptrRhs = reinterpret_cast<uint8_t*>(rhs);
+	    *ptrLhs *= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Divide(uint32_t* lhs, int32_t* rhs)
+    void MathOperation::MultiplyUInt32Int8(byte* lhs, byte* rhs)
     {
-	    *lhs /= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Divide" << " " << "uint32_t" << "," << "int32_t" << " " << *lhs << std::endl;
+	    uint32_t* ptrLhs = reinterpret_cast<uint32_t*>(lhs);
+	    int8_t* ptrRhs = reinterpret_cast<int8_t*>(rhs);
+	    *ptrLhs *= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Divide(uint32_t* lhs, uint64_t* rhs)
+    void MathOperation::MultiplyUInt32UInt16(byte* lhs, byte* rhs)
     {
-	    *lhs /= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Divide" << " " << "uint32_t" << "," << "uint64_t" << " " << *lhs << std::endl;
+	    uint32_t* ptrLhs = reinterpret_cast<uint32_t*>(lhs);
+	    uint16_t* ptrRhs = reinterpret_cast<uint16_t*>(rhs);
+	    *ptrLhs *= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Divide(uint32_t* lhs, int64_t* rhs)
+    void MathOperation::MultiplyUInt32Int16(byte* lhs, byte* rhs)
     {
-	    *lhs /= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Divide" << " " << "uint32_t" << "," << "int64_t" << " " << *lhs << std::endl;
+	    uint32_t* ptrLhs = reinterpret_cast<uint32_t*>(lhs);
+	    int16_t* ptrRhs = reinterpret_cast<int16_t*>(rhs);
+	    *ptrLhs *= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Divide(uint32_t* lhs, float* rhs)
+    void MathOperation::MultiplyUInt32UInt32(byte* lhs, byte* rhs)
     {
-	    *lhs /= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Divide" << " " << "uint32_t" << "," << "float" << " " << *lhs << std::endl;
+	    uint32_t* ptrLhs = reinterpret_cast<uint32_t*>(lhs);
+	    uint32_t* ptrRhs = reinterpret_cast<uint32_t*>(rhs);
+	    *ptrLhs *= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Divide(uint32_t* lhs, double* rhs)
+    void MathOperation::MultiplyUInt32Int32(byte* lhs, byte* rhs)
     {
-	    *lhs /= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Divide" << " " << "uint32_t" << "," << "double" << " " << *lhs << std::endl;
+	    uint32_t* ptrLhs = reinterpret_cast<uint32_t*>(lhs);
+	    int32_t* ptrRhs = reinterpret_cast<int32_t*>(rhs);
+	    *ptrLhs *= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Divide(int32_t* lhs, unsigned char* rhs)
+    void MathOperation::MultiplyUInt32UInt64(byte* lhs, byte* rhs)
     {
-	    *lhs /= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Divide" << " " << "int32_t" << "," << "unsigned char" << " " << *lhs << std::endl;
+	    uint32_t* ptrLhs = reinterpret_cast<uint32_t*>(lhs);
+	    uint64_t* ptrRhs = reinterpret_cast<uint64_t*>(rhs);
+	    *ptrLhs *= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Divide(int32_t* lhs, char* rhs)
+    void MathOperation::MultiplyUInt32Int64(byte* lhs, byte* rhs)
     {
-	    *lhs /= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Divide" << " " << "int32_t" << "," << "char" << " " << *lhs << std::endl;
+	    uint32_t* ptrLhs = reinterpret_cast<uint32_t*>(lhs);
+	    int64_t* ptrRhs = reinterpret_cast<int64_t*>(rhs);
+	    *ptrLhs *= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Divide(int32_t* lhs, uint16_t* rhs)
+    void MathOperation::MultiplyUInt32Single(byte* lhs, byte* rhs)
     {
-	    *lhs /= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Divide" << " " << "int32_t" << "," << "uint16_t" << " " << *lhs << std::endl;
+	    uint32_t* ptrLhs = reinterpret_cast<uint32_t*>(lhs);
+	    float* ptrRhs = reinterpret_cast<float*>(rhs);
+	    *ptrLhs *= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Divide(int32_t* lhs, int16_t* rhs)
+    void MathOperation::MultiplyUInt32Double(byte* lhs, byte* rhs)
     {
-	    *lhs /= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Divide" << " " << "int32_t" << "," << "int16_t" << " " << *lhs << std::endl;
+	    uint32_t* ptrLhs = reinterpret_cast<uint32_t*>(lhs);
+	    double* ptrRhs = reinterpret_cast<double*>(rhs);
+	    *ptrLhs *= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Divide(int32_t* lhs, uint32_t* rhs)
+    void MathOperation::MultiplyInt32UInt8(byte* lhs, byte* rhs)
     {
-	    *lhs /= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Divide" << " " << "int32_t" << "," << "uint32_t" << " " << *lhs << std::endl;
+	    int32_t* ptrLhs = reinterpret_cast<int32_t*>(lhs);
+	    uint8_t* ptrRhs = reinterpret_cast<uint8_t*>(rhs);
+	    *ptrLhs *= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Divide(int32_t* lhs, int32_t* rhs)
+    void MathOperation::MultiplyInt32Int8(byte* lhs, byte* rhs)
     {
-	    *lhs /= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Divide" << " " << "int32_t" << "," << "int32_t" << " " << *lhs << std::endl;
+	    int32_t* ptrLhs = reinterpret_cast<int32_t*>(lhs);
+	    int8_t* ptrRhs = reinterpret_cast<int8_t*>(rhs);
+	    *ptrLhs *= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Divide(int32_t* lhs, uint64_t* rhs)
+    void MathOperation::MultiplyInt32UInt16(byte* lhs, byte* rhs)
     {
-	    *lhs /= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Divide" << " " << "int32_t" << "," << "uint64_t" << " " << *lhs << std::endl;
+	    int32_t* ptrLhs = reinterpret_cast<int32_t*>(lhs);
+	    uint16_t* ptrRhs = reinterpret_cast<uint16_t*>(rhs);
+	    *ptrLhs *= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Divide(int32_t* lhs, int64_t* rhs)
+    void MathOperation::MultiplyInt32Int16(byte* lhs, byte* rhs)
     {
-	    *lhs /= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Divide" << " " << "int32_t" << "," << "int64_t" << " " << *lhs << std::endl;
+	    int32_t* ptrLhs = reinterpret_cast<int32_t*>(lhs);
+	    int16_t* ptrRhs = reinterpret_cast<int16_t*>(rhs);
+	    *ptrLhs *= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Divide(int32_t* lhs, float* rhs)
+    void MathOperation::MultiplyInt32UInt32(byte* lhs, byte* rhs)
     {
-	    *lhs /= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Divide" << " " << "int32_t" << "," << "float" << " " << *lhs << std::endl;
+	    int32_t* ptrLhs = reinterpret_cast<int32_t*>(lhs);
+	    uint32_t* ptrRhs = reinterpret_cast<uint32_t*>(rhs);
+	    *ptrLhs *= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Divide(int32_t* lhs, double* rhs)
+    void MathOperation::MultiplyInt32Int32(byte* lhs, byte* rhs)
     {
-	    *lhs /= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Divide" << " " << "int32_t" << "," << "double" << " " << *lhs << std::endl;
+	    int32_t* ptrLhs = reinterpret_cast<int32_t*>(lhs);
+	    int32_t* ptrRhs = reinterpret_cast<int32_t*>(rhs);
+	    *ptrLhs *= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Divide(uint64_t* lhs, unsigned char* rhs)
+    void MathOperation::MultiplyInt32UInt64(byte* lhs, byte* rhs)
     {
-	    *lhs /= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Divide" << " " << "uint64_t" << "," << "unsigned char" << " " << *lhs << std::endl;
+	    int32_t* ptrLhs = reinterpret_cast<int32_t*>(lhs);
+	    uint64_t* ptrRhs = reinterpret_cast<uint64_t*>(rhs);
+	    *ptrLhs *= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Divide(uint64_t* lhs, char* rhs)
+    void MathOperation::MultiplyInt32Int64(byte* lhs, byte* rhs)
     {
-	    *lhs /= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Divide" << " " << "uint64_t" << "," << "char" << " " << *lhs << std::endl;
+	    int32_t* ptrLhs = reinterpret_cast<int32_t*>(lhs);
+	    int64_t* ptrRhs = reinterpret_cast<int64_t*>(rhs);
+	    *ptrLhs *= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Divide(uint64_t* lhs, uint16_t* rhs)
+    void MathOperation::MultiplyInt32Single(byte* lhs, byte* rhs)
     {
-	    *lhs /= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Divide" << " " << "uint64_t" << "," << "uint16_t" << " " << *lhs << std::endl;
+	    int32_t* ptrLhs = reinterpret_cast<int32_t*>(lhs);
+	    float* ptrRhs = reinterpret_cast<float*>(rhs);
+	    *ptrLhs *= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Divide(uint64_t* lhs, int16_t* rhs)
+    void MathOperation::MultiplyInt32Double(byte* lhs, byte* rhs)
     {
-	    *lhs /= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Divide" << " " << "uint64_t" << "," << "int16_t" << " " << *lhs << std::endl;
+	    int32_t* ptrLhs = reinterpret_cast<int32_t*>(lhs);
+	    double* ptrRhs = reinterpret_cast<double*>(rhs);
+	    *ptrLhs *= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Divide(uint64_t* lhs, uint32_t* rhs)
+    void MathOperation::MultiplyUInt64UInt8(byte* lhs, byte* rhs)
     {
-	    *lhs /= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Divide" << " " << "uint64_t" << "," << "uint32_t" << " " << *lhs << std::endl;
+	    uint64_t* ptrLhs = reinterpret_cast<uint64_t*>(lhs);
+	    uint8_t* ptrRhs = reinterpret_cast<uint8_t*>(rhs);
+	    *ptrLhs *= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Divide(uint64_t* lhs, int32_t* rhs)
+    void MathOperation::MultiplyUInt64Int8(byte* lhs, byte* rhs)
     {
-	    *lhs /= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Divide" << " " << "uint64_t" << "," << "int32_t" << " " << *lhs << std::endl;
+	    uint64_t* ptrLhs = reinterpret_cast<uint64_t*>(lhs);
+	    int8_t* ptrRhs = reinterpret_cast<int8_t*>(rhs);
+	    *ptrLhs *= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Divide(uint64_t* lhs, uint64_t* rhs)
+    void MathOperation::MultiplyUInt64UInt16(byte* lhs, byte* rhs)
     {
-	    *lhs /= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Divide" << " " << "uint64_t" << "," << "uint64_t" << " " << *lhs << std::endl;
+	    uint64_t* ptrLhs = reinterpret_cast<uint64_t*>(lhs);
+	    uint16_t* ptrRhs = reinterpret_cast<uint16_t*>(rhs);
+	    *ptrLhs *= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Divide(uint64_t* lhs, int64_t* rhs)
+    void MathOperation::MultiplyUInt64Int16(byte* lhs, byte* rhs)
     {
-	    *lhs /= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Divide" << " " << "uint64_t" << "," << "int64_t" << " " << *lhs << std::endl;
+	    uint64_t* ptrLhs = reinterpret_cast<uint64_t*>(lhs);
+	    int16_t* ptrRhs = reinterpret_cast<int16_t*>(rhs);
+	    *ptrLhs *= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Divide(uint64_t* lhs, float* rhs)
+    void MathOperation::MultiplyUInt64UInt32(byte* lhs, byte* rhs)
     {
-	    *lhs /= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Divide" << " " << "uint64_t" << "," << "float" << " " << *lhs << std::endl;
+	    uint64_t* ptrLhs = reinterpret_cast<uint64_t*>(lhs);
+	    uint32_t* ptrRhs = reinterpret_cast<uint32_t*>(rhs);
+	    *ptrLhs *= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Divide(uint64_t* lhs, double* rhs)
+    void MathOperation::MultiplyUInt64Int32(byte* lhs, byte* rhs)
     {
-	    *lhs /= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Divide" << " " << "uint64_t" << "," << "double" << " " << *lhs << std::endl;
+	    uint64_t* ptrLhs = reinterpret_cast<uint64_t*>(lhs);
+	    int32_t* ptrRhs = reinterpret_cast<int32_t*>(rhs);
+	    *ptrLhs *= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Divide(int64_t* lhs, unsigned char* rhs)
+    void MathOperation::MultiplyUInt64UInt64(byte* lhs, byte* rhs)
     {
-	    *lhs /= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Divide" << " " << "int64_t" << "," << "unsigned char" << " " << *lhs << std::endl;
+	    uint64_t* ptrLhs = reinterpret_cast<uint64_t*>(lhs);
+	    uint64_t* ptrRhs = reinterpret_cast<uint64_t*>(rhs);
+	    *ptrLhs *= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Divide(int64_t* lhs, char* rhs)
+    void MathOperation::MultiplyUInt64Int64(byte* lhs, byte* rhs)
     {
-	    *lhs /= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Divide" << " " << "int64_t" << "," << "char" << " " << *lhs << std::endl;
+	    uint64_t* ptrLhs = reinterpret_cast<uint64_t*>(lhs);
+	    int64_t* ptrRhs = reinterpret_cast<int64_t*>(rhs);
+	    *ptrLhs *= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Divide(int64_t* lhs, uint16_t* rhs)
+    void MathOperation::MultiplyUInt64Single(byte* lhs, byte* rhs)
     {
-	    *lhs /= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Divide" << " " << "int64_t" << "," << "uint16_t" << " " << *lhs << std::endl;
+	    uint64_t* ptrLhs = reinterpret_cast<uint64_t*>(lhs);
+	    float* ptrRhs = reinterpret_cast<float*>(rhs);
+	    *ptrLhs *= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Divide(int64_t* lhs, int16_t* rhs)
+    void MathOperation::MultiplyUInt64Double(byte* lhs, byte* rhs)
     {
-	    *lhs /= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Divide" << " " << "int64_t" << "," << "int16_t" << " " << *lhs << std::endl;
+	    uint64_t* ptrLhs = reinterpret_cast<uint64_t*>(lhs);
+	    double* ptrRhs = reinterpret_cast<double*>(rhs);
+	    *ptrLhs *= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Divide(int64_t* lhs, uint32_t* rhs)
+    void MathOperation::MultiplyInt64UInt8(byte* lhs, byte* rhs)
     {
-	    *lhs /= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Divide" << " " << "int64_t" << "," << "uint32_t" << " " << *lhs << std::endl;
+	    int64_t* ptrLhs = reinterpret_cast<int64_t*>(lhs);
+	    uint8_t* ptrRhs = reinterpret_cast<uint8_t*>(rhs);
+	    *ptrLhs *= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Divide(int64_t* lhs, int32_t* rhs)
+    void MathOperation::MultiplyInt64Int8(byte* lhs, byte* rhs)
     {
-	    *lhs /= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Divide" << " " << "int64_t" << "," << "int32_t" << " " << *lhs << std::endl;
+	    int64_t* ptrLhs = reinterpret_cast<int64_t*>(lhs);
+	    int8_t* ptrRhs = reinterpret_cast<int8_t*>(rhs);
+	    *ptrLhs *= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Divide(int64_t* lhs, uint64_t* rhs)
+    void MathOperation::MultiplyInt64UInt16(byte* lhs, byte* rhs)
     {
-	    *lhs /= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Divide" << " " << "int64_t" << "," << "uint64_t" << " " << *lhs << std::endl;
+	    int64_t* ptrLhs = reinterpret_cast<int64_t*>(lhs);
+	    uint16_t* ptrRhs = reinterpret_cast<uint16_t*>(rhs);
+	    *ptrLhs *= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Divide(int64_t* lhs, int64_t* rhs)
+    void MathOperation::MultiplyInt64Int16(byte* lhs, byte* rhs)
     {
-	    *lhs /= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Divide" << " " << "int64_t" << "," << "int64_t" << " " << *lhs << std::endl;
+	    int64_t* ptrLhs = reinterpret_cast<int64_t*>(lhs);
+	    int16_t* ptrRhs = reinterpret_cast<int16_t*>(rhs);
+	    *ptrLhs *= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Divide(int64_t* lhs, float* rhs)
+    void MathOperation::MultiplyInt64UInt32(byte* lhs, byte* rhs)
     {
-	    *lhs /= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Divide" << " " << "int64_t" << "," << "float" << " " << *lhs << std::endl;
+	    int64_t* ptrLhs = reinterpret_cast<int64_t*>(lhs);
+	    uint32_t* ptrRhs = reinterpret_cast<uint32_t*>(rhs);
+	    *ptrLhs *= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Divide(int64_t* lhs, double* rhs)
+    void MathOperation::MultiplyInt64Int32(byte* lhs, byte* rhs)
     {
-	    *lhs /= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Divide" << " " << "int64_t" << "," << "double" << " " << *lhs << std::endl;
+	    int64_t* ptrLhs = reinterpret_cast<int64_t*>(lhs);
+	    int32_t* ptrRhs = reinterpret_cast<int32_t*>(rhs);
+	    *ptrLhs *= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Divide(float* lhs, unsigned char* rhs)
+    void MathOperation::MultiplyInt64UInt64(byte* lhs, byte* rhs)
     {
-	    *lhs /= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Divide" << " " << "float" << "," << "unsigned char" << " " << *lhs << std::endl;
+	    int64_t* ptrLhs = reinterpret_cast<int64_t*>(lhs);
+	    uint64_t* ptrRhs = reinterpret_cast<uint64_t*>(rhs);
+	    *ptrLhs *= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Divide(float* lhs, char* rhs)
+    void MathOperation::MultiplyInt64Int64(byte* lhs, byte* rhs)
     {
-	    *lhs /= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Divide" << " " << "float" << "," << "char" << " " << *lhs << std::endl;
+	    int64_t* ptrLhs = reinterpret_cast<int64_t*>(lhs);
+	    int64_t* ptrRhs = reinterpret_cast<int64_t*>(rhs);
+	    *ptrLhs *= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Divide(float* lhs, uint16_t* rhs)
+    void MathOperation::MultiplyInt64Single(byte* lhs, byte* rhs)
     {
-	    *lhs /= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Divide" << " " << "float" << "," << "uint16_t" << " " << *lhs << std::endl;
+	    int64_t* ptrLhs = reinterpret_cast<int64_t*>(lhs);
+	    float* ptrRhs = reinterpret_cast<float*>(rhs);
+	    *ptrLhs *= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Divide(float* lhs, int16_t* rhs)
+    void MathOperation::MultiplyInt64Double(byte* lhs, byte* rhs)
     {
-	    *lhs /= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Divide" << " " << "float" << "," << "int16_t" << " " << *lhs << std::endl;
+	    int64_t* ptrLhs = reinterpret_cast<int64_t*>(lhs);
+	    double* ptrRhs = reinterpret_cast<double*>(rhs);
+	    *ptrLhs *= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Divide(float* lhs, uint32_t* rhs)
+    void MathOperation::MultiplySingleUInt8(byte* lhs, byte* rhs)
     {
-	    *lhs /= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Divide" << " " << "float" << "," << "uint32_t" << " " << *lhs << std::endl;
+	    float* ptrLhs = reinterpret_cast<float*>(lhs);
+	    uint8_t* ptrRhs = reinterpret_cast<uint8_t*>(rhs);
+	    *ptrLhs *= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Divide(float* lhs, int32_t* rhs)
+    void MathOperation::MultiplySingleInt8(byte* lhs, byte* rhs)
     {
-	    *lhs /= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Divide" << " " << "float" << "," << "int32_t" << " " << *lhs << std::endl;
+	    float* ptrLhs = reinterpret_cast<float*>(lhs);
+	    int8_t* ptrRhs = reinterpret_cast<int8_t*>(rhs);
+	    *ptrLhs *= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Divide(float* lhs, uint64_t* rhs)
+    void MathOperation::MultiplySingleUInt16(byte* lhs, byte* rhs)
     {
-	    *lhs /= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Divide" << " " << "float" << "," << "uint64_t" << " " << *lhs << std::endl;
+	    float* ptrLhs = reinterpret_cast<float*>(lhs);
+	    uint16_t* ptrRhs = reinterpret_cast<uint16_t*>(rhs);
+	    *ptrLhs *= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Divide(float* lhs, int64_t* rhs)
+    void MathOperation::MultiplySingleInt16(byte* lhs, byte* rhs)
     {
-	    *lhs /= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Divide" << " " << "float" << "," << "int64_t" << " " << *lhs << std::endl;
+	    float* ptrLhs = reinterpret_cast<float*>(lhs);
+	    int16_t* ptrRhs = reinterpret_cast<int16_t*>(rhs);
+	    *ptrLhs *= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Divide(float* lhs, float* rhs)
+    void MathOperation::MultiplySingleUInt32(byte* lhs, byte* rhs)
     {
-	    *lhs /= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Divide" << " " << "float" << "," << "float" << " " << *lhs << std::endl;
+	    float* ptrLhs = reinterpret_cast<float*>(lhs);
+	    uint32_t* ptrRhs = reinterpret_cast<uint32_t*>(rhs);
+	    *ptrLhs *= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Divide(float* lhs, double* rhs)
+    void MathOperation::MultiplySingleInt32(byte* lhs, byte* rhs)
     {
-	    *lhs /= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Divide" << " " << "float" << "," << "double" << " " << *lhs << std::endl;
+	    float* ptrLhs = reinterpret_cast<float*>(lhs);
+	    int32_t* ptrRhs = reinterpret_cast<int32_t*>(rhs);
+	    *ptrLhs *= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Divide(double* lhs, unsigned char* rhs)
+    void MathOperation::MultiplySingleUInt64(byte* lhs, byte* rhs)
     {
-	    *lhs /= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Divide" << " " << "double" << "," << "unsigned char" << " " << *lhs << std::endl;
+	    float* ptrLhs = reinterpret_cast<float*>(lhs);
+	    uint64_t* ptrRhs = reinterpret_cast<uint64_t*>(rhs);
+	    *ptrLhs *= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Divide(double* lhs, char* rhs)
+    void MathOperation::MultiplySingleInt64(byte* lhs, byte* rhs)
     {
-	    *lhs /= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Divide" << " " << "double" << "," << "char" << " " << *lhs << std::endl;
+	    float* ptrLhs = reinterpret_cast<float*>(lhs);
+	    int64_t* ptrRhs = reinterpret_cast<int64_t*>(rhs);
+	    *ptrLhs *= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Divide(double* lhs, uint16_t* rhs)
+    void MathOperation::MultiplySingleSingle(byte* lhs, byte* rhs)
     {
-	    *lhs /= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Divide" << " " << "double" << "," << "uint16_t" << " " << *lhs << std::endl;
+	    float* ptrLhs = reinterpret_cast<float*>(lhs);
+	    float* ptrRhs = reinterpret_cast<float*>(rhs);
+	    *ptrLhs *= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Divide(double* lhs, int16_t* rhs)
+    void MathOperation::MultiplySingleDouble(byte* lhs, byte* rhs)
     {
-	    *lhs /= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Divide" << " " << "double" << "," << "int16_t" << " " << *lhs << std::endl;
+	    float* ptrLhs = reinterpret_cast<float*>(lhs);
+	    double* ptrRhs = reinterpret_cast<double*>(rhs);
+	    *ptrLhs *= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Divide(double* lhs, uint32_t* rhs)
+    void MathOperation::MultiplyDoubleUInt8(byte* lhs, byte* rhs)
     {
-	    *lhs /= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Divide" << " " << "double" << "," << "uint32_t" << " " << *lhs << std::endl;
+	    double* ptrLhs = reinterpret_cast<double*>(lhs);
+	    uint8_t* ptrRhs = reinterpret_cast<uint8_t*>(rhs);
+	    *ptrLhs *= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Divide(double* lhs, int32_t* rhs)
+    void MathOperation::MultiplyDoubleInt8(byte* lhs, byte* rhs)
     {
-	    *lhs /= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Divide" << " " << "double" << "," << "int32_t" << " " << *lhs << std::endl;
+	    double* ptrLhs = reinterpret_cast<double*>(lhs);
+	    int8_t* ptrRhs = reinterpret_cast<int8_t*>(rhs);
+	    *ptrLhs *= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Divide(double* lhs, uint64_t* rhs)
+    void MathOperation::MultiplyDoubleUInt16(byte* lhs, byte* rhs)
     {
-	    *lhs /= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Divide" << " " << "double" << "," << "uint64_t" << " " << *lhs << std::endl;
+	    double* ptrLhs = reinterpret_cast<double*>(lhs);
+	    uint16_t* ptrRhs = reinterpret_cast<uint16_t*>(rhs);
+	    *ptrLhs *= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Divide(double* lhs, int64_t* rhs)
+    void MathOperation::MultiplyDoubleInt16(byte* lhs, byte* rhs)
     {
-	    *lhs /= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Divide" << " " << "double" << "," << "int64_t" << " " << *lhs << std::endl;
+	    double* ptrLhs = reinterpret_cast<double*>(lhs);
+	    int16_t* ptrRhs = reinterpret_cast<int16_t*>(rhs);
+	    *ptrLhs *= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Divide(double* lhs, float* rhs)
+    void MathOperation::MultiplyDoubleUInt32(byte* lhs, byte* rhs)
     {
-	    *lhs /= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Divide" << " " << "double" << "," << "float" << " " << *lhs << std::endl;
+	    double* ptrLhs = reinterpret_cast<double*>(lhs);
+	    uint32_t* ptrRhs = reinterpret_cast<uint32_t*>(rhs);
+	    *ptrLhs *= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    void MathOperation::Divide(double* lhs, double* rhs)
+    void MathOperation::MultiplyDoubleInt32(byte* lhs, byte* rhs)
     {
-	    *lhs /= *rhs;
-		zeroFlag = *lhs == 0 ? 1 : 0;
-	    if(debugOperations)
-		    std::cout << "Divide" << " " << "double" << "," << "double" << " " << *lhs << std::endl;
+	    double* ptrLhs = reinterpret_cast<double*>(lhs);
+	    int32_t* ptrRhs = reinterpret_cast<int32_t*>(rhs);
+	    *ptrLhs *= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    int64_t MathOperation::Compare(unsigned char* lhs, unsigned char* rhs)
+    void MathOperation::MultiplyDoubleUInt64(byte* lhs, byte* rhs)
     {
-	    int64_t result = (*lhs - *rhs);
-
-	    if(debugOperations)
-		    std::cout << "Compare" << " " << "unsigned char" << "," << "unsigned char" << " " << *lhs << std::endl;
-		return result;
+	    double* ptrLhs = reinterpret_cast<double*>(lhs);
+	    uint64_t* ptrRhs = reinterpret_cast<uint64_t*>(rhs);
+	    *ptrLhs *= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    int64_t MathOperation::Compare(unsigned char* lhs, char* rhs)
+    void MathOperation::MultiplyDoubleInt64(byte* lhs, byte* rhs)
     {
-	    int64_t result = (*lhs - *rhs);
-
-	    if(debugOperations)
-		    std::cout << "Compare" << " " << "unsigned char" << "," << "char" << " " << *lhs << std::endl;
-		return result;
+	    double* ptrLhs = reinterpret_cast<double*>(lhs);
+	    int64_t* ptrRhs = reinterpret_cast<int64_t*>(rhs);
+	    *ptrLhs *= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    int64_t MathOperation::Compare(unsigned char* lhs, uint16_t* rhs)
+    void MathOperation::MultiplyDoubleSingle(byte* lhs, byte* rhs)
     {
-	    int64_t result = (*lhs - *rhs);
-
-	    if(debugOperations)
-		    std::cout << "Compare" << " " << "unsigned char" << "," << "uint16_t" << " " << *lhs << std::endl;
-		return result;
+	    double* ptrLhs = reinterpret_cast<double*>(lhs);
+	    float* ptrRhs = reinterpret_cast<float*>(rhs);
+	    *ptrLhs *= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    int64_t MathOperation::Compare(unsigned char* lhs, int16_t* rhs)
+    void MathOperation::MultiplyDoubleDouble(byte* lhs, byte* rhs)
     {
-	    int64_t result = (*lhs - *rhs);
-
-	    if(debugOperations)
-		    std::cout << "Compare" << " " << "unsigned char" << "," << "int16_t" << " " << *lhs << std::endl;
-		return result;
+	    double* ptrLhs = reinterpret_cast<double*>(lhs);
+	    double* ptrRhs = reinterpret_cast<double*>(rhs);
+	    *ptrLhs *= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    int64_t MathOperation::Compare(unsigned char* lhs, uint32_t* rhs)
-    {
-	    int64_t result = (*lhs - *rhs);
 
-	    if(debugOperations)
-		    std::cout << "Compare" << " " << "unsigned char" << "," << "uint32_t" << " " << *lhs << std::endl;
-		return result;
-    }
+    //Divide---------------------------
+    //---------------------------------
+    //---------------------------------
+    //---------------------------------
 
-    int64_t MathOperation::Compare(unsigned char* lhs, int32_t* rhs)
+    void MathOperation::DivideUInt8UInt8(byte* lhs, byte* rhs)
     {
-	    int64_t result = (*lhs - *rhs);
-
-	    if(debugOperations)
-		    std::cout << "Compare" << " " << "unsigned char" << "," << "int32_t" << " " << *lhs << std::endl;
-		return result;
+	    uint8_t* ptrLhs = reinterpret_cast<uint8_t*>(lhs);
+	    uint8_t* ptrRhs = reinterpret_cast<uint8_t*>(rhs);
+	    *ptrLhs /= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    int64_t MathOperation::Compare(unsigned char* lhs, uint64_t* rhs)
+    void MathOperation::DivideUInt8Int8(byte* lhs, byte* rhs)
     {
-	    int64_t result = (*lhs - *rhs);
-
-	    if(debugOperations)
-		    std::cout << "Compare" << " " << "unsigned char" << "," << "uint64_t" << " " << *lhs << std::endl;
-		return result;
+	    uint8_t* ptrLhs = reinterpret_cast<uint8_t*>(lhs);
+	    int8_t* ptrRhs = reinterpret_cast<int8_t*>(rhs);
+	    *ptrLhs /= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    int64_t MathOperation::Compare(unsigned char* lhs, int64_t* rhs)
+    void MathOperation::DivideUInt8UInt16(byte* lhs, byte* rhs)
     {
-	    int64_t result = (*lhs - *rhs);
-
-	    if(debugOperations)
-		    std::cout << "Compare" << " " << "unsigned char" << "," << "int64_t" << " " << *lhs << std::endl;
-		return result;
+	    uint8_t* ptrLhs = reinterpret_cast<uint8_t*>(lhs);
+	    uint16_t* ptrRhs = reinterpret_cast<uint16_t*>(rhs);
+	    *ptrLhs /= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    int64_t MathOperation::Compare(unsigned char* lhs, float* rhs)
+    void MathOperation::DivideUInt8Int16(byte* lhs, byte* rhs)
     {
-	    int64_t result = (*lhs - *rhs);
-
-	    if(debugOperations)
-		    std::cout << "Compare" << " " << "unsigned char" << "," << "float" << " " << *lhs << std::endl;
-		return result;
+	    uint8_t* ptrLhs = reinterpret_cast<uint8_t*>(lhs);
+	    int16_t* ptrRhs = reinterpret_cast<int16_t*>(rhs);
+	    *ptrLhs /= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    int64_t MathOperation::Compare(unsigned char* lhs, double* rhs)
+    void MathOperation::DivideUInt8UInt32(byte* lhs, byte* rhs)
     {
-	    int64_t result = (*lhs - *rhs);
-
-	    if(debugOperations)
-		    std::cout << "Compare" << " " << "unsigned char" << "," << "double" << " " << *lhs << std::endl;
-		return result;
+	    uint8_t* ptrLhs = reinterpret_cast<uint8_t*>(lhs);
+	    uint32_t* ptrRhs = reinterpret_cast<uint32_t*>(rhs);
+	    *ptrLhs /= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    int64_t MathOperation::Compare(char* lhs, unsigned char* rhs)
+    void MathOperation::DivideUInt8Int32(byte* lhs, byte* rhs)
     {
-	    int64_t result = (*lhs - *rhs);
-
-	    if(debugOperations)
-		    std::cout << "Compare" << " " << "char" << "," << "unsigned char" << " " << *lhs << std::endl;
-		return result;
+	    uint8_t* ptrLhs = reinterpret_cast<uint8_t*>(lhs);
+	    int32_t* ptrRhs = reinterpret_cast<int32_t*>(rhs);
+	    *ptrLhs /= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    int64_t MathOperation::Compare(char* lhs, char* rhs)
+    void MathOperation::DivideUInt8UInt64(byte* lhs, byte* rhs)
     {
-	    int64_t result = (*lhs - *rhs);
-
-	    if(debugOperations)
-		    std::cout << "Compare" << " " << "char" << "," << "char" << " " << *lhs << std::endl;
-		return result;
+	    uint8_t* ptrLhs = reinterpret_cast<uint8_t*>(lhs);
+	    uint64_t* ptrRhs = reinterpret_cast<uint64_t*>(rhs);
+	    *ptrLhs /= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    int64_t MathOperation::Compare(char* lhs, uint16_t* rhs)
+    void MathOperation::DivideUInt8Int64(byte* lhs, byte* rhs)
     {
-	    int64_t result = (*lhs - *rhs);
-
-	    if(debugOperations)
-		    std::cout << "Compare" << " " << "char" << "," << "uint16_t" << " " << *lhs << std::endl;
-		return result;
+	    uint8_t* ptrLhs = reinterpret_cast<uint8_t*>(lhs);
+	    int64_t* ptrRhs = reinterpret_cast<int64_t*>(rhs);
+	    *ptrLhs /= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    int64_t MathOperation::Compare(char* lhs, int16_t* rhs)
+    void MathOperation::DivideUInt8Single(byte* lhs, byte* rhs)
     {
-	    int64_t result = (*lhs - *rhs);
-
-	    if(debugOperations)
-		    std::cout << "Compare" << " " << "char" << "," << "int16_t" << " " << *lhs << std::endl;
-		return result;
+	    uint8_t* ptrLhs = reinterpret_cast<uint8_t*>(lhs);
+	    float* ptrRhs = reinterpret_cast<float*>(rhs);
+	    *ptrLhs /= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    int64_t MathOperation::Compare(char* lhs, uint32_t* rhs)
+    void MathOperation::DivideUInt8Double(byte* lhs, byte* rhs)
     {
-	    int64_t result = (*lhs - *rhs);
-
-	    if(debugOperations)
-		    std::cout << "Compare" << " " << "char" << "," << "uint32_t" << " " << *lhs << std::endl;
-		return result;
+	    uint8_t* ptrLhs = reinterpret_cast<uint8_t*>(lhs);
+	    double* ptrRhs = reinterpret_cast<double*>(rhs);
+	    *ptrLhs /= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    int64_t MathOperation::Compare(char* lhs, int32_t* rhs)
+    void MathOperation::DivideInt8UInt8(byte* lhs, byte* rhs)
     {
-	    int64_t result = (*lhs - *rhs);
-
-	    if(debugOperations)
-		    std::cout << "Compare" << " " << "char" << "," << "int32_t" << " " << *lhs << std::endl;
-		return result;
+	    int8_t* ptrLhs = reinterpret_cast<int8_t*>(lhs);
+	    uint8_t* ptrRhs = reinterpret_cast<uint8_t*>(rhs);
+	    *ptrLhs /= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    int64_t MathOperation::Compare(char* lhs, uint64_t* rhs)
+    void MathOperation::DivideInt8Int8(byte* lhs, byte* rhs)
     {
-	    int64_t result = (*lhs - *rhs);
-
-	    if(debugOperations)
-		    std::cout << "Compare" << " " << "char" << "," << "uint64_t" << " " << *lhs << std::endl;
-		return result;
+	    int8_t* ptrLhs = reinterpret_cast<int8_t*>(lhs);
+	    int8_t* ptrRhs = reinterpret_cast<int8_t*>(rhs);
+	    *ptrLhs /= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    int64_t MathOperation::Compare(char* lhs, int64_t* rhs)
+    void MathOperation::DivideInt8UInt16(byte* lhs, byte* rhs)
     {
-	    int64_t result = (*lhs - *rhs);
-
-	    if(debugOperations)
-		    std::cout << "Compare" << " " << "char" << "," << "int64_t" << " " << *lhs << std::endl;
-		return result;
+	    int8_t* ptrLhs = reinterpret_cast<int8_t*>(lhs);
+	    uint16_t* ptrRhs = reinterpret_cast<uint16_t*>(rhs);
+	    *ptrLhs /= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    int64_t MathOperation::Compare(char* lhs, float* rhs)
+    void MathOperation::DivideInt8Int16(byte* lhs, byte* rhs)
     {
-	    int64_t result = (*lhs - *rhs);
-
-	    if(debugOperations)
-		    std::cout << "Compare" << " " << "char" << "," << "float" << " " << *lhs << std::endl;
-		return result;
+	    int8_t* ptrLhs = reinterpret_cast<int8_t*>(lhs);
+	    int16_t* ptrRhs = reinterpret_cast<int16_t*>(rhs);
+	    *ptrLhs /= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    int64_t MathOperation::Compare(char* lhs, double* rhs)
+    void MathOperation::DivideInt8UInt32(byte* lhs, byte* rhs)
     {
-	    int64_t result = (*lhs - *rhs);
-
-	    if(debugOperations)
-		    std::cout << "Compare" << " " << "char" << "," << "double" << " " << *lhs << std::endl;
-		return result;
+	    int8_t* ptrLhs = reinterpret_cast<int8_t*>(lhs);
+	    uint32_t* ptrRhs = reinterpret_cast<uint32_t*>(rhs);
+	    *ptrLhs /= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    int64_t MathOperation::Compare(uint16_t* lhs, unsigned char* rhs)
+    void MathOperation::DivideInt8Int32(byte* lhs, byte* rhs)
     {
-	    int64_t result = (*lhs - *rhs);
-
-	    if(debugOperations)
-		    std::cout << "Compare" << " " << "uint16_t" << "," << "unsigned char" << " " << *lhs << std::endl;
-		return result;
+	    int8_t* ptrLhs = reinterpret_cast<int8_t*>(lhs);
+	    int32_t* ptrRhs = reinterpret_cast<int32_t*>(rhs);
+	    *ptrLhs /= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    int64_t MathOperation::Compare(uint16_t* lhs, char* rhs)
+    void MathOperation::DivideInt8UInt64(byte* lhs, byte* rhs)
     {
-	    int64_t result = (*lhs - *rhs);
-
-	    if(debugOperations)
-		    std::cout << "Compare" << " " << "uint16_t" << "," << "char" << " " << *lhs << std::endl;
-		return result;
+	    int8_t* ptrLhs = reinterpret_cast<int8_t*>(lhs);
+	    uint64_t* ptrRhs = reinterpret_cast<uint64_t*>(rhs);
+	    *ptrLhs /= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    int64_t MathOperation::Compare(uint16_t* lhs, uint16_t* rhs)
+    void MathOperation::DivideInt8Int64(byte* lhs, byte* rhs)
     {
-	    int64_t result = (*lhs - *rhs);
-
-	    if(debugOperations)
-		    std::cout << "Compare" << " " << "uint16_t" << "," << "uint16_t" << " " << *lhs << std::endl;
-		return result;
+	    int8_t* ptrLhs = reinterpret_cast<int8_t*>(lhs);
+	    int64_t* ptrRhs = reinterpret_cast<int64_t*>(rhs);
+	    *ptrLhs /= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    int64_t MathOperation::Compare(uint16_t* lhs, int16_t* rhs)
+    void MathOperation::DivideInt8Single(byte* lhs, byte* rhs)
     {
-	    int64_t result = (*lhs - *rhs);
-
-	    if(debugOperations)
-		    std::cout << "Compare" << " " << "uint16_t" << "," << "int16_t" << " " << *lhs << std::endl;
-		return result;
+	    int8_t* ptrLhs = reinterpret_cast<int8_t*>(lhs);
+	    float* ptrRhs = reinterpret_cast<float*>(rhs);
+	    *ptrLhs /= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    int64_t MathOperation::Compare(uint16_t* lhs, uint32_t* rhs)
+    void MathOperation::DivideInt8Double(byte* lhs, byte* rhs)
     {
-	    int64_t result = (*lhs - *rhs);
-
-	    if(debugOperations)
-		    std::cout << "Compare" << " " << "uint16_t" << "," << "uint32_t" << " " << *lhs << std::endl;
-		return result;
+	    int8_t* ptrLhs = reinterpret_cast<int8_t*>(lhs);
+	    double* ptrRhs = reinterpret_cast<double*>(rhs);
+	    *ptrLhs /= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    int64_t MathOperation::Compare(uint16_t* lhs, int32_t* rhs)
+    void MathOperation::DivideUInt16UInt8(byte* lhs, byte* rhs)
     {
-	    int64_t result = (*lhs - *rhs);
-
-	    if(debugOperations)
-		    std::cout << "Compare" << " " << "uint16_t" << "," << "int32_t" << " " << *lhs << std::endl;
-		return result;
+	    uint16_t* ptrLhs = reinterpret_cast<uint16_t*>(lhs);
+	    uint8_t* ptrRhs = reinterpret_cast<uint8_t*>(rhs);
+	    *ptrLhs /= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    int64_t MathOperation::Compare(uint16_t* lhs, uint64_t* rhs)
+    void MathOperation::DivideUInt16Int8(byte* lhs, byte* rhs)
     {
-	    int64_t result = (*lhs - *rhs);
-
-	    if(debugOperations)
-		    std::cout << "Compare" << " " << "uint16_t" << "," << "uint64_t" << " " << *lhs << std::endl;
-		return result;
+	    uint16_t* ptrLhs = reinterpret_cast<uint16_t*>(lhs);
+	    int8_t* ptrRhs = reinterpret_cast<int8_t*>(rhs);
+	    *ptrLhs /= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    int64_t MathOperation::Compare(uint16_t* lhs, int64_t* rhs)
+    void MathOperation::DivideUInt16UInt16(byte* lhs, byte* rhs)
     {
-	    int64_t result = (*lhs - *rhs);
-
-	    if(debugOperations)
-		    std::cout << "Compare" << " " << "uint16_t" << "," << "int64_t" << " " << *lhs << std::endl;
-		return result;
+	    uint16_t* ptrLhs = reinterpret_cast<uint16_t*>(lhs);
+	    uint16_t* ptrRhs = reinterpret_cast<uint16_t*>(rhs);
+	    *ptrLhs /= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    int64_t MathOperation::Compare(uint16_t* lhs, float* rhs)
+    void MathOperation::DivideUInt16Int16(byte* lhs, byte* rhs)
     {
-	    int64_t result = (*lhs - *rhs);
-
-	    if(debugOperations)
-		    std::cout << "Compare" << " " << "uint16_t" << "," << "float" << " " << *lhs << std::endl;
-		return result;
+	    uint16_t* ptrLhs = reinterpret_cast<uint16_t*>(lhs);
+	    int16_t* ptrRhs = reinterpret_cast<int16_t*>(rhs);
+	    *ptrLhs /= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    int64_t MathOperation::Compare(uint16_t* lhs, double* rhs)
+    void MathOperation::DivideUInt16UInt32(byte* lhs, byte* rhs)
     {
-	    int64_t result = (*lhs - *rhs);
-
-	    if(debugOperations)
-		    std::cout << "Compare" << " " << "uint16_t" << "," << "double" << " " << *lhs << std::endl;
-		return result;
+	    uint16_t* ptrLhs = reinterpret_cast<uint16_t*>(lhs);
+	    uint32_t* ptrRhs = reinterpret_cast<uint32_t*>(rhs);
+	    *ptrLhs /= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    int64_t MathOperation::Compare(int16_t* lhs, unsigned char* rhs)
+    void MathOperation::DivideUInt16Int32(byte* lhs, byte* rhs)
     {
-	    int64_t result = (*lhs - *rhs);
-
-	    if(debugOperations)
-		    std::cout << "Compare" << " " << "int16_t" << "," << "unsigned char" << " " << *lhs << std::endl;
-		return result;
+	    uint16_t* ptrLhs = reinterpret_cast<uint16_t*>(lhs);
+	    int32_t* ptrRhs = reinterpret_cast<int32_t*>(rhs);
+	    *ptrLhs /= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    int64_t MathOperation::Compare(int16_t* lhs, char* rhs)
+    void MathOperation::DivideUInt16UInt64(byte* lhs, byte* rhs)
     {
-	    int64_t result = (*lhs - *rhs);
-
-	    if(debugOperations)
-		    std::cout << "Compare" << " " << "int16_t" << "," << "char" << " " << *lhs << std::endl;
-		return result;
+	    uint16_t* ptrLhs = reinterpret_cast<uint16_t*>(lhs);
+	    uint64_t* ptrRhs = reinterpret_cast<uint64_t*>(rhs);
+	    *ptrLhs /= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    int64_t MathOperation::Compare(int16_t* lhs, uint16_t* rhs)
+    void MathOperation::DivideUInt16Int64(byte* lhs, byte* rhs)
     {
-	    int64_t result = (*lhs - *rhs);
-
-	    if(debugOperations)
-		    std::cout << "Compare" << " " << "int16_t" << "," << "uint16_t" << " " << *lhs << std::endl;
-		return result;
+	    uint16_t* ptrLhs = reinterpret_cast<uint16_t*>(lhs);
+	    int64_t* ptrRhs = reinterpret_cast<int64_t*>(rhs);
+	    *ptrLhs /= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    int64_t MathOperation::Compare(int16_t* lhs, int16_t* rhs)
+    void MathOperation::DivideUInt16Single(byte* lhs, byte* rhs)
     {
-	    int64_t result = (*lhs - *rhs);
-
-	    if(debugOperations)
-		    std::cout << "Compare" << " " << "int16_t" << "," << "int16_t" << " " << *lhs << std::endl;
-		return result;
+	    uint16_t* ptrLhs = reinterpret_cast<uint16_t*>(lhs);
+	    float* ptrRhs = reinterpret_cast<float*>(rhs);
+	    *ptrLhs /= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    int64_t MathOperation::Compare(int16_t* lhs, uint32_t* rhs)
+    void MathOperation::DivideUInt16Double(byte* lhs, byte* rhs)
     {
-	    int64_t result = (*lhs - *rhs);
-
-	    if(debugOperations)
-		    std::cout << "Compare" << " " << "int16_t" << "," << "uint32_t" << " " << *lhs << std::endl;
-		return result;
+	    uint16_t* ptrLhs = reinterpret_cast<uint16_t*>(lhs);
+	    double* ptrRhs = reinterpret_cast<double*>(rhs);
+	    *ptrLhs /= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    int64_t MathOperation::Compare(int16_t* lhs, int32_t* rhs)
+    void MathOperation::DivideInt16UInt8(byte* lhs, byte* rhs)
     {
-	    int64_t result = (*lhs - *rhs);
-
-	    if(debugOperations)
-		    std::cout << "Compare" << " " << "int16_t" << "," << "int32_t" << " " << *lhs << std::endl;
-		return result;
+	    int16_t* ptrLhs = reinterpret_cast<int16_t*>(lhs);
+	    uint8_t* ptrRhs = reinterpret_cast<uint8_t*>(rhs);
+	    *ptrLhs /= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    int64_t MathOperation::Compare(int16_t* lhs, uint64_t* rhs)
+    void MathOperation::DivideInt16Int8(byte* lhs, byte* rhs)
     {
-	    int64_t result = (*lhs - *rhs);
-
-	    if(debugOperations)
-		    std::cout << "Compare" << " " << "int16_t" << "," << "uint64_t" << " " << *lhs << std::endl;
-		return result;
+	    int16_t* ptrLhs = reinterpret_cast<int16_t*>(lhs);
+	    int8_t* ptrRhs = reinterpret_cast<int8_t*>(rhs);
+	    *ptrLhs /= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    int64_t MathOperation::Compare(int16_t* lhs, int64_t* rhs)
+    void MathOperation::DivideInt16UInt16(byte* lhs, byte* rhs)
     {
-	    int64_t result = (*lhs - *rhs);
-
-	    if(debugOperations)
-		    std::cout << "Compare" << " " << "int16_t" << "," << "int64_t" << " " << *lhs << std::endl;
-		return result;
+	    int16_t* ptrLhs = reinterpret_cast<int16_t*>(lhs);
+	    uint16_t* ptrRhs = reinterpret_cast<uint16_t*>(rhs);
+	    *ptrLhs /= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    int64_t MathOperation::Compare(int16_t* lhs, float* rhs)
+    void MathOperation::DivideInt16Int16(byte* lhs, byte* rhs)
     {
-	    int64_t result = (*lhs - *rhs);
-
-	    if(debugOperations)
-		    std::cout << "Compare" << " " << "int16_t" << "," << "float" << " " << *lhs << std::endl;
-		return result;
+	    int16_t* ptrLhs = reinterpret_cast<int16_t*>(lhs);
+	    int16_t* ptrRhs = reinterpret_cast<int16_t*>(rhs);
+	    *ptrLhs /= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    int64_t MathOperation::Compare(int16_t* lhs, double* rhs)
+    void MathOperation::DivideInt16UInt32(byte* lhs, byte* rhs)
     {
-	    int64_t result = (*lhs - *rhs);
-
-	    if(debugOperations)
-		    std::cout << "Compare" << " " << "int16_t" << "," << "double" << " " << *lhs << std::endl;
-		return result;
+	    int16_t* ptrLhs = reinterpret_cast<int16_t*>(lhs);
+	    uint32_t* ptrRhs = reinterpret_cast<uint32_t*>(rhs);
+	    *ptrLhs /= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    int64_t MathOperation::Compare(uint32_t* lhs, unsigned char* rhs)
+    void MathOperation::DivideInt16Int32(byte* lhs, byte* rhs)
     {
-	    int64_t result = (*lhs - *rhs);
-
-	    if(debugOperations)
-		    std::cout << "Compare" << " " << "uint32_t" << "," << "unsigned char" << " " << *lhs << std::endl;
-		return result;
+	    int16_t* ptrLhs = reinterpret_cast<int16_t*>(lhs);
+	    int32_t* ptrRhs = reinterpret_cast<int32_t*>(rhs);
+	    *ptrLhs /= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    int64_t MathOperation::Compare(uint32_t* lhs, char* rhs)
+    void MathOperation::DivideInt16UInt64(byte* lhs, byte* rhs)
     {
-	    int64_t result = (*lhs - *rhs);
-
-	    if(debugOperations)
-		    std::cout << "Compare" << " " << "uint32_t" << "," << "char" << " " << *lhs << std::endl;
-		return result;
+	    int16_t* ptrLhs = reinterpret_cast<int16_t*>(lhs);
+	    uint64_t* ptrRhs = reinterpret_cast<uint64_t*>(rhs);
+	    *ptrLhs /= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    int64_t MathOperation::Compare(uint32_t* lhs, uint16_t* rhs)
+    void MathOperation::DivideInt16Int64(byte* lhs, byte* rhs)
     {
-	    int64_t result = (*lhs - *rhs);
-
-	    if(debugOperations)
-		    std::cout << "Compare" << " " << "uint32_t" << "," << "uint16_t" << " " << *lhs << std::endl;
-		return result;
+	    int16_t* ptrLhs = reinterpret_cast<int16_t*>(lhs);
+	    int64_t* ptrRhs = reinterpret_cast<int64_t*>(rhs);
+	    *ptrLhs /= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    int64_t MathOperation::Compare(uint32_t* lhs, int16_t* rhs)
+    void MathOperation::DivideInt16Single(byte* lhs, byte* rhs)
     {
-	    int64_t result = (*lhs - *rhs);
-
-	    if(debugOperations)
-		    std::cout << "Compare" << " " << "uint32_t" << "," << "int16_t" << " " << *lhs << std::endl;
-		return result;
+	    int16_t* ptrLhs = reinterpret_cast<int16_t*>(lhs);
+	    float* ptrRhs = reinterpret_cast<float*>(rhs);
+	    *ptrLhs /= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    int64_t MathOperation::Compare(uint32_t* lhs, uint32_t* rhs)
+    void MathOperation::DivideInt16Double(byte* lhs, byte* rhs)
     {
-	    int64_t result = (*lhs - *rhs);
-
-	    if(debugOperations)
-		    std::cout << "Compare" << " " << "uint32_t" << "," << "uint32_t" << " " << *lhs << std::endl;
-		return result;
+	    int16_t* ptrLhs = reinterpret_cast<int16_t*>(lhs);
+	    double* ptrRhs = reinterpret_cast<double*>(rhs);
+	    *ptrLhs /= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    int64_t MathOperation::Compare(uint32_t* lhs, int32_t* rhs)
+    void MathOperation::DivideUInt32UInt8(byte* lhs, byte* rhs)
     {
-	    int64_t result = (*lhs - *rhs);
-
-	    if(debugOperations)
-		    std::cout << "Compare" << " " << "uint32_t" << "," << "int32_t" << " " << *lhs << std::endl;
-		return result;
+	    uint32_t* ptrLhs = reinterpret_cast<uint32_t*>(lhs);
+	    uint8_t* ptrRhs = reinterpret_cast<uint8_t*>(rhs);
+	    *ptrLhs /= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    int64_t MathOperation::Compare(uint32_t* lhs, uint64_t* rhs)
+    void MathOperation::DivideUInt32Int8(byte* lhs, byte* rhs)
     {
-	    int64_t result = (*lhs - *rhs);
-
-	    if(debugOperations)
-		    std::cout << "Compare" << " " << "uint32_t" << "," << "uint64_t" << " " << *lhs << std::endl;
-		return result;
+	    uint32_t* ptrLhs = reinterpret_cast<uint32_t*>(lhs);
+	    int8_t* ptrRhs = reinterpret_cast<int8_t*>(rhs);
+	    *ptrLhs /= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    int64_t MathOperation::Compare(uint32_t* lhs, int64_t* rhs)
+    void MathOperation::DivideUInt32UInt16(byte* lhs, byte* rhs)
     {
-	    int64_t result = (*lhs - *rhs);
-
-	    if(debugOperations)
-		    std::cout << "Compare" << " " << "uint32_t" << "," << "int64_t" << " " << *lhs << std::endl;
-		return result;
+	    uint32_t* ptrLhs = reinterpret_cast<uint32_t*>(lhs);
+	    uint16_t* ptrRhs = reinterpret_cast<uint16_t*>(rhs);
+	    *ptrLhs /= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    int64_t MathOperation::Compare(uint32_t* lhs, float* rhs)
+    void MathOperation::DivideUInt32Int16(byte* lhs, byte* rhs)
     {
-	    int64_t result = (*lhs - *rhs);
-
-	    if(debugOperations)
-		    std::cout << "Compare" << " " << "uint32_t" << "," << "float" << " " << *lhs << std::endl;
-		return result;
+	    uint32_t* ptrLhs = reinterpret_cast<uint32_t*>(lhs);
+	    int16_t* ptrRhs = reinterpret_cast<int16_t*>(rhs);
+	    *ptrLhs /= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    int64_t MathOperation::Compare(uint32_t* lhs, double* rhs)
+    void MathOperation::DivideUInt32UInt32(byte* lhs, byte* rhs)
     {
-	    int64_t result = (*lhs - *rhs);
-
-	    if(debugOperations)
-		    std::cout << "Compare" << " " << "uint32_t" << "," << "double" << " " << *lhs << std::endl;
-		return result;
+	    uint32_t* ptrLhs = reinterpret_cast<uint32_t*>(lhs);
+	    uint32_t* ptrRhs = reinterpret_cast<uint32_t*>(rhs);
+	    *ptrLhs /= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    int64_t MathOperation::Compare(int32_t* lhs, unsigned char* rhs)
+    void MathOperation::DivideUInt32Int32(byte* lhs, byte* rhs)
     {
-	    int64_t result = (*lhs - *rhs);
-
-	    if(debugOperations)
-		    std::cout << "Compare" << " " << "int32_t" << "," << "unsigned char" << " " << *lhs << std::endl;
-		return result;
+	    uint32_t* ptrLhs = reinterpret_cast<uint32_t*>(lhs);
+	    int32_t* ptrRhs = reinterpret_cast<int32_t*>(rhs);
+	    *ptrLhs /= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    int64_t MathOperation::Compare(int32_t* lhs, char* rhs)
+    void MathOperation::DivideUInt32UInt64(byte* lhs, byte* rhs)
     {
-	    int64_t result = (*lhs - *rhs);
-
-	    if(debugOperations)
-		    std::cout << "Compare" << " " << "int32_t" << "," << "char" << " " << *lhs << std::endl;
-		return result;
+	    uint32_t* ptrLhs = reinterpret_cast<uint32_t*>(lhs);
+	    uint64_t* ptrRhs = reinterpret_cast<uint64_t*>(rhs);
+	    *ptrLhs /= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    int64_t MathOperation::Compare(int32_t* lhs, uint16_t* rhs)
+    void MathOperation::DivideUInt32Int64(byte* lhs, byte* rhs)
     {
-	    int64_t result = (*lhs - *rhs);
-
-	    if(debugOperations)
-		    std::cout << "Compare" << " " << "int32_t" << "," << "uint16_t" << " " << *lhs << std::endl;
-		return result;
+	    uint32_t* ptrLhs = reinterpret_cast<uint32_t*>(lhs);
+	    int64_t* ptrRhs = reinterpret_cast<int64_t*>(rhs);
+	    *ptrLhs /= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    int64_t MathOperation::Compare(int32_t* lhs, int16_t* rhs)
+    void MathOperation::DivideUInt32Single(byte* lhs, byte* rhs)
     {
-	    int64_t result = (*lhs - *rhs);
-
-	    if(debugOperations)
-		    std::cout << "Compare" << " " << "int32_t" << "," << "int16_t" << " " << *lhs << std::endl;
-		return result;
+	    uint32_t* ptrLhs = reinterpret_cast<uint32_t*>(lhs);
+	    float* ptrRhs = reinterpret_cast<float*>(rhs);
+	    *ptrLhs /= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    int64_t MathOperation::Compare(int32_t* lhs, uint32_t* rhs)
+    void MathOperation::DivideUInt32Double(byte* lhs, byte* rhs)
     {
-	    int64_t result = (*lhs - *rhs);
-
-	    if(debugOperations)
-		    std::cout << "Compare" << " " << "int32_t" << "," << "uint32_t" << " " << *lhs << std::endl;
-		return result;
+	    uint32_t* ptrLhs = reinterpret_cast<uint32_t*>(lhs);
+	    double* ptrRhs = reinterpret_cast<double*>(rhs);
+	    *ptrLhs /= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    int64_t MathOperation::Compare(int32_t* lhs, int32_t* rhs)
+    void MathOperation::DivideInt32UInt8(byte* lhs, byte* rhs)
     {
-	    int64_t result = (*lhs - *rhs);
-
-	    if(debugOperations)
-		    std::cout << "Compare" << " " << "int32_t" << "," << "int32_t" << " " << *lhs << std::endl;
-		return result;
+	    int32_t* ptrLhs = reinterpret_cast<int32_t*>(lhs);
+	    uint8_t* ptrRhs = reinterpret_cast<uint8_t*>(rhs);
+	    *ptrLhs /= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    int64_t MathOperation::Compare(int32_t* lhs, uint64_t* rhs)
+    void MathOperation::DivideInt32Int8(byte* lhs, byte* rhs)
     {
-	    int64_t result = (*lhs - *rhs);
-
-	    if(debugOperations)
-		    std::cout << "Compare" << " " << "int32_t" << "," << "uint64_t" << " " << *lhs << std::endl;
-		return result;
+	    int32_t* ptrLhs = reinterpret_cast<int32_t*>(lhs);
+	    int8_t* ptrRhs = reinterpret_cast<int8_t*>(rhs);
+	    *ptrLhs /= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    int64_t MathOperation::Compare(int32_t* lhs, int64_t* rhs)
+    void MathOperation::DivideInt32UInt16(byte* lhs, byte* rhs)
     {
-	    int64_t result = (*lhs - *rhs);
-
-	    if(debugOperations)
-		    std::cout << "Compare" << " " << "int32_t" << "," << "int64_t" << " " << *lhs << std::endl;
-		return result;
+	    int32_t* ptrLhs = reinterpret_cast<int32_t*>(lhs);
+	    uint16_t* ptrRhs = reinterpret_cast<uint16_t*>(rhs);
+	    *ptrLhs /= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    int64_t MathOperation::Compare(int32_t* lhs, float* rhs)
+    void MathOperation::DivideInt32Int16(byte* lhs, byte* rhs)
     {
-	    int64_t result = (*lhs - *rhs);
-
-	    if(debugOperations)
-		    std::cout << "Compare" << " " << "int32_t" << "," << "float" << " " << *lhs << std::endl;
-		return result;
+	    int32_t* ptrLhs = reinterpret_cast<int32_t*>(lhs);
+	    int16_t* ptrRhs = reinterpret_cast<int16_t*>(rhs);
+	    *ptrLhs /= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    int64_t MathOperation::Compare(int32_t* lhs, double* rhs)
+    void MathOperation::DivideInt32UInt32(byte* lhs, byte* rhs)
     {
-	    int64_t result = (*lhs - *rhs);
-
-	    if(debugOperations)
-		    std::cout << "Compare" << " " << "int32_t" << "," << "double" << " " << *lhs << std::endl;
-		return result;
+	    int32_t* ptrLhs = reinterpret_cast<int32_t*>(lhs);
+	    uint32_t* ptrRhs = reinterpret_cast<uint32_t*>(rhs);
+	    *ptrLhs /= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    int64_t MathOperation::Compare(uint64_t* lhs, unsigned char* rhs)
+    void MathOperation::DivideInt32Int32(byte* lhs, byte* rhs)
     {
-	    int64_t result = (*lhs - *rhs);
-
-	    if(debugOperations)
-		    std::cout << "Compare" << " " << "uint64_t" << "," << "unsigned char" << " " << *lhs << std::endl;
-		return result;
+	    int32_t* ptrLhs = reinterpret_cast<int32_t*>(lhs);
+	    int32_t* ptrRhs = reinterpret_cast<int32_t*>(rhs);
+	    *ptrLhs /= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    int64_t MathOperation::Compare(uint64_t* lhs, char* rhs)
+    void MathOperation::DivideInt32UInt64(byte* lhs, byte* rhs)
     {
-	    int64_t result = (*lhs - *rhs);
-
-	    if(debugOperations)
-		    std::cout << "Compare" << " " << "uint64_t" << "," << "char" << " " << *lhs << std::endl;
-		return result;
+	    int32_t* ptrLhs = reinterpret_cast<int32_t*>(lhs);
+	    uint64_t* ptrRhs = reinterpret_cast<uint64_t*>(rhs);
+	    *ptrLhs /= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    int64_t MathOperation::Compare(uint64_t* lhs, uint16_t* rhs)
+    void MathOperation::DivideInt32Int64(byte* lhs, byte* rhs)
     {
-	    int64_t result = (*lhs - *rhs);
-
-	    if(debugOperations)
-		    std::cout << "Compare" << " " << "uint64_t" << "," << "uint16_t" << " " << *lhs << std::endl;
-		return result;
+	    int32_t* ptrLhs = reinterpret_cast<int32_t*>(lhs);
+	    int64_t* ptrRhs = reinterpret_cast<int64_t*>(rhs);
+	    *ptrLhs /= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    int64_t MathOperation::Compare(uint64_t* lhs, int16_t* rhs)
+    void MathOperation::DivideInt32Single(byte* lhs, byte* rhs)
     {
-	    int64_t result = (*lhs - *rhs);
-
-	    if(debugOperations)
-		    std::cout << "Compare" << " " << "uint64_t" << "," << "int16_t" << " " << *lhs << std::endl;
-		return result;
+	    int32_t* ptrLhs = reinterpret_cast<int32_t*>(lhs);
+	    float* ptrRhs = reinterpret_cast<float*>(rhs);
+	    *ptrLhs /= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    int64_t MathOperation::Compare(uint64_t* lhs, uint32_t* rhs)
+    void MathOperation::DivideInt32Double(byte* lhs, byte* rhs)
     {
-	    int64_t result = (*lhs - *rhs);
-
-	    if(debugOperations)
-		    std::cout << "Compare" << " " << "uint64_t" << "," << "uint32_t" << " " << *lhs << std::endl;
-		return result;
+	    int32_t* ptrLhs = reinterpret_cast<int32_t*>(lhs);
+	    double* ptrRhs = reinterpret_cast<double*>(rhs);
+	    *ptrLhs /= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    int64_t MathOperation::Compare(uint64_t* lhs, int32_t* rhs)
+    void MathOperation::DivideUInt64UInt8(byte* lhs, byte* rhs)
     {
-	    int64_t result = (*lhs - *rhs);
-
-	    if(debugOperations)
-		    std::cout << "Compare" << " " << "uint64_t" << "," << "int32_t" << " " << *lhs << std::endl;
-		return result;
+	    uint64_t* ptrLhs = reinterpret_cast<uint64_t*>(lhs);
+	    uint8_t* ptrRhs = reinterpret_cast<uint8_t*>(rhs);
+	    *ptrLhs /= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    int64_t MathOperation::Compare(uint64_t* lhs, uint64_t* rhs)
+    void MathOperation::DivideUInt64Int8(byte* lhs, byte* rhs)
     {
-	    int64_t result = (*lhs - *rhs);
-
-	    if(debugOperations)
-		    std::cout << "Compare" << " " << "uint64_t" << "," << "uint64_t" << " " << *lhs << std::endl;
-		return result;
+	    uint64_t* ptrLhs = reinterpret_cast<uint64_t*>(lhs);
+	    int8_t* ptrRhs = reinterpret_cast<int8_t*>(rhs);
+	    *ptrLhs /= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    int64_t MathOperation::Compare(uint64_t* lhs, int64_t* rhs)
+    void MathOperation::DivideUInt64UInt16(byte* lhs, byte* rhs)
     {
-	    int64_t result = (*lhs - *rhs);
-
-	    if(debugOperations)
-		    std::cout << "Compare" << " " << "uint64_t" << "," << "int64_t" << " " << *lhs << std::endl;
-		return result;
+	    uint64_t* ptrLhs = reinterpret_cast<uint64_t*>(lhs);
+	    uint16_t* ptrRhs = reinterpret_cast<uint16_t*>(rhs);
+	    *ptrLhs /= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    int64_t MathOperation::Compare(uint64_t* lhs, float* rhs)
+    void MathOperation::DivideUInt64Int16(byte* lhs, byte* rhs)
     {
-	    int64_t result = (*lhs - *rhs);
-
-	    if(debugOperations)
-		    std::cout << "Compare" << " " << "uint64_t" << "," << "float" << " " << *lhs << std::endl;
-		return result;
+	    uint64_t* ptrLhs = reinterpret_cast<uint64_t*>(lhs);
+	    int16_t* ptrRhs = reinterpret_cast<int16_t*>(rhs);
+	    *ptrLhs /= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    int64_t MathOperation::Compare(uint64_t* lhs, double* rhs)
+    void MathOperation::DivideUInt64UInt32(byte* lhs, byte* rhs)
     {
-	    int64_t result = (*lhs - *rhs);
-
-	    if(debugOperations)
-		    std::cout << "Compare" << " " << "uint64_t" << "," << "double" << " " << *lhs << std::endl;
-		return result;
+	    uint64_t* ptrLhs = reinterpret_cast<uint64_t*>(lhs);
+	    uint32_t* ptrRhs = reinterpret_cast<uint32_t*>(rhs);
+	    *ptrLhs /= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    int64_t MathOperation::Compare(int64_t* lhs, unsigned char* rhs)
+    void MathOperation::DivideUInt64Int32(byte* lhs, byte* rhs)
     {
-	    int64_t result = (*lhs - *rhs);
-
-	    if(debugOperations)
-		    std::cout << "Compare" << " " << "int64_t" << "," << "unsigned char" << " " << *lhs << std::endl;
-		return result;
+	    uint64_t* ptrLhs = reinterpret_cast<uint64_t*>(lhs);
+	    int32_t* ptrRhs = reinterpret_cast<int32_t*>(rhs);
+	    *ptrLhs /= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    int64_t MathOperation::Compare(int64_t* lhs, char* rhs)
+    void MathOperation::DivideUInt64UInt64(byte* lhs, byte* rhs)
     {
-	    int64_t result = (*lhs - *rhs);
-
-	    if(debugOperations)
-		    std::cout << "Compare" << " " << "int64_t" << "," << "char" << " " << *lhs << std::endl;
-		return result;
+	    uint64_t* ptrLhs = reinterpret_cast<uint64_t*>(lhs);
+	    uint64_t* ptrRhs = reinterpret_cast<uint64_t*>(rhs);
+	    *ptrLhs /= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    int64_t MathOperation::Compare(int64_t* lhs, uint16_t* rhs)
+    void MathOperation::DivideUInt64Int64(byte* lhs, byte* rhs)
     {
-	    int64_t result = (*lhs - *rhs);
-
-	    if(debugOperations)
-		    std::cout << "Compare" << " " << "int64_t" << "," << "uint16_t" << " " << *lhs << std::endl;
-		return result;
+	    uint64_t* ptrLhs = reinterpret_cast<uint64_t*>(lhs);
+	    int64_t* ptrRhs = reinterpret_cast<int64_t*>(rhs);
+	    *ptrLhs /= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    int64_t MathOperation::Compare(int64_t* lhs, int16_t* rhs)
+    void MathOperation::DivideUInt64Single(byte* lhs, byte* rhs)
     {
-	    int64_t result = (*lhs - *rhs);
-
-	    if(debugOperations)
-		    std::cout << "Compare" << " " << "int64_t" << "," << "int16_t" << " " << *lhs << std::endl;
-		return result;
+	    uint64_t* ptrLhs = reinterpret_cast<uint64_t*>(lhs);
+	    float* ptrRhs = reinterpret_cast<float*>(rhs);
+	    *ptrLhs /= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    int64_t MathOperation::Compare(int64_t* lhs, uint32_t* rhs)
+    void MathOperation::DivideUInt64Double(byte* lhs, byte* rhs)
     {
-	    int64_t result = (*lhs - *rhs);
-
-	    if(debugOperations)
-		    std::cout << "Compare" << " " << "int64_t" << "," << "uint32_t" << " " << *lhs << std::endl;
-		return result;
+	    uint64_t* ptrLhs = reinterpret_cast<uint64_t*>(lhs);
+	    double* ptrRhs = reinterpret_cast<double*>(rhs);
+	    *ptrLhs /= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    int64_t MathOperation::Compare(int64_t* lhs, int32_t* rhs)
+    void MathOperation::DivideInt64UInt8(byte* lhs, byte* rhs)
     {
-	    int64_t result = (*lhs - *rhs);
-
-	    if(debugOperations)
-		    std::cout << "Compare" << " " << "int64_t" << "," << "int32_t" << " " << *lhs << std::endl;
-		return result;
+	    int64_t* ptrLhs = reinterpret_cast<int64_t*>(lhs);
+	    uint8_t* ptrRhs = reinterpret_cast<uint8_t*>(rhs);
+	    *ptrLhs /= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    int64_t MathOperation::Compare(int64_t* lhs, uint64_t* rhs)
+    void MathOperation::DivideInt64Int8(byte* lhs, byte* rhs)
     {
-	    int64_t result = (*lhs - *rhs);
-
-	    if(debugOperations)
-		    std::cout << "Compare" << " " << "int64_t" << "," << "uint64_t" << " " << *lhs << std::endl;
-		return result;
+	    int64_t* ptrLhs = reinterpret_cast<int64_t*>(lhs);
+	    int8_t* ptrRhs = reinterpret_cast<int8_t*>(rhs);
+	    *ptrLhs /= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    int64_t MathOperation::Compare(int64_t* lhs, int64_t* rhs)
+    void MathOperation::DivideInt64UInt16(byte* lhs, byte* rhs)
     {
-	    int64_t result = (*lhs - *rhs);
-
-	    if(debugOperations)
-		    std::cout << "Compare" << " " << "int64_t" << "," << "int64_t" << " " << *lhs << std::endl;
-		return result;
+	    int64_t* ptrLhs = reinterpret_cast<int64_t*>(lhs);
+	    uint16_t* ptrRhs = reinterpret_cast<uint16_t*>(rhs);
+	    *ptrLhs /= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    int64_t MathOperation::Compare(int64_t* lhs, float* rhs)
+    void MathOperation::DivideInt64Int16(byte* lhs, byte* rhs)
     {
-	    int64_t result = (*lhs - *rhs);
-
-	    if(debugOperations)
-		    std::cout << "Compare" << " " << "int64_t" << "," << "float" << " " << *lhs << std::endl;
-		return result;
+	    int64_t* ptrLhs = reinterpret_cast<int64_t*>(lhs);
+	    int16_t* ptrRhs = reinterpret_cast<int16_t*>(rhs);
+	    *ptrLhs /= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    int64_t MathOperation::Compare(int64_t* lhs, double* rhs)
+    void MathOperation::DivideInt64UInt32(byte* lhs, byte* rhs)
     {
-	    int64_t result = (*lhs - *rhs);
-
-	    if(debugOperations)
-		    std::cout << "Compare" << " " << "int64_t" << "," << "double" << " " << *lhs << std::endl;
-		return result;
+	    int64_t* ptrLhs = reinterpret_cast<int64_t*>(lhs);
+	    uint32_t* ptrRhs = reinterpret_cast<uint32_t*>(rhs);
+	    *ptrLhs /= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    int64_t MathOperation::Compare(float* lhs, unsigned char* rhs)
+    void MathOperation::DivideInt64Int32(byte* lhs, byte* rhs)
     {
-	    int64_t result = (*lhs - *rhs);
-
-	    if(debugOperations)
-		    std::cout << "Compare" << " " << "float" << "," << "unsigned char" << " " << *lhs << std::endl;
-		return result;
+	    int64_t* ptrLhs = reinterpret_cast<int64_t*>(lhs);
+	    int32_t* ptrRhs = reinterpret_cast<int32_t*>(rhs);
+	    *ptrLhs /= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    int64_t MathOperation::Compare(float* lhs, char* rhs)
+    void MathOperation::DivideInt64UInt64(byte* lhs, byte* rhs)
     {
-	    int64_t result = (*lhs - *rhs);
-
-	    if(debugOperations)
-		    std::cout << "Compare" << " " << "float" << "," << "char" << " " << *lhs << std::endl;
-		return result;
+	    int64_t* ptrLhs = reinterpret_cast<int64_t*>(lhs);
+	    uint64_t* ptrRhs = reinterpret_cast<uint64_t*>(rhs);
+	    *ptrLhs /= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    int64_t MathOperation::Compare(float* lhs, uint16_t* rhs)
+    void MathOperation::DivideInt64Int64(byte* lhs, byte* rhs)
     {
-	    int64_t result = (*lhs - *rhs);
-
-	    if(debugOperations)
-		    std::cout << "Compare" << " " << "float" << "," << "uint16_t" << " " << *lhs << std::endl;
-		return result;
+	    int64_t* ptrLhs = reinterpret_cast<int64_t*>(lhs);
+	    int64_t* ptrRhs = reinterpret_cast<int64_t*>(rhs);
+	    *ptrLhs /= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    int64_t MathOperation::Compare(float* lhs, int16_t* rhs)
+    void MathOperation::DivideInt64Single(byte* lhs, byte* rhs)
     {
-	    int64_t result = (*lhs - *rhs);
-
-	    if(debugOperations)
-		    std::cout << "Compare" << " " << "float" << "," << "int16_t" << " " << *lhs << std::endl;
-		return result;
+	    int64_t* ptrLhs = reinterpret_cast<int64_t*>(lhs);
+	    float* ptrRhs = reinterpret_cast<float*>(rhs);
+	    *ptrLhs /= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    int64_t MathOperation::Compare(float* lhs, uint32_t* rhs)
+    void MathOperation::DivideInt64Double(byte* lhs, byte* rhs)
     {
-	    int64_t result = (*lhs - *rhs);
-
-	    if(debugOperations)
-		    std::cout << "Compare" << " " << "float" << "," << "uint32_t" << " " << *lhs << std::endl;
-		return result;
+	    int64_t* ptrLhs = reinterpret_cast<int64_t*>(lhs);
+	    double* ptrRhs = reinterpret_cast<double*>(rhs);
+	    *ptrLhs /= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    int64_t MathOperation::Compare(float* lhs, int32_t* rhs)
+    void MathOperation::DivideSingleUInt8(byte* lhs, byte* rhs)
     {
-	    int64_t result = (*lhs - *rhs);
-
-	    if(debugOperations)
-		    std::cout << "Compare" << " " << "float" << "," << "int32_t" << " " << *lhs << std::endl;
-		return result;
+	    float* ptrLhs = reinterpret_cast<float*>(lhs);
+	    uint8_t* ptrRhs = reinterpret_cast<uint8_t*>(rhs);
+	    *ptrLhs /= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    int64_t MathOperation::Compare(float* lhs, uint64_t* rhs)
+    void MathOperation::DivideSingleInt8(byte* lhs, byte* rhs)
     {
-	    int64_t result = (*lhs - *rhs);
-
-	    if(debugOperations)
-		    std::cout << "Compare" << " " << "float" << "," << "uint64_t" << " " << *lhs << std::endl;
-		return result;
+	    float* ptrLhs = reinterpret_cast<float*>(lhs);
+	    int8_t* ptrRhs = reinterpret_cast<int8_t*>(rhs);
+	    *ptrLhs /= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    int64_t MathOperation::Compare(float* lhs, int64_t* rhs)
+    void MathOperation::DivideSingleUInt16(byte* lhs, byte* rhs)
     {
-	    int64_t result = (*lhs - *rhs);
-
-	    if(debugOperations)
-		    std::cout << "Compare" << " " << "float" << "," << "int64_t" << " " << *lhs << std::endl;
-		return result;
+	    float* ptrLhs = reinterpret_cast<float*>(lhs);
+	    uint16_t* ptrRhs = reinterpret_cast<uint16_t*>(rhs);
+	    *ptrLhs /= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    int64_t MathOperation::Compare(float* lhs, float* rhs)
+    void MathOperation::DivideSingleInt16(byte* lhs, byte* rhs)
     {
-	    int64_t result = (*lhs - *rhs);
-
-	    if(debugOperations)
-		    std::cout << "Compare" << " " << "float" << "," << "float" << " " << *lhs << std::endl;
-		return result;
+	    float* ptrLhs = reinterpret_cast<float*>(lhs);
+	    int16_t* ptrRhs = reinterpret_cast<int16_t*>(rhs);
+	    *ptrLhs /= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    int64_t MathOperation::Compare(float* lhs, double* rhs)
+    void MathOperation::DivideSingleUInt32(byte* lhs, byte* rhs)
     {
-	    int64_t result = (*lhs - *rhs);
-
-	    if(debugOperations)
-		    std::cout << "Compare" << " " << "float" << "," << "double" << " " << *lhs << std::endl;
-		return result;
+	    float* ptrLhs = reinterpret_cast<float*>(lhs);
+	    uint32_t* ptrRhs = reinterpret_cast<uint32_t*>(rhs);
+	    *ptrLhs /= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    int64_t MathOperation::Compare(double* lhs, unsigned char* rhs)
+    void MathOperation::DivideSingleInt32(byte* lhs, byte* rhs)
     {
-	    int64_t result = (*lhs - *rhs);
-
-	    if(debugOperations)
-		    std::cout << "Compare" << " " << "double" << "," << "unsigned char" << " " << *lhs << std::endl;
-		return result;
+	    float* ptrLhs = reinterpret_cast<float*>(lhs);
+	    int32_t* ptrRhs = reinterpret_cast<int32_t*>(rhs);
+	    *ptrLhs /= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    int64_t MathOperation::Compare(double* lhs, char* rhs)
+    void MathOperation::DivideSingleUInt64(byte* lhs, byte* rhs)
     {
-	    int64_t result = (*lhs - *rhs);
-
-	    if(debugOperations)
-		    std::cout << "Compare" << " " << "double" << "," << "char" << " " << *lhs << std::endl;
-		return result;
+	    float* ptrLhs = reinterpret_cast<float*>(lhs);
+	    uint64_t* ptrRhs = reinterpret_cast<uint64_t*>(rhs);
+	    *ptrLhs /= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    int64_t MathOperation::Compare(double* lhs, uint16_t* rhs)
+    void MathOperation::DivideSingleInt64(byte* lhs, byte* rhs)
     {
-	    int64_t result = (*lhs - *rhs);
-
-	    if(debugOperations)
-		    std::cout << "Compare" << " " << "double" << "," << "uint16_t" << " " << *lhs << std::endl;
-		return result;
+	    float* ptrLhs = reinterpret_cast<float*>(lhs);
+	    int64_t* ptrRhs = reinterpret_cast<int64_t*>(rhs);
+	    *ptrLhs /= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    int64_t MathOperation::Compare(double* lhs, int16_t* rhs)
+    void MathOperation::DivideSingleSingle(byte* lhs, byte* rhs)
     {
-	    int64_t result = (*lhs - *rhs);
-
-	    if(debugOperations)
-		    std::cout << "Compare" << " " << "double" << "," << "int16_t" << " " << *lhs << std::endl;
-		return result;
+	    float* ptrLhs = reinterpret_cast<float*>(lhs);
+	    float* ptrRhs = reinterpret_cast<float*>(rhs);
+	    *ptrLhs /= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    int64_t MathOperation::Compare(double* lhs, uint32_t* rhs)
+    void MathOperation::DivideSingleDouble(byte* lhs, byte* rhs)
     {
-	    int64_t result = (*lhs - *rhs);
-
-	    if(debugOperations)
-		    std::cout << "Compare" << " " << "double" << "," << "uint32_t" << " " << *lhs << std::endl;
-		return result;
+	    float* ptrLhs = reinterpret_cast<float*>(lhs);
+	    double* ptrRhs = reinterpret_cast<double*>(rhs);
+	    *ptrLhs /= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    int64_t MathOperation::Compare(double* lhs, int32_t* rhs)
+    void MathOperation::DivideDoubleUInt8(byte* lhs, byte* rhs)
     {
-	    int64_t result = (*lhs - *rhs);
+	    double* ptrLhs = reinterpret_cast<double*>(lhs);
+	    uint8_t* ptrRhs = reinterpret_cast<uint8_t*>(rhs);
+	    *ptrLhs /= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
+    }
 
-	    if(debugOperations)
-		    std::cout << "Compare" << " " << "double" << "," << "int32_t" << " " << *lhs << std::endl;
-		return result;
+    void MathOperation::DivideDoubleInt8(byte* lhs, byte* rhs)
+    {
+	    double* ptrLhs = reinterpret_cast<double*>(lhs);
+	    int8_t* ptrRhs = reinterpret_cast<int8_t*>(rhs);
+	    *ptrLhs /= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    int64_t MathOperation::Compare(double* lhs, uint64_t* rhs)
+    void MathOperation::DivideDoubleUInt16(byte* lhs, byte* rhs)
     {
-	    int64_t result = (*lhs - *rhs);
+	    double* ptrLhs = reinterpret_cast<double*>(lhs);
+	    uint16_t* ptrRhs = reinterpret_cast<uint16_t*>(rhs);
+	    *ptrLhs /= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
+    }
 
-	    if(debugOperations)
-		    std::cout << "Compare" << " " << "double" << "," << "uint64_t" << " " << *lhs << std::endl;
-		return result;
+    void MathOperation::DivideDoubleInt16(byte* lhs, byte* rhs)
+    {
+	    double* ptrLhs = reinterpret_cast<double*>(lhs);
+	    int16_t* ptrRhs = reinterpret_cast<int16_t*>(rhs);
+	    *ptrLhs /= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    int64_t MathOperation::Compare(double* lhs, int64_t* rhs)
+    void MathOperation::DivideDoubleUInt32(byte* lhs, byte* rhs)
     {
-	    int64_t result = (*lhs - *rhs);
+	    double* ptrLhs = reinterpret_cast<double*>(lhs);
+	    uint32_t* ptrRhs = reinterpret_cast<uint32_t*>(rhs);
+	    *ptrLhs /= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
+    }
 
-	    if(debugOperations)
-		    std::cout << "Compare" << " " << "double" << "," << "int64_t" << " " << *lhs << std::endl;
-		return result;
+    void MathOperation::DivideDoubleInt32(byte* lhs, byte* rhs)
+    {
+	    double* ptrLhs = reinterpret_cast<double*>(lhs);
+	    int32_t* ptrRhs = reinterpret_cast<int32_t*>(rhs);
+	    *ptrLhs /= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    int64_t MathOperation::Compare(double* lhs, float* rhs)
+    void MathOperation::DivideDoubleUInt64(byte* lhs, byte* rhs)
     {
-	    int64_t result = (*lhs - *rhs);
+	    double* ptrLhs = reinterpret_cast<double*>(lhs);
+	    uint64_t* ptrRhs = reinterpret_cast<uint64_t*>(rhs);
+	    *ptrLhs /= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
+    }
 
-	    if(debugOperations)
-		    std::cout << "Compare" << " " << "double" << "," << "float" << " " << *lhs << std::endl;
-		return result;
+    void MathOperation::DivideDoubleInt64(byte* lhs, byte* rhs)
+    {
+	    double* ptrLhs = reinterpret_cast<double*>(lhs);
+	    int64_t* ptrRhs = reinterpret_cast<int64_t*>(rhs);
+	    *ptrLhs /= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 
-    int64_t MathOperation::Compare(double* lhs, double* rhs)
+    void MathOperation::DivideDoubleSingle(byte* lhs, byte* rhs)
     {
-	    int64_t result = (*lhs - *rhs);
+	    double* ptrLhs = reinterpret_cast<double*>(lhs);
+	    float* ptrRhs = reinterpret_cast<float*>(rhs);
+	    *ptrLhs /= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
+    }
 
-	    if(debugOperations)
-		    std::cout << "Compare" << " " << "double" << "," << "double" << " " << *lhs << std::endl;
-		return result;
+    void MathOperation::DivideDoubleDouble(byte* lhs, byte* rhs)
+    {
+	    double* ptrLhs = reinterpret_cast<double*>(lhs);
+	    double* ptrRhs = reinterpret_cast<double*>(rhs);
+	    *ptrLhs /= *ptrRhs;
+	    zeroFlag = *ptrLhs == 0 ? 1 : 0;
     }
 }

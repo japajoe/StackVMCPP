@@ -51,7 +51,7 @@ namespace StackVM
         uint32_t instructionIndex = (currentInstruction - entryInstruction);
         std::string currentIndex = std::to_string(instructionIndex);
 
-        Debug("OpCode " + std::to_string(currentInstruction->opcode));
+        //Debug("OpCode " + std::to_string(currentInstruction->opcode));
 
         switch(currentInstruction->opcode)
         {
@@ -452,7 +452,26 @@ namespace StackVM
                     characters[i] = character;
                 }
 
-                printf(characters);
+                std::cout << characters;
+                IncrementInstructionPointer();
+                SetStackPointer(stack.getPointer());
+                break;
+            }
+            case OpCode::PRINTF:
+            {
+                Debug("PRINT " + currentIndex);
+                
+                int32_t numberType = stack.pop_int32();
+                if(numberType == 0)
+                {
+                    int32_t val = stack.pop_int32();
+                    std::cout << val;
+                }
+                else
+                {
+                    float val = stack.pop_float();
+                    std::cout << val;
+                }
                 IncrementInstructionPointer();
                 SetStackPointer(stack.getPointer());
                 break;
@@ -467,7 +486,7 @@ namespace StackVM
                 Type typeLeft = GetLeftOperandDataType(currentInstruction);
                 Type typeRight = Type::UInt16;
 
-                MathOperation::Add(currentInstruction, dst, src, typeLeft, typeRight, &registers[0], &assembly->data[0]);
+                MathOperation::Add(dst, src, typeLeft, typeRight);
 
                 IncrementInstructionPointer();
                 break;
@@ -482,7 +501,7 @@ namespace StackVM
                 Type typeLeft = GetLeftOperandDataType(currentInstruction);
                 Type typeRight = Type::UInt16;
 
-                MathOperation::Subtract(currentInstruction, dst, src, typeLeft, typeRight, &registers[0], &assembly->data[0]);
+                MathOperation::Subtract(dst, src, typeLeft, typeRight);
                 IncrementInstructionPointer();
                 break;
             }
@@ -495,7 +514,7 @@ namespace StackVM
                 Type typeLeft = GetLeftOperandDataType(currentInstruction);
                 Type typeRight = GetRightOperandDataType(currentInstruction);
 
-                MathOperation::Add(currentInstruction, dst, src, typeLeft, typeRight, &registers[0], &assembly->data[0]);
+                MathOperation::Add(dst, src, typeLeft, typeRight);
                 
                 IncrementInstructionPointer();
                 break;
@@ -509,7 +528,7 @@ namespace StackVM
                 Type typeLeft = GetLeftOperandDataType(currentInstruction);
                 Type typeRight = GetRightOperandDataType(currentInstruction);
 
-                MathOperation::Subtract(currentInstruction, dst, src, typeLeft, typeRight, &registers[0], &assembly->data[0]);
+                MathOperation::Subtract(dst, src, typeLeft, typeRight);
                 
                 IncrementInstructionPointer();
                 break;
@@ -523,7 +542,7 @@ namespace StackVM
                 Type typeLeft = GetLeftOperandDataType(currentInstruction);
                 Type typeRight = GetRightOperandDataType(currentInstruction);                
 
-                MathOperation::Multiply(currentInstruction, dst, src, typeLeft, typeRight, &registers[0], &assembly->data[0]);
+                MathOperation::Multiply(dst, src, typeLeft, typeRight);
 
                 IncrementInstructionPointer();
                 break;
@@ -537,7 +556,7 @@ namespace StackVM
                 Type typeLeft = GetLeftOperandDataType(currentInstruction);
                 Type typeRight = GetRightOperandDataType(currentInstruction);                
 
-                MathOperation::Divide(currentInstruction, dst, src, typeLeft, typeRight, &registers[0], &assembly->data[0]);
+                MathOperation::Divide(dst, src, typeLeft, typeRight);
 
                 IncrementInstructionPointer();
                 break;
@@ -551,9 +570,31 @@ namespace StackVM
                 Type typeLeft = GetLeftOperandDataType(currentInstruction);
                 Type typeRight = GetRightOperandDataType(currentInstruction);
 
-                MathOperation::Compare(currentInstruction, dst, src, typeLeft, typeRight, &registers[0], &assembly->data[0]);
+                MathOperation::Compare(dst, src, typeLeft, typeRight);
 
                 IncrementInstructionPointer();
+                break;
+            }
+            case OpCode::CALL:
+            {
+                Debug("CALL " + currentIndex);
+                byte* dst = GetLeftOperandPointer(currentInstruction);
+                uint32_t offset;
+                memcpy(&offset, dst, sizeof(int32_t));
+
+                uint32_t ip = (currentInstruction - entryInstruction) + 1;
+                stack.push_uint32(ip);
+                SetStackPointer(stack.getPointer());
+
+                SetInstructionPointer(offset);
+                break;
+            }
+            case OpCode::RET:
+            {
+                Debug("RET " + currentIndex);
+                uint32_t ip = stack.pop_uint32();
+                SetInstructionPointer(ip);
+                SetStackPointer(stack.getPointer());
                 break;
             }
             case OpCode::JMP:
@@ -561,9 +602,7 @@ namespace StackVM
                 Debug("JMP " + currentIndex);
                 byte* dst = GetLeftOperandPointer(currentInstruction);
                 uint32_t offset;
-                memcpy(&offset, dst, sizeof(int32_t));
-
-                std::cout << "JMP offset " << offset << std::endl;
+                memcpy(&offset, dst, sizeof(int32_t));                
                 SetInstructionPointer(offset);
                 break;
             }
