@@ -14,54 +14,9 @@ void RunExampleProgram();
 
 int main()
 {
-    // auto startTime = high_resolution_clock::now();
-    
-    // for(int i = 0; i < 1000000; i++)
-    // {
-    //     std::cout << "Hello world! " << i << '\n';
-    // }
-    
-    // auto endTime = high_resolution_clock::now();
-
-    // auto ms_int = duration_cast<milliseconds>(endTime - startTime);
-    // int64_t elapsedTime = ms_int.count();
-
-    // std::cout << "Elapsed time " << elapsedTime << std::endl;
-
-
     CompileProgram();
     //RunExampleProgram();
     return 0;
-}
-
-void RunExampleProgram()
-{
-    Assembly assembly;
-    
-    assembly.instructions.push_back(Instruction(OpCode::MOV, EAX, OperandType::Register, 0, OperandType::IntegerLiteral));
-    assembly.instructions.push_back(Instruction(OpCode::MOV, EBX, OperandType::Register, 10, OperandType::IntegerLiteral));
-    assembly.instructions.push_back(Instruction(OpCode::INC, EAX, OperandType::Register));
-    assembly.instructions.push_back(Instruction(OpCode::PUSHI8, '\n', OperandType::IntegerLiteral));
-    assembly.instructions.push_back(Instruction(OpCode::PUSHI8, 'o', OperandType::IntegerLiteral));
-    assembly.instructions.push_back(Instruction(OpCode::PUSHI8, 'l', OperandType::IntegerLiteral));
-    assembly.instructions.push_back(Instruction(OpCode::PUSHI8, 'l', OperandType::IntegerLiteral));
-    assembly.instructions.push_back(Instruction(OpCode::PUSHI8, 'e', OperandType::IntegerLiteral));
-    assembly.instructions.push_back(Instruction(OpCode::PUSHI8, 'h', OperandType::IntegerLiteral));
-    assembly.instructions.push_back(Instruction(OpCode::PUSHI32, 6, OperandType::IntegerLiteral));
-    assembly.instructions.push_back(Instruction(OpCode::PRINT));
-    assembly.instructions.push_back(Instruction(OpCode::CMP, EAX, OperandType::Register, EBX, OperandType::Register));
-    assembly.instructions.push_back(Instruction(OpCode::JNE, 2, OperandType::IntegerLiteral));    
-    assembly.instructions.push_back(Instruction(OpCode::HLT));
-
-    if(machine.LoadProgram(&assembly))
-    {
-        bool execute = true;
-
-        while(execute)
-        {
-            execute = machine.Execute();
-        }
-    }
 }
 
 void CompileProgram()
@@ -97,5 +52,35 @@ void CompileProgram()
     else
     {
         std::cout << "The file " << filename << " does not exist" << std::endl;
+    }
+}
+
+void RunExampleProgram()
+{
+    Assembly assembly;
+    
+    assembly.instructions.push_back(Instruction(OpCode::MOV, EAX, OperandType::Register, 0, OperandType::IntegerLiteral));
+    assembly.instructions.push_back(Instruction(OpCode::MOV, EBX, OperandType::Register, 10, OperandType::IntegerLiteral));
+    assembly.instructions.push_back(Instruction(OpCode::INC, EAX, OperandType::Register));
+    assembly.instructions.push_back(Instruction(OpCode::PUSHI8, '\n', OperandType::IntegerLiteral));
+    assembly.instructions.push_back(Instruction(OpCode::PUSHI8, 'o', OperandType::IntegerLiteral));
+    assembly.instructions.push_back(Instruction(OpCode::PUSHI8, 'l', OperandType::IntegerLiteral));
+    assembly.instructions.push_back(Instruction(OpCode::PUSHI8, 'l', OperandType::IntegerLiteral));
+    assembly.instructions.push_back(Instruction(OpCode::PUSHI8, 'e', OperandType::IntegerLiteral));
+    assembly.instructions.push_back(Instruction(OpCode::PUSHI8, 'h', OperandType::IntegerLiteral));
+    assembly.instructions.push_back(Instruction(OpCode::PUSHI32, 6, OperandType::IntegerLiteral));
+    assembly.instructions.push_back(Instruction(OpCode::PRINT));
+    assembly.instructions.push_back(Instruction(OpCode::CMP, EAX, OperandType::Register, EBX, OperandType::Register));
+    assembly.instructions.push_back(Instruction(OpCode::JNE, 2, OperandType::IntegerLiteral));    
+    assembly.instructions.push_back(Instruction(OpCode::HLT));
+
+    if(machine.LoadProgram(&assembly))
+    {
+        bool execute = true;
+
+        while(execute)
+        {
+            execute = machine.Execute();
+        }
     }
 }

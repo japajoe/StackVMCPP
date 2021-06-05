@@ -58,20 +58,6 @@ namespace StackVM
         NUM_OPCODES
     };
 
-    // enum Type : uint8_t
-    // {
-    //     Int8 = 0,
-    //     Int16 = 1,
-    //     Int32 = 2,
-    //     Int64 = 3,
-    //     UInt8 = 4,
-    //     UInt16 = 5,
-    //     UInt32 = 6,
-    //     UInt64 = 7,
-    //     Double = 8,
-    //     Single = 9
-    // };
-
     enum Type : uint8_t
     {
         UInt8 = 0,

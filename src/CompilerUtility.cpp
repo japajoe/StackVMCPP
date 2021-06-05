@@ -228,9 +228,10 @@ namespace StackVM
                         }
                         else
                         {
-                            if(components[3].size() == 1)
+                            if(components[3].size() == 1 || components[3].size() == 2)
                             {
                                 tokens.push_back(Token(TokenType::CHARACTER_LITERAL, components[3], lines[i].lineNumber));
+                                std::cout << components[3].size() << std::endl;
                             }
                             
                             //WriteError(lines[i].lineNumber, "Invalid value '" + components[3] + "'");

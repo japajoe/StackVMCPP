@@ -8,6 +8,7 @@
 namespace StackVM
 {
     bool debugLog = false;
+    char characterBuffer[1024];
 
     void Debug(const std::string& message)
     {
@@ -41,15 +42,12 @@ namespace StackVM
         entryInstruction = &assembly->instructions[0];
         startTime = high_resolution_clock::now();
         return true;
-    }
+    }    
 
     bool VirtualMachine::Execute()
     {
         if(currentInstruction == nullptr)
             return false;
-
-        uint32_t instructionIndex = (currentInstruction - entryInstruction);
-        std::string currentIndex = std::to_string(instructionIndex);
 
         //Debug("OpCode " + std::to_string(currentInstruction->opcode));
 
@@ -151,6 +149,7 @@ namespace StackVM
                 //Debug("PUSHI32 " + currentIndex);
                 byte* src = GetLeftOperandPointer(currentInstruction);
                 stack.push_from_type<int32_t>(src);
+                //stack.push_int32(src);
                 IncrementInstructionPointer();
                 SetStackPointer(stack.getPointer());
                 break;
@@ -443,16 +442,15 @@ namespace StackVM
 
                 int32_t numArgs = stack.pop_int32();
 
-                char characters[numArgs + 1];
-                characters[numArgs] = '\0';
+                memset(characterBuffer, 0, 1024);
+                characterBuffer[numArgs] = '\0';
                 
                 for(size_t i = 0; i < numArgs; i++)
-                {     
-                    char character = stack.pop_char();
-                    characters[i] = character;
+                {
+                    characterBuffer[i] = stack.pop_char();;
                 }
 
-                std::cout << characters;
+                std::cout << characterBuffer;
                 IncrementInstructionPointer();
                 SetStackPointer(stack.getPointer());
                 break;
@@ -878,7 +876,6 @@ namespace StackVM
     void VirtualMachine::SetDestinationRegisterDataType(Instruction* instruction, Type type)
     {
         int32_t index = GetDestinationRegisterIndex(instruction);
-        memcpy(&index, &instruction->lhs[0], 4);
         registerDataType[index] = type;
     }
 
@@ -886,7 +883,6 @@ namespace StackVM
     {
         currentInstruction += 1;
         uint32_t address = static_cast<uint32_t>(currentInstruction - entryInstruction);
-        memset(&registers[EIP * 8], 0, 8);
         memcpy(&registers[EIP * 8], &address, sizeof(uint32_t));
         registerDataType[EIP] = Type::UInt32;
     }
@@ -895,7 +891,6 @@ namespace StackVM
     {
         currentInstruction += offset;
         uint32_t address = static_cast<uint32_t>(currentInstruction - entryInstruction);
-        memset(&registers[EIP * 8], 0, 8);
         memcpy(&registers[EIP * 8], &address, sizeof(uint32_t));
         registerDataType[EIP] = Type::UInt32;        
     }    
@@ -904,14 +899,12 @@ namespace StackVM
     {
         currentInstruction = (entryInstruction + offset);
         uint32_t address = static_cast<uint32_t>(currentInstruction - entryInstruction);
-        memset(&registers[EIP * 8], 0, 8);
         memcpy(&registers[EIP * 8], &address, sizeof(uint32_t));
         registerDataType[EIP] = Type::UInt32;
     }
 
     void VirtualMachine::SetStackPointer(uint32_t offset)
     {
-        memset(&registers[ESP * 8], 0, 8);
         memcpy(&registers[ESP * 8], &offset, sizeof(uint32_t));
         registerDataType[ESP] = Type::UInt32;
     }    
