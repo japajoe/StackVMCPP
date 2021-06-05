@@ -425,7 +425,7 @@ namespace StackVM
                 
                 for(size_t i = 0; i < numArgs; i++)
                 {
-                    characterBuffer[i] = stack.pop_char();;
+                    characterBuffer[i] = stack.pop_char();
                 }
 
                 std::cout << characterBuffer;
@@ -440,12 +440,12 @@ namespace StackVM
                 if(numberType == 0)
                 {
                     int32_t val = stack.pop_int32();
-                    std::cout << val;
+                    std::cout << val << '\n';
                 }
                 else
                 {
                     float val = stack.pop_float();
-                    std::cout << val;
+                    std::cout << val << '\n';
                 }
                 IncrementInstructionPointer();
                 break;

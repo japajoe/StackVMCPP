@@ -24,12 +24,12 @@
 
 section .data
     iteration dd : 0
-    iterations dd : 10
+    iterations dd : 1000000
     numChars dd : 13
 
 section .text
 _print:
-    pushi8 '\n'
+    pushi8 ' '
     pushi8 '!'
     pushi8 'd'
     pushi8 'l'
@@ -44,8 +44,12 @@ _print:
     pushi8 'H'
     pushi32 numChars
     print
+    pushi32 iteration
+    pushi32 0           ;passing 0 means print integer, 1 means print float
+    printf
     inc iteration
     cmp iteration, iterations
     jne _print
+
 _stop:
     hlt
