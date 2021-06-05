@@ -39,8 +39,7 @@ namespace StackVM
         this->assembly = assembly;
         program = &assembly->instructions[0];
         currentInstruction = &assembly->instructions[0];
-        entryInstruction = &assembly->instructions[0];
-        startTime = high_resolution_clock::now();
+        entryInstruction = &assembly->instructions[0];        
         return true;
     }    
 
@@ -49,14 +48,15 @@ namespace StackVM
         if(currentInstruction == nullptr)
             return false;
 
-        //Debug("OpCode " + std::to_string(currentInstruction->opcode));
-
         switch(currentInstruction->opcode)
         {
             case OpCode::HLT:
             {
                 //Debug("HLT " + currentIndex);
                 currentInstruction = nullptr;
+                endTime = high_resolution_clock::now();
+                auto ms_int = duration_cast<milliseconds>(endTime - startTime);
+                elapsedTime = ms_int.count();                 
                 std::cout << "Elapsed time " << elapsedTime << std::endl;
                 return false;
             }
@@ -105,7 +105,6 @@ namespace StackVM
                 Type type = GetLeftOperandDataType(currentInstruction);
                 stack.push(src, type);
                 IncrementInstructionPointer();
-                SetStackPointer(stack.getPointer());
                 break;
             }
             case OpCode::PUSHI8:
@@ -114,7 +113,6 @@ namespace StackVM
                 byte* src = GetLeftOperandPointer(currentInstruction);
                 stack.push_from_type<char>(src);
                 IncrementInstructionPointer();
-                SetStackPointer(stack.getPointer());
                 break;
             }
             case OpCode::PUSHU8:
@@ -123,7 +121,6 @@ namespace StackVM
                 byte* src = GetLeftOperandPointer(currentInstruction);
                 stack.push_from_type<unsigned char>(src);
                 IncrementInstructionPointer();
-                SetStackPointer(stack.getPointer());
                 break;
             }            
             case OpCode::PUSHF:
@@ -132,7 +129,6 @@ namespace StackVM
                 byte* src = GetLeftOperandPointer(currentInstruction);
                 stack.push_from_type<float>(src);
                 IncrementInstructionPointer();
-                SetStackPointer(stack.getPointer());
                 break;
             }
             case OpCode::PUSHD:
@@ -141,7 +137,6 @@ namespace StackVM
                 byte* src = GetLeftOperandPointer(currentInstruction);
                 stack.push_from_type<double>(src);
                 IncrementInstructionPointer();
-                SetStackPointer(stack.getPointer());
                 break;
             }                  
             case OpCode::PUSHI32:
@@ -151,7 +146,6 @@ namespace StackVM
                 stack.push_from_type<int32_t>(src);
                 //stack.push_int32(src);
                 IncrementInstructionPointer();
-                SetStackPointer(stack.getPointer());
                 break;
             }
             case OpCode::PUSHU32:
@@ -160,7 +154,6 @@ namespace StackVM
                 byte* src = GetLeftOperandPointer(currentInstruction);
                 stack.push_from_type<uint32_t>(src);
                 IncrementInstructionPointer();
-                SetStackPointer(stack.getPointer());
                 break;
             }            
             case OpCode::PUSHI16:
@@ -169,7 +162,6 @@ namespace StackVM
                 byte* src = GetLeftOperandPointer(currentInstruction);
                 stack.push_from_type<int16_t>(src);
                 IncrementInstructionPointer();
-                SetStackPointer(stack.getPointer());
                 break;
             }    
             case OpCode::PUSHU16:
@@ -178,7 +170,6 @@ namespace StackVM
                 byte* src = GetLeftOperandPointer(currentInstruction);
                 stack.push_from_type<uint16_t>(src);
                 IncrementInstructionPointer();
-                SetStackPointer(stack.getPointer());
                 break;
             }                          
             case OpCode::PUSHI64:
@@ -187,7 +178,6 @@ namespace StackVM
                 byte* src = GetLeftOperandPointer(currentInstruction);
                 stack.push_from_type<int64_t>(src);
                 IncrementInstructionPointer();
-                SetStackPointer(stack.getPointer());
                 break;
             }
             case OpCode::PUSHU64:
@@ -196,7 +186,6 @@ namespace StackVM
                 byte* src = GetLeftOperandPointer(currentInstruction);
                 stack.push_from_type<uint64_t>(src);
                 IncrementInstructionPointer();
-                SetStackPointer(stack.getPointer());
                 break;
             }                                    
             case OpCode::POP:
@@ -213,7 +202,6 @@ namespace StackVM
                     stack.pop_bytes();
                 }
                 IncrementInstructionPointer();
-                SetStackPointer(stack.getPointer());
                 break;
             }
             case OpCode::POPI8:
@@ -235,7 +223,6 @@ namespace StackVM
                     stack.pop_char();
                 }                
                 IncrementInstructionPointer();
-                SetStackPointer(stack.getPointer());
                 break;
             }
             case OpCode::POPU8:
@@ -257,7 +244,6 @@ namespace StackVM
                     stack.pop_uchar();
                 }                 
                 IncrementInstructionPointer();
-                SetStackPointer(stack.getPointer());
                 break;
             }
             case OpCode::POPF:
@@ -279,7 +265,6 @@ namespace StackVM
                     stack.pop_float();
                 }                 
                 IncrementInstructionPointer();
-                SetStackPointer(stack.getPointer());
                 break;
             }
             case OpCode::POPD:
@@ -301,7 +286,6 @@ namespace StackVM
                     stack.pop_double();
                 }                 
                 IncrementInstructionPointer();
-                SetStackPointer(stack.getPointer());
                 break;
             }
             case OpCode::POPI32:
@@ -323,7 +307,6 @@ namespace StackVM
                     stack.pop_int32();
                 }                
                 IncrementInstructionPointer();
-                SetStackPointer(stack.getPointer());
                 break;
             }
             case OpCode::POPU32:
@@ -345,7 +328,6 @@ namespace StackVM
                     stack.pop_uint32();
                 }                
                 IncrementInstructionPointer();
-                SetStackPointer(stack.getPointer());
                 break;
             }
             case OpCode::POPI16:
@@ -367,7 +349,6 @@ namespace StackVM
                     stack.pop_int16();
                 }                 
                 IncrementInstructionPointer();
-                SetStackPointer(stack.getPointer());
                 break;
             }
             case OpCode::POPU16:
@@ -389,7 +370,6 @@ namespace StackVM
                     stack.pop_uint16();
                 }                
                 IncrementInstructionPointer();
-                SetStackPointer(stack.getPointer());
                 break;
             }
             case OpCode::POPI64:
@@ -411,7 +391,6 @@ namespace StackVM
                     stack.pop_int64();
                 }                   
                 IncrementInstructionPointer();
-                SetStackPointer(stack.getPointer());
                 break;
             }
             case OpCode::POPU64:
@@ -433,7 +412,6 @@ namespace StackVM
                     stack.pop_uint64();
                 }                
                 IncrementInstructionPointer();
-                SetStackPointer(stack.getPointer());
                 break;
             }            
             case OpCode::PRINT:
@@ -452,7 +430,6 @@ namespace StackVM
 
                 std::cout << characterBuffer;
                 IncrementInstructionPointer();
-                SetStackPointer(stack.getPointer());
                 break;
             }
             case OpCode::PRINTF:
@@ -471,7 +448,6 @@ namespace StackVM
                     std::cout << val;
                 }
                 IncrementInstructionPointer();
-                SetStackPointer(stack.getPointer());
                 break;
             }
             case OpCode::INC:
@@ -582,7 +558,6 @@ namespace StackVM
 
                 uint32_t ip = (currentInstruction - entryInstruction) + 1;
                 stack.push_uint32(ip);
-                SetStackPointer(stack.getPointer());
 
                 SetInstructionPointer(offset);
                 break;
@@ -592,7 +567,6 @@ namespace StackVM
                 //Debug("RET " + currentIndex);
                 uint32_t ip = stack.pop_uint32();
                 SetInstructionPointer(ip);
-                SetStackPointer(stack.getPointer());
                 break;
             }
             case OpCode::JMP:
@@ -737,11 +711,7 @@ namespace StackVM
                 IncrementInstructionPointer();
                 break;
             }
-        }
-
-        endTime = high_resolution_clock::now();
-        auto ms_int = duration_cast<milliseconds>(endTime - startTime);
-        elapsedTime = ms_int.count();       
+        }      
 
         return true;   
     }
@@ -761,26 +731,22 @@ namespace StackVM
         compareFlag = 0;
         elapsedTime = 0;
         stack.clear();
+        startTime = high_resolution_clock::now();
     }
 
     byte* VirtualMachine::GetLeftOperandPointer(Instruction* instruction)
     {
-        byte* ptr = nullptr;
-
         switch(instruction->lhsOperandType)
         {
             case OperandType::IntegerLiteral:
-                ptr = &instruction->lhs[0];
-                break;
+                return &instruction->lhs[0];
             case OperandType::Register:                
-                ptr = &registers[0] + (instruction->GetLeftValue<int32_t>() * (sizeof(byte) * 8));
-                break;
+                return &registers[0] + (instruction->GetLeftValue<int32_t>() * (sizeof(byte) * 8));
             case OperandType::Variable:
-                ptr = assembly->GetDataAtIndex(instruction->GetLeftValue<int32_t>());
-                break;
+                return assembly->GetDataAtIndex(instruction->GetLeftValue<int32_t>());
         }
         
-        return ptr;
+        return nullptr;
     }
 
     byte* VirtualMachine::GetRightOperandPointer(Instruction* instruction)
@@ -882,32 +848,17 @@ namespace StackVM
     void VirtualMachine::IncrementInstructionPointer()
     {
         currentInstruction += 1;
-        uint32_t address = static_cast<uint32_t>(currentInstruction - entryInstruction);
-        memcpy(&registers[EIP * 8], &address, sizeof(uint32_t));
-        registerDataType[EIP] = Type::UInt32;
     }
 
     void VirtualMachine::IncrementInstructionPointer(uint32_t offset)
     {
-        currentInstruction += offset;
-        uint32_t address = static_cast<uint32_t>(currentInstruction - entryInstruction);
-        memcpy(&registers[EIP * 8], &address, sizeof(uint32_t));
-        registerDataType[EIP] = Type::UInt32;        
+        currentInstruction += offset;   
     }    
 
     void VirtualMachine::SetInstructionPointer(uint32_t offset)
     {
         currentInstruction = (entryInstruction + offset);
-        uint32_t address = static_cast<uint32_t>(currentInstruction - entryInstruction);
-        memcpy(&registers[EIP * 8], &address, sizeof(uint32_t));
-        registerDataType[EIP] = Type::UInt32;
-    }
-
-    void VirtualMachine::SetStackPointer(uint32_t offset)
-    {
-        memcpy(&registers[ESP * 8], &offset, sizeof(uint32_t));
-        registerDataType[ESP] = Type::UInt32;
-    }    
+    }   
 
     void VirtualMachine::LogMessage(const std::string& message)
     {

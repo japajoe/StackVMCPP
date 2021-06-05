@@ -177,8 +177,9 @@ namespace StackVM
 
         char pop_char()
         {
-            char value;
-            memcpy(&value, &buffer[sp - sizeof(char)], sizeof(char));
+            //char value;
+            char value = *(char*)&buffer[sp - sizeof(char)];
+            //memcpy(&value, &buffer[sp - sizeof(char)], sizeof(char));
             sp -= sizeof(char);
             return value;
         }

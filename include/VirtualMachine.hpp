@@ -44,7 +44,6 @@ namespace StackVM
         void IncrementInstructionPointer();
         void IncrementInstructionPointer(uint32_t offset);
         void SetInstructionPointer(uint32_t offset);
-        void SetStackPointer(uint32_t offset);
         void ResetState();
         void LogMessage(const std::string& message);
     public:
