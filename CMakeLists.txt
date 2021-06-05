@@ -1,6 +1,14 @@
 cmake_minimum_required(VERSION 3.5.1)
 project(stackvm)
 
+if(NOT CMAKE_BUILD_TYPE)
+  set(CMAKE_BUILD_TYPE Release)
+endif()
+
+# set this for adding debug symbols
+#set (CMAKE_CXX_FLAGS "-pg")
+# set(CMAKE_CXX_FLAGS_RELEASE "-O3")
+
 # Add sources
 file(GLOB SOURCES
     "${PROJECT_SOURCE_DIR}/src/*.cpp"
@@ -35,8 +43,8 @@ add_executable(${PROJECT_NAME} ${SOURCES})
 set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD 17)
 set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD_REQUIRED ON)
 
-# set this for adding debug symbols
-#set (CMAKE_CXX_FLAGS "-pg")
+
+
 
 define_file_basename_for_sources(${PROJECT_NAME})
 

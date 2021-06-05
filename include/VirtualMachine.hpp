@@ -26,11 +26,8 @@ namespace StackVM
         std::vector<byte> registers;
         Type registerDataType[13];
         Assembly* assembly;
-        Instruction* program;
         Instruction* currentInstruction;
         Instruction* entryInstruction;
-        int32_t zeroFlag;
-        int32_t compareFlag;
         TimePoint startTime;
         TimePoint endTime;
         int32_t elapsedTime;
