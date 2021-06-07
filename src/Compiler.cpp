@@ -1,10 +1,20 @@
 #include "Compiler.hpp"
+#include "StandardLibrary.hpp"
 
 namespace StackVM
 {
     Compiler::Compiler()
     {
         CompilerUtility::Initialize();
+
+        functionMap["abs"] = reinterpret_cast<uint64_t>(StandardLibrary::Abs);
+        functionMap["clamp"] = reinterpret_cast<uint64_t>(StandardLibrary::Clamp);
+        functionMap["cos"] = reinterpret_cast<uint64_t>(StandardLibrary::Cos);
+        functionMap["lerp"] = reinterpret_cast<uint64_t>(StandardLibrary::Lerp);
+        functionMap["pow"] = reinterpret_cast<uint64_t>(StandardLibrary::Pow);
+        functionMap["sin"] = reinterpret_cast<uint64_t>(StandardLibrary::Sin);
+        functionMap["sign"] = reinterpret_cast<uint64_t>(StandardLibrary::Sign);
+        functionMap["sqrt"] = reinterpret_cast<uint64_t>(StandardLibrary::Sqrt);
     }
 
     bool Compiler::Compile(const std::string& source, Assembly& assembly)
@@ -393,6 +403,13 @@ namespace StackVM
                 else if(labelMap.count(operandToken.text) > 0)
                 {
                     uint64_t value = labelMap[operandToken.text];
+                    memcpy(operandValue, &value, sizeof(uint64_t));
+                    operandType = OperandType::IntegerLiteral;
+                    operandValueType = Type::UInt64;
+                }
+                else if(functionMap.count(operandToken.text) > 0)
+                {
+                    uint64_t value = functionMap[operandToken.text];
                     memcpy(operandValue, &value, sizeof(uint64_t));
                     operandType = OperandType::IntegerLiteral;
                     operandValueType = Type::UInt64;

@@ -22,6 +22,7 @@ namespace StackVM
         Assembly* assembly;
         std::map<std::string, uint32_t> dataMap;
         std::map<std::string, uint64_t> labelMap;
+        std::map<std::string, uint64_t> functionMap;
         std::map<uint64_t, std::string> instructionsWithLabel;
         void WriteError(int lineNumber, const std::string& error);
         bool ProcessToken(std::vector<Token>& tokens, size_t index);

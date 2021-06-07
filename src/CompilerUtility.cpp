@@ -46,6 +46,7 @@ namespace StackVM
         opcodeInfoMap["printf"]    = OpCodeInfo(OpCode::PRINTF,    OperandInfo::None);
         opcodeInfoMap["cmp"]       = OpCodeInfo(OpCode::CMP,       OperandInfo::Two,        OperandTypeOption::All,                 OperandTypeOption::All);
         opcodeInfoMap["call"]      = OpCodeInfo(OpCode::CALL,      OperandInfo::One,        OperandTypeOption::All);
+        opcodeInfoMap["callf"]     = OpCodeInfo(OpCode::CALLF,     OperandInfo::One,        OperandTypeOption::All);
         opcodeInfoMap["ret"]       = OpCodeInfo(OpCode::RET,       OperandInfo::None);
         opcodeInfoMap["jmp"]       = OpCodeInfo(OpCode::JMP,       OperandInfo::One,        OperandTypeOption::All);
         opcodeInfoMap["je"]        = OpCodeInfo(OpCode::JE,        OperandInfo::One,        OperandTypeOption::All);

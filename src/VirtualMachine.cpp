@@ -1,6 +1,7 @@
 #include "VirtualMachine.hpp"
 #include "MathOperation.hpp"
 #include "ConversionUtility.hpp"
+#include "StandardLibrary.hpp"
 #include <cstring>
 #include <iostream>
 #include <algorithm>
@@ -520,6 +521,18 @@ namespace StackVM
                 stack.push_uint64(ip);
 
                 SetInstructionPointer(offset);
+                break;
+            }
+            case OpCode::CALLF:
+            {
+                byte* dst = GetLeftOperandPointer(currentInstruction);
+                uint64_t address;
+                memcpy(&address, dst, sizeof(uint64_t));
+
+                StandardLibraryFunction func = reinterpret_cast<StandardLibraryFunction>(address);
+                func(&stack);
+
+                IncrementInstructionPointer();
                 break;
             }
             case OpCode::RET:
