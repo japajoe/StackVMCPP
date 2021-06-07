@@ -657,6 +657,26 @@ namespace StackVM
         return count;
     }
 
+    bool CompilerUtility::IsJumpInstruction(OpCode opcode)
+    {
+        switch(opcode)
+        {
+            case OpCode::CALL:
+            case OpCode::JMP:
+            case OpCode::JE:
+            case OpCode::JNE:
+            case OpCode::JG:
+            case OpCode::JGE:
+            case OpCode::JL:
+            case OpCode::JLE:
+            case OpCode::JZ:
+            case OpCode::JNZ:
+                return true;
+            default:
+                return false;
+        }
+    }
+
     void CompilerUtility::WriteError(int lineNumber, const std::string& error)
     {
         std::cout << "Tokenizer -> Error on line " << lineNumber << ": " << error << std::endl;

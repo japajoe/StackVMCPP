@@ -19,13 +19,7 @@ namespace StackVM
         if(!CompilerUtility::Tokenize(lines, tokens))
             return false;          
 
-        size_t tokenCount = tokens.size();
         size_t index = 0;
-
-        size_t numVariables = CompilerUtility::CountTokens(tokens, TokenType::VARIABLE_LABEL);
-        size_t numFunctions = CompilerUtility::CountTokens(tokens, TokenType::FUNCTION_LABEL);
-        size_t numOpcodes = CompilerUtility::CountTokens(tokens, TokenType::OPCODE);
-
         size_t numInstructions = 0;
         Token prevToken = tokens[0];
 
@@ -39,7 +33,6 @@ namespace StackVM
                 if(prevToken.type == TokenType::FUNCTION_LABEL)
                 {
                     labelMap[prevToken.text] = numInstructions;
-                    //std::cout << "Found label " << prevToken.text << " to index " << numInstructions << std::endl;
                 }
                 numInstructions++;
             }
@@ -59,12 +52,22 @@ namespace StackVM
             }
         }
 
+        //Convert all indices of instructions with a jump to a pointer
+        for(size_t i = 0; i < assembly.instructions.size(); i++)
+        {
+            if(CompilerUtility::IsJumpInstruction(assembly.instructions[i].opcode))
+            {
+                uint64_t offsetDst = *(uint64_t*)&assembly.instructions[i].lhs;
+                uint64_t dst = reinterpret_cast<uint64_t>(&assembly.instructions[offsetDst]);
+                memcpy(&assembly.instructions[i].lhs[0], &dst, sizeof(uint64_t));
+            }            
+        }
+
         return true;
     }
 
     bool Compiler::ProcessToken(std::vector<Token>& tokens, size_t index)
-    {        
-
+    {
         switch(tokens[index].type)
         {
             case TokenType::VARIABLE_LABEL:
@@ -389,10 +392,10 @@ namespace StackVM
                 }                                        
                 else if(labelMap.count(operandToken.text) > 0)
                 {
-                    uint32_t value = labelMap[operandToken.text];
-                    memcpy(operandValue, &value, sizeof(uint32_t));
+                    uint64_t value = labelMap[operandToken.text];
+                    memcpy(operandValue, &value, sizeof(uint64_t));
                     operandType = OperandType::IntegerLiteral;
-                    operandValueType = Type::UInt32;
+                    operandValueType = Type::UInt64;
                 }
                 else
                 {
@@ -479,10 +482,10 @@ namespace StackVM
                 }                                        
                 else if(labelMap.count(operandToken.text) > 0)
                 {
-                    uint32_t value = labelMap[operandToken.text];
-                    memcpy(operandValue, &value, sizeof(uint32_t));
+                    uint64_t value = labelMap[operandToken.text];
+                    memcpy(operandValue, &value, sizeof(uint64_t));
                     operandType = OperandType::IntegerLiteral;
-                    operandValueType = Type::UInt32;
+                    operandValueType = Type::UInt64;
                 }
                 else
                 {

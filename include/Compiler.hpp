@@ -21,8 +21,8 @@ namespace StackVM
     private:
         Assembly* assembly;
         std::map<std::string, uint32_t> dataMap;
-        std::map<std::string, uint32_t> labelMap;
-        std::map<uint32_t, std::string> instructionsWithLabel;
+        std::map<std::string, uint64_t> labelMap;
+        std::map<uint64_t, std::string> instructionsWithLabel;
         void WriteError(int lineNumber, const std::string& error);
         bool ProcessToken(std::vector<Token>& tokens, size_t index);
         bool ProcessSingleOperandInstruction(std::vector<Token>& tokens, size_t index, const OpCodeInfo& opcodeInfo);

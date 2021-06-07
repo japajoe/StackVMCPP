@@ -8,7 +8,6 @@
 namespace StackVM
 {
     bool debugLog = false;
-    char characterBuffer[1024];
 
     void Debug(const std::string& message)
     {
@@ -391,16 +390,15 @@ namespace StackVM
             case OpCode::PRINT:
             {
                 int32_t numArgs = stack.pop_int32();
-
-                memset(characterBuffer, 0, 1024);
-                characterBuffer[numArgs] = '\0';
+                char characters[numArgs];
+                characters[numArgs] = '\0';
                 
                 for(size_t i = 0; i < numArgs; i++)
                 {
-                    characterBuffer[i] = stack.pop_char();
+                    characters[i] = stack.pop_char();
                 }
 
-                std::cout << characterBuffer;
+                std::cout << characters;
                 IncrementInstructionPointer();
                 break;
             }
@@ -515,26 +513,26 @@ namespace StackVM
             case OpCode::CALL:
             {
                 byte* dst = GetLeftOperandPointer(currentInstruction);
-                uint32_t offset;
-                memcpy(&offset, dst, sizeof(int32_t));
+                uint64_t offset;
+                memcpy(&offset, dst, sizeof(uint64_t));
 
-                uint32_t ip = (currentInstruction - entryInstruction) + 1;
-                stack.push_uint32(ip);
+                uint64_t ip = (currentInstruction - entryInstruction) + 1;
+                stack.push_uint64(ip);
 
                 SetInstructionPointer(offset);
                 break;
             }
             case OpCode::RET:
             {
-                uint32_t ip = stack.pop_uint32();
+                uint64_t ip = stack.pop_uint64();
                 SetInstructionPointer(ip);
                 break;
             }
             case OpCode::JMP:
             {
                 byte* dst = GetLeftOperandPointer(currentInstruction);
-                uint32_t offset;
-                memcpy(&offset, dst, sizeof(int32_t));                
+                uint64_t offset;
+                memcpy(&offset, dst, sizeof(uint64_t));                
                 SetInstructionPointer(offset);
                 break;
             }
@@ -543,8 +541,8 @@ namespace StackVM
                 if(MathOperation::GetCompareFlag() == 0)
                 {
                     byte* dst = GetLeftOperandPointer(currentInstruction);
-                    int32_t offset;
-                    memcpy(&offset, dst, sizeof(int32_t));
+                    uint64_t offset;
+                    memcpy(&offset, dst, sizeof(uint64_t));
                     SetInstructionPointer(offset);                    
                 }
                 else
@@ -558,8 +556,8 @@ namespace StackVM
                 if(MathOperation::GetCompareFlag() != 0)
                 {
                     byte* dst = GetLeftOperandPointer(currentInstruction);
-                    uint32_t offset;
-                    memcpy(&offset, dst, sizeof(uint32_t));
+                    uint64_t offset;
+                    memcpy(&offset, dst, sizeof(uint64_t));
                     SetInstructionPointer(offset);                    
                 }
                 else
@@ -573,8 +571,8 @@ namespace StackVM
                 if(MathOperation::GetCompareFlag() > 0)
                 {
                     byte* dst = GetLeftOperandPointer(currentInstruction);
-                    int32_t offset;
-                    memcpy(&offset, dst, sizeof(int32_t));
+                    uint64_t offset;
+                    memcpy(&offset, dst, sizeof(uint64_t));
                     SetInstructionPointer(offset);                    
                 }
                 else
@@ -588,8 +586,8 @@ namespace StackVM
                 if(MathOperation::GetCompareFlag() >= 0)
                 {
                     byte* dst = GetLeftOperandPointer(currentInstruction);
-                    int32_t offset;
-                    memcpy(&offset, dst, sizeof(int32_t));
+                    uint64_t offset;
+                    memcpy(&offset, dst, sizeof(uint64_t));
                     SetInstructionPointer(offset);                    
                 }
                 else
@@ -603,8 +601,8 @@ namespace StackVM
                 if(MathOperation::GetCompareFlag() < 0)
                 {
                     byte* dst = GetLeftOperandPointer(currentInstruction);
-                    int32_t offset;
-                    memcpy(&offset, dst, sizeof(int32_t));
+                    uint64_t offset;
+                    memcpy(&offset, dst, sizeof(uint64_t));
                     SetInstructionPointer(offset);                    
                 }
                 else
@@ -618,8 +616,8 @@ namespace StackVM
                 if(MathOperation::GetCompareFlag() <= 0)
                 {
                     byte* dst = GetLeftOperandPointer(currentInstruction);
-                    int32_t offset;
-                    memcpy(&offset, dst, sizeof(int32_t));
+                    uint64_t offset;
+                    memcpy(&offset, dst, sizeof(uint64_t));
                     SetInstructionPointer(offset);                    
                 }
                 else
@@ -633,8 +631,8 @@ namespace StackVM
                 if(MathOperation::GetZeroFlag() == 0)
                 {
                     byte* dst = GetLeftOperandPointer(currentInstruction);
-                    int32_t offset;
-                    memcpy(&offset, dst, sizeof(int32_t));
+                    uint64_t offset;
+                    memcpy(&offset, dst, sizeof(uint64_t));
                     SetInstructionPointer(offset);                    
                 }
                 else
@@ -648,8 +646,8 @@ namespace StackVM
                 if(MathOperation::GetZeroFlag() != 0)
                 {
                     byte* dst = GetLeftOperandPointer(currentInstruction);
-                    int32_t offset;
-                    memcpy(&offset, dst, sizeof(int32_t));
+                    uint64_t offset;
+                    memcpy(&offset, dst, sizeof(uint64_t));
                     SetInstructionPointer(offset);                    
                 }
                 else
@@ -799,14 +797,15 @@ namespace StackVM
         currentInstruction += 1;
     }
 
-    void VirtualMachine::IncrementInstructionPointer(uint32_t offset)
+    void VirtualMachine::IncrementInstructionPointer(uint64_t offset)
     {
         currentInstruction += offset;   
     }    
 
-    void VirtualMachine::SetInstructionPointer(uint32_t offset)
+    void VirtualMachine::SetInstructionPointer(uint64_t offset)
     {
-        currentInstruction = (entryInstruction + offset);
+        //currentInstruction = (entryInstruction + offset);
+        currentInstruction = reinterpret_cast<Instruction*>(offset);
     }   
 
     void VirtualMachine::LogMessage(const std::string& message)

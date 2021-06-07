@@ -114,6 +114,7 @@ namespace StackVM
         static int WriteStringValueToBuffer(const std::string& text, byte* buffer, Type type);
         static bool NumberIsSigned(const std::string& text);
         static size_t CountTokens(const std::vector<Token>& tokens, TokenType type);
+        static bool IsJumpInstruction(OpCode opcode);
         
     };
 };
