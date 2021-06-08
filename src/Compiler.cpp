@@ -424,7 +424,7 @@ namespace StackVM
                     uint64_t temp = 0;
                     if(StringUtility::ParseNumberLexical<uint64_t>(operandToken.text, temp))
                     {
-                        operandValueType = CompilerUtility::GetNumberTypeFromText(operandToken.text);                            
+                        operandValueType = CompilerUtility::GetNumberTypeFromText(operandToken.text);                        
 
                         //Force minimum size of integers to 4 bytes
                         if(operandValueType == Type::UInt8)

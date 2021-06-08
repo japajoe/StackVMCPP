@@ -413,7 +413,13 @@ namespace StackVM
         
         uint64_t val = 0;
         
-        StringUtility::ParseNumber<uint64_t>(t, val);
+        if(StringUtility::ParseNumber<uint64_t>(t, val))
+        {
+            if(StringUtility::Contains(text, "."))
+            {
+                return Type::Single;
+            }
+        }
 
         if(isSigned)
         {
