@@ -3,6 +3,7 @@
 #include "VirtualMachine.hpp"
 #include "Compiler.hpp"
 #include "IO.hpp"
+#include <math.h>
 
 using namespace StackVM;
 
@@ -20,7 +21,7 @@ int main()
 
 void CompileProgram()
 {
-    std::string filename = "demo.asm";
+    std::string filename = "helloworld.asm";
 
     if(IO::FileExists(filename))
     {

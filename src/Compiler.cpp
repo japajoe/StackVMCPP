@@ -7,14 +7,19 @@ namespace StackVM
     {
         CompilerUtility::Initialize();
 
-        functionMap["abs"] = reinterpret_cast<uint64_t>(StandardLibrary::Abs);
-        functionMap["clamp"] = reinterpret_cast<uint64_t>(StandardLibrary::Clamp);
-        functionMap["cos"] = reinterpret_cast<uint64_t>(StandardLibrary::Cos);
-        functionMap["lerp"] = reinterpret_cast<uint64_t>(StandardLibrary::Lerp);
-        functionMap["pow"] = reinterpret_cast<uint64_t>(StandardLibrary::Pow);
-        functionMap["sin"] = reinterpret_cast<uint64_t>(StandardLibrary::Sin);
-        functionMap["sign"] = reinterpret_cast<uint64_t>(StandardLibrary::Sign);
-        functionMap["sqrt"] = reinterpret_cast<uint64_t>(StandardLibrary::Sqrt);
+        functionMap["abs"]          = reinterpret_cast<uint64_t>(StandardLibrary::Abs);
+        functionMap["clamp"]        = reinterpret_cast<uint64_t>(StandardLibrary::Clamp);
+        functionMap["cos"]          = reinterpret_cast<uint64_t>(StandardLibrary::Cos);
+        functionMap["lerp"]         = reinterpret_cast<uint64_t>(StandardLibrary::Lerp);
+        functionMap["pow"]          = reinterpret_cast<uint64_t>(StandardLibrary::Pow);
+        functionMap["sin"]          = reinterpret_cast<uint64_t>(StandardLibrary::Sin);
+        functionMap["sign"]         = reinterpret_cast<uint64_t>(StandardLibrary::Sign);
+        functionMap["sqrt"]         = reinterpret_cast<uint64_t>(StandardLibrary::Sqrt);
+        functionMap["getTimeStamp"] = reinterpret_cast<uint64_t>(StandardLibrary::GetTimeStamp);
+        functionMap["print"]        = reinterpret_cast<uint64_t>(StandardLibrary::Print);
+        functionMap["printline"]    = reinterpret_cast<uint64_t>(StandardLibrary::PrintLine);
+        functionMap["printnum"]     = reinterpret_cast<uint64_t>(StandardLibrary::PrintNum);
+        functionMap["endline"]      = reinterpret_cast<uint64_t>(StandardLibrary::EndLine);
     }
 
     bool Compiler::Compile(const std::string& source, Assembly& assembly)
@@ -63,15 +68,15 @@ namespace StackVM
         }
 
         //Convert all indices of instructions with a jump to a pointer
-        for(size_t i = 0; i < assembly.instructions.size(); i++)
-        {
-            if(CompilerUtility::IsJumpInstruction(assembly.instructions[i].opcode))
-            {
-                uint64_t offsetDst = *(uint64_t*)&assembly.instructions[i].lhs;
-                uint64_t dst = reinterpret_cast<uint64_t>(&assembly.instructions[offsetDst]);
-                memcpy(&assembly.instructions[i].lhs[0], &dst, sizeof(uint64_t));
-            }            
-        }
+        // for(size_t i = 0; i < assembly.instructions.size(); i++)
+        // {
+        //     if(CompilerUtility::IsJumpInstruction(assembly.instructions[i].opcode))
+        //     {
+        //         uint64_t offsetDst = *(uint64_t*)&assembly.instructions[i].lhs;
+        //         uint64_t dst = reinterpret_cast<uint64_t>(&assembly.instructions[offsetDst]);
+        //         memcpy(&assembly.instructions[i].lhs[0], &dst, sizeof(uint64_t));
+        //     }            
+        // }
 
         return true;
     }

@@ -18,6 +18,11 @@ namespace StackVM
         static void Sin(Stack<byte>* stack);
         static void Sign(Stack<byte>* stack);
         static void Sqrt(Stack<byte>* stack);
+        static void GetTimeStamp(Stack<byte>* stack);
+        static void Print(Stack<byte>* stack);
+        static void PrintLine(Stack<byte>* stack);
+        static void PrintNum(Stack<byte>* stack);
+        static void EndLine(Stack<byte>* stack);
     };
 }
 

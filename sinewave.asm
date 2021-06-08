@@ -24,32 +24,43 @@
 
 section .data
     iteration dd : 0
-    iterations dd : 1000000
-    numChars dd : 13
+    iterations dd : 1000
+    PI2 dd : 6.28318530718
+    freq dd : 440
+    sampleRate dd : 44100
+    amp dd : 10.0
 
 section .text
-_print:
-    pushi8 ' '
-    pushi8 '!'
-    pushi8 'd'
-    pushi8 'l'
-    pushi8 'r'
-    pushi8 'o'
-    pushi8 'w'
-    pushi8 ' '
-    pushi8 'o'
-    pushi8 'l'
-    pushi8 'l'
-    pushi8 'e'
-    pushi8 'H'
-    pushi32 numChars
-    print
-    pushi32 iteration
-    pushi32 0           ;passing 0 means print integer, 1 means print float
-    printf
-    inc iteration
-    cmp iteration, iterations
-    jne _print
 
-_stop:
+update:
+    call calculateSineWave
+    call displayInfo    
+    inc iteration    
+    cmp iteration, iterations
+    jne update
+    jmp end
+
+calculateSineWave:
+    popu64 ebp
+    mov eax, PI2
+    mul eax, iteration
+    mul eax, freq
+    div eax, sampleRate
+    pushf eax
+    callf sin
+    popf eax
+    mul eax, amp
+    pushu64 ebp
+    ret
+
+displayInfo:
+    popu64 ebp
+    pushf eax
+    pushi32 2   ;0 is int32, 1 is int64, 2 is float
+    callf printnum
+    callf endline
+    pushu64 ebp
+    ret
+
+end:
     hlt

@@ -56,7 +56,7 @@ namespace StackVM
                 endTime = high_resolution_clock::now();
                 auto ms_int = duration_cast<milliseconds>(endTime - startTime);
                 elapsedTime = ms_int.count();                 
-                std::cout << "Elapsed time " << elapsedTime << std::endl;
+                std::cout << "Execution finished in " << elapsedTime << " milliseconds" << std::endl;
                 return false;
             }
             case OpCode::NOP:
@@ -385,37 +385,6 @@ namespace StackVM
                 {
                     stack.pop_uint64();
                 }                
-                IncrementInstructionPointer();
-                break;
-            }            
-            case OpCode::PRINT:
-            {
-                int32_t numArgs = stack.pop_int32();
-                char characters[numArgs];
-                characters[numArgs] = '\0';
-                
-                for(size_t i = 0; i < numArgs; i++)
-                {
-                    characters[i] = stack.pop_char();
-                }
-
-                std::cout << characters;
-                IncrementInstructionPointer();
-                break;
-            }
-            case OpCode::PRINTF:
-            {                
-                int32_t numberType = stack.pop_int32();
-                if(numberType == 0)
-                {
-                    int32_t val = stack.pop_int32();
-                    std::cout << val << '\n';
-                }
-                else
-                {
-                    float val = stack.pop_float();
-                    std::cout << val << '\n';
-                }
                 IncrementInstructionPointer();
                 break;
             }
@@ -817,8 +786,8 @@ namespace StackVM
 
     void VirtualMachine::SetInstructionPointer(uint64_t offset)
     {
-        //currentInstruction = (entryInstruction + offset);
-        currentInstruction = reinterpret_cast<Instruction*>(offset);
+        currentInstruction = (entryInstruction + offset);
+        //currentInstruction = reinterpret_cast<Instruction*>(offset);
     }   
 
     void VirtualMachine::LogMessage(const std::string& message)

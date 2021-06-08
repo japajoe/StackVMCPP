@@ -42,8 +42,6 @@ namespace StackVM
         opcodeInfoMap["popu16"]    = OpCodeInfo(OpCode::POPU16,    OperandInfo::Optional,   OperandTypeOption::RegisterOrVariable);
         opcodeInfoMap["popi64"]    = OpCodeInfo(OpCode::POPI64,    OperandInfo::Optional,   OperandTypeOption::RegisterOrVariable);
         opcodeInfoMap["popu64"]    = OpCodeInfo(OpCode::POPU64,    OperandInfo::Optional,   OperandTypeOption::RegisterOrVariable);
-        opcodeInfoMap["print"]     = OpCodeInfo(OpCode::PRINT,     OperandInfo::None);
-        opcodeInfoMap["printf"]    = OpCodeInfo(OpCode::PRINTF,    OperandInfo::None);
         opcodeInfoMap["cmp"]       = OpCodeInfo(OpCode::CMP,       OperandInfo::Two,        OperandTypeOption::All,                 OperandTypeOption::All);
         opcodeInfoMap["call"]      = OpCodeInfo(OpCode::CALL,      OperandInfo::One,        OperandTypeOption::All);
         opcodeInfoMap["callf"]     = OpCodeInfo(OpCode::CALLF,     OperandInfo::One,        OperandTypeOption::All);
