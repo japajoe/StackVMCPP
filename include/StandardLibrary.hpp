@@ -4,8 +4,8 @@
 #include "Stack.hpp"
 
 namespace StackVM
-{
-    typedef void (*StandardLibraryFunction)(Stack<byte>* stack);
+{    
+    typedef void (*StackVMFunction)(Stack<byte>* stack);
     
     class StandardLibrary
     {

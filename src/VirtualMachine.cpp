@@ -498,7 +498,7 @@ namespace StackVM
                 uint64_t address;
                 memcpy(&address, dst, sizeof(uint64_t));
 
-                StandardLibraryFunction func = reinterpret_cast<StandardLibraryFunction>(address);
+                StackVMFunction func = reinterpret_cast<StackVMFunction>(address);
                 func(&stack);
 
                 IncrementInstructionPointer();
@@ -657,6 +657,7 @@ namespace StackVM
     {
         currentInstruction = nullptr;
         entryInstruction = nullptr;
+        assembly = nullptr;
         memset(&registers[0], 0, 13 * sizeof(byte) * 8);
         elapsedTime = 0;
         stack.clear();

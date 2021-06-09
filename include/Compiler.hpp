@@ -6,6 +6,7 @@
 #include "Assembly.hpp"
 #include "StringUtility.hpp"
 #include "CompilerUtility.hpp"
+#include "StandardLibrary.hpp"
 #include <map>
 #include <vector>
 #include <string>
@@ -17,6 +18,7 @@ namespace StackVM
     {
     public:
         Compiler();
+        bool RegisterFunction(const std::string& name, StackVMFunction fn_ptr);
         bool Compile(const std::string& source, Assembly& assembly);         
     private:
         Assembly* assembly;

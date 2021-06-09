@@ -1,5 +1,4 @@
 #include "Compiler.hpp"
-#include "StandardLibrary.hpp"
 
 namespace StackVM
 {
@@ -20,6 +19,17 @@ namespace StackVM
         functionMap["printline"]    = reinterpret_cast<uint64_t>(StandardLibrary::PrintLine);
         functionMap["printnum"]     = reinterpret_cast<uint64_t>(StandardLibrary::PrintNum);
         functionMap["endline"]      = reinterpret_cast<uint64_t>(StandardLibrary::EndLine);
+    }
+
+    bool Compiler::RegisterFunction(const std::string& name, StackVMFunction fn_ptr)
+    {
+        if(functionMap.count(name) == 0)
+        {
+            functionMap[name] = reinterpret_cast<uint64_t>(fn_ptr);
+            return true;
+        }
+
+        return false;
     }
 
     bool Compiler::Compile(const std::string& source, Assembly& assembly)

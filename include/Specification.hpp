@@ -6,7 +6,7 @@
 
 namespace StackVM
 {
-    typedef unsigned char byte;
+    typedef unsigned char byte;    
 
     enum OpCode : uint8_t
     {

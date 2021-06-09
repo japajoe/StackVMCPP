@@ -21,7 +21,7 @@ int main()
 
 void CompileProgram()
 {
-    std::string filename = "helloworld.asm";
+    std::string filename = "sinewave.asm";
 
     if(IO::FileExists(filename))
     {
