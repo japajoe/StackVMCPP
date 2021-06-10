@@ -11,11 +11,6 @@ Compiler compiler;
 VirtualMachine machine;
 
 void CompileProgram();
-void Tokenize();
-
-void PlayLotto(Stack<byte>* stack);
-void GetUpcomingWeather(Stack<byte>* stack);
-void SetUpcomingWeather(Stack<byte>* stack);
 
 int main()
 {
@@ -25,11 +20,7 @@ int main()
 
 void CompileProgram()
 {
-    compiler.RegisterFunction("playLotto", PlayLotto);
-    compiler.RegisterFunction("getUpcomingWeather", GetUpcomingWeather);
-    compiler.RegisterFunction("setUpcomingWeather", SetUpcomingWeather);
-
-    std::string filename = "sampscript.asm";
+    std::string filename = "helloworld.asm";
 
     if(IO::FileExists(filename))
     {
@@ -43,7 +34,7 @@ void CompileProgram()
             {
                 bool execute = true;
 
-                while(true)
+                while(execute)
                 {
                     execute = machine.Execute();
                 }
@@ -58,20 +49,4 @@ void CompileProgram()
     {
         std::cout << "The file " << filename << " does not exist" << std::endl;
     }
-}
-
-void PlayLotto(Stack<byte>* stack)
-{
-    std::cout << "PlayLotto" << std::endl;
-}
-
-void GetUpcomingWeather(Stack<byte>* stack)
-{
-    //std::cout << "GetUpComingWeather" << std::endl;
-    stack->push_int32(2);
-}
-
-void SetUpcomingWeather(Stack<byte>* stack)
-{
-    //std::cout << "SetUpComingWeather" << std::endl;
 }
