@@ -102,7 +102,7 @@ namespace StackVM
 
     void MathOperation::Compare(byte* lhs, byte* rhs, Type lhsDataType, Type rhsDataType)
     {
-        uint64_t result = cmpFunctions[lhsDataType][rhsDataType](lhs, rhs);
+        int64_t result = cmpFunctions[lhsDataType][rhsDataType](lhs, rhs);
 
         if(result == 0)
             compareFlag = 0;
@@ -137,7 +137,7 @@ namespace StackVM
     //---------------------------------
     //---------------------------------
 
-    uint64_t MathOperation::CompareUInt8UInt8(byte* lhs, byte* rhs)
+    int64_t MathOperation::CompareUInt8UInt8(byte* lhs, byte* rhs)
     {
 	    uint8_t* ptrLhs = reinterpret_cast<uint8_t*>(lhs);
 	    uint8_t* ptrRhs = reinterpret_cast<uint8_t*>(rhs);
@@ -145,7 +145,7 @@ namespace StackVM
 	    return result;
     }
 
-    uint64_t MathOperation::CompareUInt8Int8(byte* lhs, byte* rhs)
+    int64_t MathOperation::CompareUInt8Int8(byte* lhs, byte* rhs)
     {
 	    uint8_t* ptrLhs = reinterpret_cast<uint8_t*>(lhs);
 	    int8_t* ptrRhs = reinterpret_cast<int8_t*>(rhs);
@@ -153,7 +153,7 @@ namespace StackVM
 	    return result;
     }
 
-    uint64_t MathOperation::CompareUInt8UInt16(byte* lhs, byte* rhs)
+    int64_t MathOperation::CompareUInt8UInt16(byte* lhs, byte* rhs)
     {
 	    uint8_t* ptrLhs = reinterpret_cast<uint8_t*>(lhs);
 	    uint16_t* ptrRhs = reinterpret_cast<uint16_t*>(rhs);
@@ -161,7 +161,7 @@ namespace StackVM
 	    return result;
     }
 
-    uint64_t MathOperation::CompareUInt8Int16(byte* lhs, byte* rhs)
+    int64_t MathOperation::CompareUInt8Int16(byte* lhs, byte* rhs)
     {
 	    uint8_t* ptrLhs = reinterpret_cast<uint8_t*>(lhs);
 	    int16_t* ptrRhs = reinterpret_cast<int16_t*>(rhs);
@@ -169,7 +169,7 @@ namespace StackVM
 	    return result;
     }
 
-    uint64_t MathOperation::CompareUInt8UInt32(byte* lhs, byte* rhs)
+    int64_t MathOperation::CompareUInt8UInt32(byte* lhs, byte* rhs)
     {
 	    uint8_t* ptrLhs = reinterpret_cast<uint8_t*>(lhs);
 	    uint32_t* ptrRhs = reinterpret_cast<uint32_t*>(rhs);
@@ -177,7 +177,7 @@ namespace StackVM
 	    return result;
     }
 
-    uint64_t MathOperation::CompareUInt8Int32(byte* lhs, byte* rhs)
+    int64_t MathOperation::CompareUInt8Int32(byte* lhs, byte* rhs)
     {
 	    uint8_t* ptrLhs = reinterpret_cast<uint8_t*>(lhs);
 	    int32_t* ptrRhs = reinterpret_cast<int32_t*>(rhs);
@@ -185,7 +185,7 @@ namespace StackVM
 	    return result;
     }
 
-    uint64_t MathOperation::CompareUInt8UInt64(byte* lhs, byte* rhs)
+    int64_t MathOperation::CompareUInt8UInt64(byte* lhs, byte* rhs)
     {
 	    uint8_t* ptrLhs = reinterpret_cast<uint8_t*>(lhs);
 	    uint64_t* ptrRhs = reinterpret_cast<uint64_t*>(rhs);
@@ -193,7 +193,7 @@ namespace StackVM
 	    return result;
     }
 
-    uint64_t MathOperation::CompareUInt8Int64(byte* lhs, byte* rhs)
+    int64_t MathOperation::CompareUInt8Int64(byte* lhs, byte* rhs)
     {
 	    uint8_t* ptrLhs = reinterpret_cast<uint8_t*>(lhs);
 	    int64_t* ptrRhs = reinterpret_cast<int64_t*>(rhs);
@@ -201,7 +201,7 @@ namespace StackVM
 	    return result;
     }
 
-    uint64_t MathOperation::CompareUInt8Single(byte* lhs, byte* rhs)
+    int64_t MathOperation::CompareUInt8Single(byte* lhs, byte* rhs)
     {
 	    uint8_t* ptrLhs = reinterpret_cast<uint8_t*>(lhs);
 	    float* ptrRhs = reinterpret_cast<float*>(rhs);
@@ -209,7 +209,7 @@ namespace StackVM
 	    return result;
     }
 
-    uint64_t MathOperation::CompareUInt8Double(byte* lhs, byte* rhs)
+    int64_t MathOperation::CompareUInt8Double(byte* lhs, byte* rhs)
     {
 	    uint8_t* ptrLhs = reinterpret_cast<uint8_t*>(lhs);
 	    double* ptrRhs = reinterpret_cast<double*>(rhs);
@@ -217,7 +217,7 @@ namespace StackVM
 	    return result;
     }
 
-    uint64_t MathOperation::CompareInt8UInt8(byte* lhs, byte* rhs)
+    int64_t MathOperation::CompareInt8UInt8(byte* lhs, byte* rhs)
     {
 	    int8_t* ptrLhs = reinterpret_cast<int8_t*>(lhs);
 	    uint8_t* ptrRhs = reinterpret_cast<uint8_t*>(rhs);
@@ -225,7 +225,7 @@ namespace StackVM
 	    return result;
     }
 
-    uint64_t MathOperation::CompareInt8Int8(byte* lhs, byte* rhs)
+    int64_t MathOperation::CompareInt8Int8(byte* lhs, byte* rhs)
     {
 	    int8_t* ptrLhs = reinterpret_cast<int8_t*>(lhs);
 	    int8_t* ptrRhs = reinterpret_cast<int8_t*>(rhs);
@@ -233,7 +233,7 @@ namespace StackVM
 	    return result;
     }
 
-    uint64_t MathOperation::CompareInt8UInt16(byte* lhs, byte* rhs)
+    int64_t MathOperation::CompareInt8UInt16(byte* lhs, byte* rhs)
     {
 	    int8_t* ptrLhs = reinterpret_cast<int8_t*>(lhs);
 	    uint16_t* ptrRhs = reinterpret_cast<uint16_t*>(rhs);
@@ -241,7 +241,7 @@ namespace StackVM
 	    return result;
     }
 
-    uint64_t MathOperation::CompareInt8Int16(byte* lhs, byte* rhs)
+    int64_t MathOperation::CompareInt8Int16(byte* lhs, byte* rhs)
     {
 	    int8_t* ptrLhs = reinterpret_cast<int8_t*>(lhs);
 	    int16_t* ptrRhs = reinterpret_cast<int16_t*>(rhs);
@@ -249,7 +249,7 @@ namespace StackVM
 	    return result;
     }
 
-    uint64_t MathOperation::CompareInt8UInt32(byte* lhs, byte* rhs)
+    int64_t MathOperation::CompareInt8UInt32(byte* lhs, byte* rhs)
     {
 	    int8_t* ptrLhs = reinterpret_cast<int8_t*>(lhs);
 	    uint32_t* ptrRhs = reinterpret_cast<uint32_t*>(rhs);
@@ -257,7 +257,7 @@ namespace StackVM
 	    return result;
     }
 
-    uint64_t MathOperation::CompareInt8Int32(byte* lhs, byte* rhs)
+    int64_t MathOperation::CompareInt8Int32(byte* lhs, byte* rhs)
     {
 	    int8_t* ptrLhs = reinterpret_cast<int8_t*>(lhs);
 	    int32_t* ptrRhs = reinterpret_cast<int32_t*>(rhs);
@@ -265,7 +265,7 @@ namespace StackVM
 	    return result;
     }
 
-    uint64_t MathOperation::CompareInt8UInt64(byte* lhs, byte* rhs)
+    int64_t MathOperation::CompareInt8UInt64(byte* lhs, byte* rhs)
     {
 	    int8_t* ptrLhs = reinterpret_cast<int8_t*>(lhs);
 	    uint64_t* ptrRhs = reinterpret_cast<uint64_t*>(rhs);
@@ -273,7 +273,7 @@ namespace StackVM
 	    return result;
     }
 
-    uint64_t MathOperation::CompareInt8Int64(byte* lhs, byte* rhs)
+    int64_t MathOperation::CompareInt8Int64(byte* lhs, byte* rhs)
     {
 	    int8_t* ptrLhs = reinterpret_cast<int8_t*>(lhs);
 	    int64_t* ptrRhs = reinterpret_cast<int64_t*>(rhs);
@@ -281,7 +281,7 @@ namespace StackVM
 	    return result;
     }
 
-    uint64_t MathOperation::CompareInt8Single(byte* lhs, byte* rhs)
+    int64_t MathOperation::CompareInt8Single(byte* lhs, byte* rhs)
     {
 	    int8_t* ptrLhs = reinterpret_cast<int8_t*>(lhs);
 	    float* ptrRhs = reinterpret_cast<float*>(rhs);
@@ -289,7 +289,7 @@ namespace StackVM
 	    return result;
     }
 
-    uint64_t MathOperation::CompareInt8Double(byte* lhs, byte* rhs)
+    int64_t MathOperation::CompareInt8Double(byte* lhs, byte* rhs)
     {
 	    int8_t* ptrLhs = reinterpret_cast<int8_t*>(lhs);
 	    double* ptrRhs = reinterpret_cast<double*>(rhs);
@@ -297,7 +297,7 @@ namespace StackVM
 	    return result;
     }
 
-    uint64_t MathOperation::CompareUInt16UInt8(byte* lhs, byte* rhs)
+    int64_t MathOperation::CompareUInt16UInt8(byte* lhs, byte* rhs)
     {
 	    uint16_t* ptrLhs = reinterpret_cast<uint16_t*>(lhs);
 	    uint8_t* ptrRhs = reinterpret_cast<uint8_t*>(rhs);
@@ -305,7 +305,7 @@ namespace StackVM
 	    return result;
     }
 
-    uint64_t MathOperation::CompareUInt16Int8(byte* lhs, byte* rhs)
+    int64_t MathOperation::CompareUInt16Int8(byte* lhs, byte* rhs)
     {
 	    uint16_t* ptrLhs = reinterpret_cast<uint16_t*>(lhs);
 	    int8_t* ptrRhs = reinterpret_cast<int8_t*>(rhs);
@@ -313,7 +313,7 @@ namespace StackVM
 	    return result;
     }
 
-    uint64_t MathOperation::CompareUInt16UInt16(byte* lhs, byte* rhs)
+    int64_t MathOperation::CompareUInt16UInt16(byte* lhs, byte* rhs)
     {
 	    uint16_t* ptrLhs = reinterpret_cast<uint16_t*>(lhs);
 	    uint16_t* ptrRhs = reinterpret_cast<uint16_t*>(rhs);
@@ -321,7 +321,7 @@ namespace StackVM
 	    return result;
     }
 
-    uint64_t MathOperation::CompareUInt16Int16(byte* lhs, byte* rhs)
+    int64_t MathOperation::CompareUInt16Int16(byte* lhs, byte* rhs)
     {
 	    uint16_t* ptrLhs = reinterpret_cast<uint16_t*>(lhs);
 	    int16_t* ptrRhs = reinterpret_cast<int16_t*>(rhs);
@@ -329,7 +329,7 @@ namespace StackVM
 	    return result;
     }
 
-    uint64_t MathOperation::CompareUInt16UInt32(byte* lhs, byte* rhs)
+    int64_t MathOperation::CompareUInt16UInt32(byte* lhs, byte* rhs)
     {
 	    uint16_t* ptrLhs = reinterpret_cast<uint16_t*>(lhs);
 	    uint32_t* ptrRhs = reinterpret_cast<uint32_t*>(rhs);
@@ -337,7 +337,7 @@ namespace StackVM
 	    return result;
     }
 
-    uint64_t MathOperation::CompareUInt16Int32(byte* lhs, byte* rhs)
+    int64_t MathOperation::CompareUInt16Int32(byte* lhs, byte* rhs)
     {
 	    uint16_t* ptrLhs = reinterpret_cast<uint16_t*>(lhs);
 	    int32_t* ptrRhs = reinterpret_cast<int32_t*>(rhs);
@@ -345,7 +345,7 @@ namespace StackVM
 	    return result;
     }
 
-    uint64_t MathOperation::CompareUInt16UInt64(byte* lhs, byte* rhs)
+    int64_t MathOperation::CompareUInt16UInt64(byte* lhs, byte* rhs)
     {
 	    uint16_t* ptrLhs = reinterpret_cast<uint16_t*>(lhs);
 	    uint64_t* ptrRhs = reinterpret_cast<uint64_t*>(rhs);
@@ -353,7 +353,7 @@ namespace StackVM
 	    return result;
     }
 
-    uint64_t MathOperation::CompareUInt16Int64(byte* lhs, byte* rhs)
+    int64_t MathOperation::CompareUInt16Int64(byte* lhs, byte* rhs)
     {
 	    uint16_t* ptrLhs = reinterpret_cast<uint16_t*>(lhs);
 	    int64_t* ptrRhs = reinterpret_cast<int64_t*>(rhs);
@@ -361,7 +361,7 @@ namespace StackVM
 	    return result;
     }
 
-    uint64_t MathOperation::CompareUInt16Single(byte* lhs, byte* rhs)
+    int64_t MathOperation::CompareUInt16Single(byte* lhs, byte* rhs)
     {
 	    uint16_t* ptrLhs = reinterpret_cast<uint16_t*>(lhs);
 	    float* ptrRhs = reinterpret_cast<float*>(rhs);
@@ -369,7 +369,7 @@ namespace StackVM
 	    return result;
     }
 
-    uint64_t MathOperation::CompareUInt16Double(byte* lhs, byte* rhs)
+    int64_t MathOperation::CompareUInt16Double(byte* lhs, byte* rhs)
     {
 	    uint16_t* ptrLhs = reinterpret_cast<uint16_t*>(lhs);
 	    double* ptrRhs = reinterpret_cast<double*>(rhs);
@@ -377,7 +377,7 @@ namespace StackVM
 	    return result;
     }
 
-    uint64_t MathOperation::CompareInt16UInt8(byte* lhs, byte* rhs)
+    int64_t MathOperation::CompareInt16UInt8(byte* lhs, byte* rhs)
     {
 	    int16_t* ptrLhs = reinterpret_cast<int16_t*>(lhs);
 	    uint8_t* ptrRhs = reinterpret_cast<uint8_t*>(rhs);
@@ -385,7 +385,7 @@ namespace StackVM
 	    return result;
     }
 
-    uint64_t MathOperation::CompareInt16Int8(byte* lhs, byte* rhs)
+    int64_t MathOperation::CompareInt16Int8(byte* lhs, byte* rhs)
     {
 	    int16_t* ptrLhs = reinterpret_cast<int16_t*>(lhs);
 	    int8_t* ptrRhs = reinterpret_cast<int8_t*>(rhs);
@@ -393,7 +393,7 @@ namespace StackVM
 	    return result;
     }
 
-    uint64_t MathOperation::CompareInt16UInt16(byte* lhs, byte* rhs)
+    int64_t MathOperation::CompareInt16UInt16(byte* lhs, byte* rhs)
     {
 	    int16_t* ptrLhs = reinterpret_cast<int16_t*>(lhs);
 	    uint16_t* ptrRhs = reinterpret_cast<uint16_t*>(rhs);
@@ -401,7 +401,7 @@ namespace StackVM
 	    return result;
     }
 
-    uint64_t MathOperation::CompareInt16Int16(byte* lhs, byte* rhs)
+    int64_t MathOperation::CompareInt16Int16(byte* lhs, byte* rhs)
     {
 	    int16_t* ptrLhs = reinterpret_cast<int16_t*>(lhs);
 	    int16_t* ptrRhs = reinterpret_cast<int16_t*>(rhs);
@@ -409,532 +409,466 @@ namespace StackVM
 	    return result;
     }
 
-    uint64_t MathOperation::CompareInt16UInt32(byte* lhs, byte* rhs)
+    int64_t MathOperation::CompareInt16UInt32(byte* lhs, byte* rhs)
     {
 	    int16_t* ptrLhs = reinterpret_cast<int16_t*>(lhs);
 	    uint32_t* ptrRhs = reinterpret_cast<uint32_t*>(rhs);
-	    int64_t result = (*ptrLhs - *ptrRhs);
-	    return result;
+		return CompareTypeWithType(*ptrLhs, *ptrRhs);
     }
 
-    uint64_t MathOperation::CompareInt16Int32(byte* lhs, byte* rhs)
+    int64_t MathOperation::CompareInt16Int32(byte* lhs, byte* rhs)
     {
 	    int16_t* ptrLhs = reinterpret_cast<int16_t*>(lhs);
 	    int32_t* ptrRhs = reinterpret_cast<int32_t*>(rhs);
-	    int64_t result = (*ptrLhs - *ptrRhs);
-	    return result;
+		return CompareTypeWithType(*ptrLhs, *ptrRhs);
     }
 
-    uint64_t MathOperation::CompareInt16UInt64(byte* lhs, byte* rhs)
+    int64_t MathOperation::CompareInt16UInt64(byte* lhs, byte* rhs)
     {
 	    int16_t* ptrLhs = reinterpret_cast<int16_t*>(lhs);
 	    uint64_t* ptrRhs = reinterpret_cast<uint64_t*>(rhs);
-	    int64_t result = (*ptrLhs - *ptrRhs);
-	    return result;
+		return CompareTypeWithType(*ptrLhs, *ptrRhs);
     }
 
-    uint64_t MathOperation::CompareInt16Int64(byte* lhs, byte* rhs)
+    int64_t MathOperation::CompareInt16Int64(byte* lhs, byte* rhs)
     {
 	    int16_t* ptrLhs = reinterpret_cast<int16_t*>(lhs);
 	    int64_t* ptrRhs = reinterpret_cast<int64_t*>(rhs);
-	    int64_t result = (*ptrLhs - *ptrRhs);
-	    return result;
+		return CompareTypeWithType(*ptrLhs, *ptrRhs);
     }
 
-    uint64_t MathOperation::CompareInt16Single(byte* lhs, byte* rhs)
+    int64_t MathOperation::CompareInt16Single(byte* lhs, byte* rhs)
     {
 	    int16_t* ptrLhs = reinterpret_cast<int16_t*>(lhs);
 	    float* ptrRhs = reinterpret_cast<float*>(rhs);
-	    int64_t result = (*ptrLhs - *ptrRhs);
-	    return result;
+		return CompareTypeWithType(*ptrLhs, *ptrRhs);
     }
 
-    uint64_t MathOperation::CompareInt16Double(byte* lhs, byte* rhs)
+    int64_t MathOperation::CompareInt16Double(byte* lhs, byte* rhs)
     {
 	    int16_t* ptrLhs = reinterpret_cast<int16_t*>(lhs);
 	    double* ptrRhs = reinterpret_cast<double*>(rhs);
-	    int64_t result = (*ptrLhs - *ptrRhs);
-	    return result;
+		return CompareTypeWithType(*ptrLhs, *ptrRhs);
     }
 
-    uint64_t MathOperation::CompareUInt32UInt8(byte* lhs, byte* rhs)
+    int64_t MathOperation::CompareUInt32UInt8(byte* lhs, byte* rhs)
     {
 	    uint32_t* ptrLhs = reinterpret_cast<uint32_t*>(lhs);
 	    uint8_t* ptrRhs = reinterpret_cast<uint8_t*>(rhs);
-	    int64_t result = (*ptrLhs - *ptrRhs);
-	    return result;
+		return CompareTypeWithType(*ptrLhs, *ptrRhs);
     }
 
-    uint64_t MathOperation::CompareUInt32Int8(byte* lhs, byte* rhs)
+    int64_t MathOperation::CompareUInt32Int8(byte* lhs, byte* rhs)
     {
 	    uint32_t* ptrLhs = reinterpret_cast<uint32_t*>(lhs);
 	    int8_t* ptrRhs = reinterpret_cast<int8_t*>(rhs);
-	    int64_t result = (*ptrLhs - *ptrRhs);
-	    return result;
+		return CompareTypeWithType(*ptrLhs, *ptrRhs);
     }
 
-    uint64_t MathOperation::CompareUInt32UInt16(byte* lhs, byte* rhs)
+    int64_t MathOperation::CompareUInt32UInt16(byte* lhs, byte* rhs)
     {
 	    uint32_t* ptrLhs = reinterpret_cast<uint32_t*>(lhs);
 	    uint16_t* ptrRhs = reinterpret_cast<uint16_t*>(rhs);
-	    int64_t result = (*ptrLhs - *ptrRhs);
-	    return result;
+		return CompareTypeWithType(*ptrLhs, *ptrRhs);
     }
 
-    uint64_t MathOperation::CompareUInt32Int16(byte* lhs, byte* rhs)
+    int64_t MathOperation::CompareUInt32Int16(byte* lhs, byte* rhs)
     {
 	    uint32_t* ptrLhs = reinterpret_cast<uint32_t*>(lhs);
 	    int16_t* ptrRhs = reinterpret_cast<int16_t*>(rhs);
-	    int64_t result = (*ptrLhs - *ptrRhs);
-	    return result;
+		return CompareTypeWithType(*ptrLhs, *ptrRhs);
     }
 
-    uint64_t MathOperation::CompareUInt32UInt32(byte* lhs, byte* rhs)
+    int64_t MathOperation::CompareUInt32UInt32(byte* lhs, byte* rhs)
     {
 	    uint32_t* ptrLhs = reinterpret_cast<uint32_t*>(lhs);
 	    uint32_t* ptrRhs = reinterpret_cast<uint32_t*>(rhs);
-	    int64_t result = (*ptrLhs - *ptrRhs);
-	    return result;
+		return CompareTypeWithType(*ptrLhs, *ptrRhs);
     }
 
-    uint64_t MathOperation::CompareUInt32Int32(byte* lhs, byte* rhs)
+    int64_t MathOperation::CompareUInt32Int32(byte* lhs, byte* rhs)
     {
 	    uint32_t* ptrLhs = reinterpret_cast<uint32_t*>(lhs);
 	    int32_t* ptrRhs = reinterpret_cast<int32_t*>(rhs);
-	    int64_t result = (*ptrLhs - *ptrRhs);
-	    return result;
+		return CompareTypeWithType(*ptrLhs, *ptrRhs);
     }
 
-    uint64_t MathOperation::CompareUInt32UInt64(byte* lhs, byte* rhs)
+    int64_t MathOperation::CompareUInt32UInt64(byte* lhs, byte* rhs)
     {
 	    uint32_t* ptrLhs = reinterpret_cast<uint32_t*>(lhs);
 	    uint64_t* ptrRhs = reinterpret_cast<uint64_t*>(rhs);
-	    int64_t result = (*ptrLhs - *ptrRhs);
-	    return result;
+		return CompareTypeWithType(*ptrLhs, *ptrRhs);
     }
 
-    uint64_t MathOperation::CompareUInt32Int64(byte* lhs, byte* rhs)
+    int64_t MathOperation::CompareUInt32Int64(byte* lhs, byte* rhs)
     {
 	    uint32_t* ptrLhs = reinterpret_cast<uint32_t*>(lhs);
 	    int64_t* ptrRhs = reinterpret_cast<int64_t*>(rhs);
-	    int64_t result = (*ptrLhs - *ptrRhs);
-	    return result;
+		return CompareTypeWithType(*ptrLhs, *ptrRhs);
     }
 
-    uint64_t MathOperation::CompareUInt32Single(byte* lhs, byte* rhs)
+    int64_t MathOperation::CompareUInt32Single(byte* lhs, byte* rhs)
     {
 	    uint32_t* ptrLhs = reinterpret_cast<uint32_t*>(lhs);
 	    float* ptrRhs = reinterpret_cast<float*>(rhs);
-	    int64_t result = (*ptrLhs - *ptrRhs);
-	    return result;
+		return CompareTypeWithType(*ptrLhs, *ptrRhs);
     }
 
-    uint64_t MathOperation::CompareUInt32Double(byte* lhs, byte* rhs)
+    int64_t MathOperation::CompareUInt32Double(byte* lhs, byte* rhs)
     {
 	    uint32_t* ptrLhs = reinterpret_cast<uint32_t*>(lhs);
 	    double* ptrRhs = reinterpret_cast<double*>(rhs);
-	    int64_t result = (*ptrLhs - *ptrRhs);
-	    return result;
+		return CompareTypeWithType(*ptrLhs, *ptrRhs);
     }
 
-    uint64_t MathOperation::CompareInt32UInt8(byte* lhs, byte* rhs)
+    int64_t MathOperation::CompareInt32UInt8(byte* lhs, byte* rhs)
     {
 	    int32_t* ptrLhs = reinterpret_cast<int32_t*>(lhs);
 	    uint8_t* ptrRhs = reinterpret_cast<uint8_t*>(rhs);
-	    int64_t result = (*ptrLhs - *ptrRhs);
-	    return result;
+		return CompareTypeWithType(*ptrLhs, *ptrRhs);
     }
 
-    uint64_t MathOperation::CompareInt32Int8(byte* lhs, byte* rhs)
+    int64_t MathOperation::CompareInt32Int8(byte* lhs, byte* rhs)
     {
 	    int32_t* ptrLhs = reinterpret_cast<int32_t*>(lhs);
 	    int8_t* ptrRhs = reinterpret_cast<int8_t*>(rhs);
-	    int64_t result = (*ptrLhs - *ptrRhs);
-	    return result;
+		return CompareTypeWithType(*ptrLhs, *ptrRhs);
     }
 
-    uint64_t MathOperation::CompareInt32UInt16(byte* lhs, byte* rhs)
+    int64_t MathOperation::CompareInt32UInt16(byte* lhs, byte* rhs)
     {
 	    int32_t* ptrLhs = reinterpret_cast<int32_t*>(lhs);
 	    uint16_t* ptrRhs = reinterpret_cast<uint16_t*>(rhs);
-	    int64_t result = (*ptrLhs - *ptrRhs);
-	    return result;
+		return CompareTypeWithType(*ptrLhs, *ptrRhs);
     }
 
-    uint64_t MathOperation::CompareInt32Int16(byte* lhs, byte* rhs)
+    int64_t MathOperation::CompareInt32Int16(byte* lhs, byte* rhs)
     {
 	    int32_t* ptrLhs = reinterpret_cast<int32_t*>(lhs);
 	    int16_t* ptrRhs = reinterpret_cast<int16_t*>(rhs);
-	    int64_t result = (*ptrLhs - *ptrRhs);
-	    return result;
+		return CompareTypeWithType(*ptrLhs, *ptrRhs);
     }
 
-    uint64_t MathOperation::CompareInt32UInt32(byte* lhs, byte* rhs)
+    int64_t MathOperation::CompareInt32UInt32(byte* lhs, byte* rhs)
     {
 	    int32_t* ptrLhs = reinterpret_cast<int32_t*>(lhs);
-	    uint32_t* ptrRhs = reinterpret_cast<uint32_t*>(rhs);
-	    int64_t result = (*ptrLhs - *ptrRhs);
-	    return result;
+	    uint32_t* ptrRhs = reinterpret_cast<uint32_t*>(rhs);	    
+		return CompareTypeWithType(*ptrLhs, *ptrRhs);
     }
 
-    uint64_t MathOperation::CompareInt32Int32(byte* lhs, byte* rhs)
+    int64_t MathOperation::CompareInt32Int32(byte* lhs, byte* rhs)
     {
 	    int32_t* ptrLhs = reinterpret_cast<int32_t*>(lhs);
 	    int32_t* ptrRhs = reinterpret_cast<int32_t*>(rhs);
-	    int64_t result = (*ptrLhs - *ptrRhs);
-	    return result;
+		return CompareTypeWithType(*ptrLhs, *ptrRhs);
     }
 
-    uint64_t MathOperation::CompareInt32UInt64(byte* lhs, byte* rhs)
+    int64_t MathOperation::CompareInt32UInt64(byte* lhs, byte* rhs)
     {
 	    int32_t* ptrLhs = reinterpret_cast<int32_t*>(lhs);
 	    uint64_t* ptrRhs = reinterpret_cast<uint64_t*>(rhs);
-	    int64_t result = (*ptrLhs - *ptrRhs);
-	    return result;
+		return CompareTypeWithType(*ptrLhs, *ptrRhs);
     }
 
-    uint64_t MathOperation::CompareInt32Int64(byte* lhs, byte* rhs)
+    int64_t MathOperation::CompareInt32Int64(byte* lhs, byte* rhs)
     {
 	    int32_t* ptrLhs = reinterpret_cast<int32_t*>(lhs);
 	    int64_t* ptrRhs = reinterpret_cast<int64_t*>(rhs);
-	    int64_t result = (*ptrLhs - *ptrRhs);
-	    return result;
+		return CompareTypeWithType(*ptrLhs, *ptrRhs);
     }
 
-    uint64_t MathOperation::CompareInt32Single(byte* lhs, byte* rhs)
+    int64_t MathOperation::CompareInt32Single(byte* lhs, byte* rhs)
     {
 	    int32_t* ptrLhs = reinterpret_cast<int32_t*>(lhs);
 	    float* ptrRhs = reinterpret_cast<float*>(rhs);
-	    int64_t result = (*ptrLhs - *ptrRhs);
-	    return result;
+		return CompareTypeWithType(*ptrLhs, *ptrRhs);
     }
 
-    uint64_t MathOperation::CompareInt32Double(byte* lhs, byte* rhs)
+    int64_t MathOperation::CompareInt32Double(byte* lhs, byte* rhs)
     {
 	    int32_t* ptrLhs = reinterpret_cast<int32_t*>(lhs);
 	    double* ptrRhs = reinterpret_cast<double*>(rhs);
-	    int64_t result = (*ptrLhs - *ptrRhs);
-	    return result;
+		return CompareTypeWithType(*ptrLhs, *ptrRhs);
     }
 
-    uint64_t MathOperation::CompareUInt64UInt8(byte* lhs, byte* rhs)
+    int64_t MathOperation::CompareUInt64UInt8(byte* lhs, byte* rhs)
     {
 	    uint64_t* ptrLhs = reinterpret_cast<uint64_t*>(lhs);
 	    uint8_t* ptrRhs = reinterpret_cast<uint8_t*>(rhs);
-	    int64_t result = (*ptrLhs - *ptrRhs);
-	    return result;
+		return CompareTypeWithType(*ptrLhs, *ptrRhs);
     }
 
-    uint64_t MathOperation::CompareUInt64Int8(byte* lhs, byte* rhs)
+    int64_t MathOperation::CompareUInt64Int8(byte* lhs, byte* rhs)
     {
 	    uint64_t* ptrLhs = reinterpret_cast<uint64_t*>(lhs);
 	    int8_t* ptrRhs = reinterpret_cast<int8_t*>(rhs);
-	    int64_t result = (*ptrLhs - *ptrRhs);
-	    return result;
+		return CompareTypeWithType(*ptrLhs, *ptrRhs);
     }
 
-    uint64_t MathOperation::CompareUInt64UInt16(byte* lhs, byte* rhs)
+    int64_t MathOperation::CompareUInt64UInt16(byte* lhs, byte* rhs)
     {
 	    uint64_t* ptrLhs = reinterpret_cast<uint64_t*>(lhs);
 	    uint16_t* ptrRhs = reinterpret_cast<uint16_t*>(rhs);
-	    int64_t result = (*ptrLhs - *ptrRhs);
-	    return result;
+		return CompareTypeWithType(*ptrLhs, *ptrRhs);
     }
 
-    uint64_t MathOperation::CompareUInt64Int16(byte* lhs, byte* rhs)
+    int64_t MathOperation::CompareUInt64Int16(byte* lhs, byte* rhs)
     {
 	    uint64_t* ptrLhs = reinterpret_cast<uint64_t*>(lhs);
 	    int16_t* ptrRhs = reinterpret_cast<int16_t*>(rhs);
-	    int64_t result = (*ptrLhs - *ptrRhs);
-	    return result;
+		return CompareTypeWithType(*ptrLhs, *ptrRhs);
     }
 
-    uint64_t MathOperation::CompareUInt64UInt32(byte* lhs, byte* rhs)
+    int64_t MathOperation::CompareUInt64UInt32(byte* lhs, byte* rhs)
     {
 	    uint64_t* ptrLhs = reinterpret_cast<uint64_t*>(lhs);
 	    uint32_t* ptrRhs = reinterpret_cast<uint32_t*>(rhs);
-	    int64_t result = (*ptrLhs - *ptrRhs);
-	    return result;
+		return CompareTypeWithType(*ptrLhs, *ptrRhs);
     }
 
-    uint64_t MathOperation::CompareUInt64Int32(byte* lhs, byte* rhs)
+    int64_t MathOperation::CompareUInt64Int32(byte* lhs, byte* rhs)
     {
 	    uint64_t* ptrLhs = reinterpret_cast<uint64_t*>(lhs);
 	    int32_t* ptrRhs = reinterpret_cast<int32_t*>(rhs);
-	    int64_t result = (*ptrLhs - *ptrRhs);
-	    return result;
+		return CompareTypeWithType(*ptrLhs, *ptrRhs);
     }
 
-    uint64_t MathOperation::CompareUInt64UInt64(byte* lhs, byte* rhs)
+    int64_t MathOperation::CompareUInt64UInt64(byte* lhs, byte* rhs)
     {
 	    uint64_t* ptrLhs = reinterpret_cast<uint64_t*>(lhs);
 	    uint64_t* ptrRhs = reinterpret_cast<uint64_t*>(rhs);
-	    int64_t result = (*ptrLhs - *ptrRhs);
-	    return result;
+		return CompareTypeWithType(*ptrLhs, *ptrRhs);
     }
 
-    uint64_t MathOperation::CompareUInt64Int64(byte* lhs, byte* rhs)
+    int64_t MathOperation::CompareUInt64Int64(byte* lhs, byte* rhs)
     {
 	    uint64_t* ptrLhs = reinterpret_cast<uint64_t*>(lhs);
 	    int64_t* ptrRhs = reinterpret_cast<int64_t*>(rhs);
-	    int64_t result = (*ptrLhs - *ptrRhs);
-	    return result;
+		return CompareTypeWithType(*ptrLhs, *ptrRhs);
     }
 
-    uint64_t MathOperation::CompareUInt64Single(byte* lhs, byte* rhs)
+    int64_t MathOperation::CompareUInt64Single(byte* lhs, byte* rhs)
     {
 	    uint64_t* ptrLhs = reinterpret_cast<uint64_t*>(lhs);
 	    float* ptrRhs = reinterpret_cast<float*>(rhs);
-	    int64_t result = (*ptrLhs - *ptrRhs);
-	    return result;
+		return CompareTypeWithType(*ptrLhs, *ptrRhs);
     }
 
-    uint64_t MathOperation::CompareUInt64Double(byte* lhs, byte* rhs)
+    int64_t MathOperation::CompareUInt64Double(byte* lhs, byte* rhs)
     {
 	    uint64_t* ptrLhs = reinterpret_cast<uint64_t*>(lhs);
 	    double* ptrRhs = reinterpret_cast<double*>(rhs);
-	    int64_t result = (*ptrLhs - *ptrRhs);
-	    return result;
+		return CompareTypeWithType(*ptrLhs, *ptrRhs);
     }
 
-    uint64_t MathOperation::CompareInt64UInt8(byte* lhs, byte* rhs)
+    int64_t MathOperation::CompareInt64UInt8(byte* lhs, byte* rhs)
     {
 	    int64_t* ptrLhs = reinterpret_cast<int64_t*>(lhs);
 	    uint8_t* ptrRhs = reinterpret_cast<uint8_t*>(rhs);
-	    int64_t result = (*ptrLhs - *ptrRhs);
-	    return result;
+		return CompareTypeWithType(*ptrLhs, *ptrRhs);
     }
 
-    uint64_t MathOperation::CompareInt64Int8(byte* lhs, byte* rhs)
+    int64_t MathOperation::CompareInt64Int8(byte* lhs, byte* rhs)
     {
 	    int64_t* ptrLhs = reinterpret_cast<int64_t*>(lhs);
 	    int8_t* ptrRhs = reinterpret_cast<int8_t*>(rhs);
-	    int64_t result = (*ptrLhs - *ptrRhs);
-	    return result;
+		return CompareTypeWithType(*ptrLhs, *ptrRhs);
     }
 
-    uint64_t MathOperation::CompareInt64UInt16(byte* lhs, byte* rhs)
+    int64_t MathOperation::CompareInt64UInt16(byte* lhs, byte* rhs)
     {
 	    int64_t* ptrLhs = reinterpret_cast<int64_t*>(lhs);
 	    uint16_t* ptrRhs = reinterpret_cast<uint16_t*>(rhs);
-	    int64_t result = (*ptrLhs - *ptrRhs);
-	    return result;
+		return CompareTypeWithType(*ptrLhs, *ptrRhs);
     }
 
-    uint64_t MathOperation::CompareInt64Int16(byte* lhs, byte* rhs)
+    int64_t MathOperation::CompareInt64Int16(byte* lhs, byte* rhs)
     {
 	    int64_t* ptrLhs = reinterpret_cast<int64_t*>(lhs);
 	    int16_t* ptrRhs = reinterpret_cast<int16_t*>(rhs);
-	    int64_t result = (*ptrLhs - *ptrRhs);
-	    return result;
+		return CompareTypeWithType(*ptrLhs, *ptrRhs);
     }
 
-    uint64_t MathOperation::CompareInt64UInt32(byte* lhs, byte* rhs)
+    int64_t MathOperation::CompareInt64UInt32(byte* lhs, byte* rhs)
     {
 	    int64_t* ptrLhs = reinterpret_cast<int64_t*>(lhs);
 	    uint32_t* ptrRhs = reinterpret_cast<uint32_t*>(rhs);
-	    int64_t result = (*ptrLhs - *ptrRhs);
-	    return result;
+		return CompareTypeWithType(*ptrLhs, *ptrRhs);
     }
 
-    uint64_t MathOperation::CompareInt64Int32(byte* lhs, byte* rhs)
+    int64_t MathOperation::CompareInt64Int32(byte* lhs, byte* rhs)
     {
 	    int64_t* ptrLhs = reinterpret_cast<int64_t*>(lhs);
 	    int32_t* ptrRhs = reinterpret_cast<int32_t*>(rhs);
-	    int64_t result = (*ptrLhs - *ptrRhs);
-	    return result;
+		return CompareTypeWithType(*ptrLhs, *ptrRhs);
     }
 
-    uint64_t MathOperation::CompareInt64UInt64(byte* lhs, byte* rhs)
+    int64_t MathOperation::CompareInt64UInt64(byte* lhs, byte* rhs)
     {
 	    int64_t* ptrLhs = reinterpret_cast<int64_t*>(lhs);
 	    uint64_t* ptrRhs = reinterpret_cast<uint64_t*>(rhs);
-	    int64_t result = (*ptrLhs - *ptrRhs);
-	    return result;
+		return CompareTypeWithType(*ptrLhs, *ptrRhs);
     }
 
-    uint64_t MathOperation::CompareInt64Int64(byte* lhs, byte* rhs)
+    int64_t MathOperation::CompareInt64Int64(byte* lhs, byte* rhs)
     {
 	    int64_t* ptrLhs = reinterpret_cast<int64_t*>(lhs);
 	    int64_t* ptrRhs = reinterpret_cast<int64_t*>(rhs);
-	    int64_t result = (*ptrLhs - *ptrRhs);
-	    return result;
+		return CompareTypeWithType(*ptrLhs, *ptrRhs);
     }
 
-    uint64_t MathOperation::CompareInt64Single(byte* lhs, byte* rhs)
+    int64_t MathOperation::CompareInt64Single(byte* lhs, byte* rhs)
     {
 	    int64_t* ptrLhs = reinterpret_cast<int64_t*>(lhs);
 	    float* ptrRhs = reinterpret_cast<float*>(rhs);
-	    int64_t result = (*ptrLhs - *ptrRhs);
-	    return result;
+		return CompareTypeWithType(*ptrLhs, *ptrRhs);
     }
 
-    uint64_t MathOperation::CompareInt64Double(byte* lhs, byte* rhs)
+    int64_t MathOperation::CompareInt64Double(byte* lhs, byte* rhs)
     {
 	    int64_t* ptrLhs = reinterpret_cast<int64_t*>(lhs);
 	    double* ptrRhs = reinterpret_cast<double*>(rhs);
-	    int64_t result = (*ptrLhs - *ptrRhs);
-	    return result;
+		return CompareTypeWithType(*ptrLhs, *ptrRhs);
     }
 
-    uint64_t MathOperation::CompareSingleUInt8(byte* lhs, byte* rhs)
+    int64_t MathOperation::CompareSingleUInt8(byte* lhs, byte* rhs)
     {
 	    float* ptrLhs = reinterpret_cast<float*>(lhs);
 	    uint8_t* ptrRhs = reinterpret_cast<uint8_t*>(rhs);
-	    int64_t result = (*ptrLhs - *ptrRhs);
-	    return result;
+		return CompareTypeWithType(*ptrLhs, *ptrRhs);
     }
 
-    uint64_t MathOperation::CompareSingleInt8(byte* lhs, byte* rhs)
+    int64_t MathOperation::CompareSingleInt8(byte* lhs, byte* rhs)
     {
 	    float* ptrLhs = reinterpret_cast<float*>(lhs);
 	    int8_t* ptrRhs = reinterpret_cast<int8_t*>(rhs);
-	    int64_t result = (*ptrLhs - *ptrRhs);
-	    return result;
+		return CompareTypeWithType(*ptrLhs, *ptrRhs);
     }
 
-    uint64_t MathOperation::CompareSingleUInt16(byte* lhs, byte* rhs)
+    int64_t MathOperation::CompareSingleUInt16(byte* lhs, byte* rhs)
     {
 	    float* ptrLhs = reinterpret_cast<float*>(lhs);
 	    uint16_t* ptrRhs = reinterpret_cast<uint16_t*>(rhs);
-	    int64_t result = (*ptrLhs - *ptrRhs);
-	    return result;
+		return CompareTypeWithType(*ptrLhs, *ptrRhs);
     }
 
-    uint64_t MathOperation::CompareSingleInt16(byte* lhs, byte* rhs)
+    int64_t MathOperation::CompareSingleInt16(byte* lhs, byte* rhs)
     {
 	    float* ptrLhs = reinterpret_cast<float*>(lhs);
 	    int16_t* ptrRhs = reinterpret_cast<int16_t*>(rhs);
-	    int64_t result = (*ptrLhs - *ptrRhs);
-	    return result;
+		return CompareTypeWithType(*ptrLhs, *ptrRhs);
     }
 
-    uint64_t MathOperation::CompareSingleUInt32(byte* lhs, byte* rhs)
+    int64_t MathOperation::CompareSingleUInt32(byte* lhs, byte* rhs)
     {
 	    float* ptrLhs = reinterpret_cast<float*>(lhs);
 	    uint32_t* ptrRhs = reinterpret_cast<uint32_t*>(rhs);
-	    int64_t result = (*ptrLhs - *ptrRhs);
-	    return result;
+		return CompareTypeWithType(*ptrLhs, *ptrRhs);
     }
 
-    uint64_t MathOperation::CompareSingleInt32(byte* lhs, byte* rhs)
+    int64_t MathOperation::CompareSingleInt32(byte* lhs, byte* rhs)
     {
 	    float* ptrLhs = reinterpret_cast<float*>(lhs);
 	    int32_t* ptrRhs = reinterpret_cast<int32_t*>(rhs);
-	    int64_t result = (*ptrLhs - *ptrRhs);
-	    return result;
+		return CompareTypeWithType(*ptrLhs, *ptrRhs);
     }
 
-    uint64_t MathOperation::CompareSingleUInt64(byte* lhs, byte* rhs)
+    int64_t MathOperation::CompareSingleUInt64(byte* lhs, byte* rhs)
     {
 	    float* ptrLhs = reinterpret_cast<float*>(lhs);
 	    uint64_t* ptrRhs = reinterpret_cast<uint64_t*>(rhs);
-	    int64_t result = (*ptrLhs - *ptrRhs);
-	    return result;
+		return CompareTypeWithType(*ptrLhs, *ptrRhs);
     }
 
-    uint64_t MathOperation::CompareSingleInt64(byte* lhs, byte* rhs)
+    int64_t MathOperation::CompareSingleInt64(byte* lhs, byte* rhs)
     {
 	    float* ptrLhs = reinterpret_cast<float*>(lhs);
 	    int64_t* ptrRhs = reinterpret_cast<int64_t*>(rhs);
-	    int64_t result = (*ptrLhs - *ptrRhs);
-	    return result;
+		return CompareTypeWithType(*ptrLhs, *ptrRhs);
     }
 
-    uint64_t MathOperation::CompareSingleSingle(byte* lhs, byte* rhs)
+    int64_t MathOperation::CompareSingleSingle(byte* lhs, byte* rhs)
     {
 	    float* ptrLhs = reinterpret_cast<float*>(lhs);
 	    float* ptrRhs = reinterpret_cast<float*>(rhs);
-	    int64_t result = (*ptrLhs - *ptrRhs);
-	    return result;
+		return CompareTypeWithType(*ptrLhs, *ptrRhs);
     }
 
-    uint64_t MathOperation::CompareSingleDouble(byte* lhs, byte* rhs)
+    int64_t MathOperation::CompareSingleDouble(byte* lhs, byte* rhs)
     {
 	    float* ptrLhs = reinterpret_cast<float*>(lhs);
 	    double* ptrRhs = reinterpret_cast<double*>(rhs);
-	    int64_t result = (*ptrLhs - *ptrRhs);
-	    return result;
+		return CompareTypeWithType(*ptrLhs, *ptrRhs);
     }
 
-    uint64_t MathOperation::CompareDoubleUInt8(byte* lhs, byte* rhs)
+    int64_t MathOperation::CompareDoubleUInt8(byte* lhs, byte* rhs)
     {
 	    double* ptrLhs = reinterpret_cast<double*>(lhs);
 	    uint8_t* ptrRhs = reinterpret_cast<uint8_t*>(rhs);
-	    int64_t result = (*ptrLhs - *ptrRhs);
-	    return result;
+		return CompareTypeWithType(*ptrLhs, *ptrRhs);
     }
 
-    uint64_t MathOperation::CompareDoubleInt8(byte* lhs, byte* rhs)
+    int64_t MathOperation::CompareDoubleInt8(byte* lhs, byte* rhs)
     {
 	    double* ptrLhs = reinterpret_cast<double*>(lhs);
 	    int8_t* ptrRhs = reinterpret_cast<int8_t*>(rhs);
-	    int64_t result = (*ptrLhs - *ptrRhs);
-	    return result;
+		return CompareTypeWithType(*ptrLhs, *ptrRhs);
     }
 
-    uint64_t MathOperation::CompareDoubleUInt16(byte* lhs, byte* rhs)
+    int64_t MathOperation::CompareDoubleUInt16(byte* lhs, byte* rhs)
     {
 	    double* ptrLhs = reinterpret_cast<double*>(lhs);
 	    uint16_t* ptrRhs = reinterpret_cast<uint16_t*>(rhs);
-	    int64_t result = (*ptrLhs - *ptrRhs);
-	    return result;
+		return CompareTypeWithType(*ptrLhs, *ptrRhs);
     }
 
-    uint64_t MathOperation::CompareDoubleInt16(byte* lhs, byte* rhs)
+    int64_t MathOperation::CompareDoubleInt16(byte* lhs, byte* rhs)
     {
 	    double* ptrLhs = reinterpret_cast<double*>(lhs);
 	    int16_t* ptrRhs = reinterpret_cast<int16_t*>(rhs);
-	    int64_t result = (*ptrLhs - *ptrRhs);
-	    return result;
+		return CompareTypeWithType(*ptrLhs, *ptrRhs);
     }
 
-    uint64_t MathOperation::CompareDoubleUInt32(byte* lhs, byte* rhs)
+    int64_t MathOperation::CompareDoubleUInt32(byte* lhs, byte* rhs)
     {
 	    double* ptrLhs = reinterpret_cast<double*>(lhs);
 	    uint32_t* ptrRhs = reinterpret_cast<uint32_t*>(rhs);
-	    int64_t result = (*ptrLhs - *ptrRhs);
-	    return result;
+		return CompareTypeWithType(*ptrLhs, *ptrRhs);
     }
 
-    uint64_t MathOperation::CompareDoubleInt32(byte* lhs, byte* rhs)
+    int64_t MathOperation::CompareDoubleInt32(byte* lhs, byte* rhs)
     {
 	    double* ptrLhs = reinterpret_cast<double*>(lhs);
 	    int32_t* ptrRhs = reinterpret_cast<int32_t*>(rhs);
-	    int64_t result = (*ptrLhs - *ptrRhs);
-	    return result;
+		return CompareTypeWithType(*ptrLhs, *ptrRhs);
     }
 
-    uint64_t MathOperation::CompareDoubleUInt64(byte* lhs, byte* rhs)
+    int64_t MathOperation::CompareDoubleUInt64(byte* lhs, byte* rhs)
     {
 	    double* ptrLhs = reinterpret_cast<double*>(lhs);
 	    uint64_t* ptrRhs = reinterpret_cast<uint64_t*>(rhs);
-	    int64_t result = (*ptrLhs - *ptrRhs);
-	    return result;
+		return CompareTypeWithType(*ptrLhs, *ptrRhs);
     }
 
-    uint64_t MathOperation::CompareDoubleInt64(byte* lhs, byte* rhs)
+    int64_t MathOperation::CompareDoubleInt64(byte* lhs, byte* rhs)
     {
 	    double* ptrLhs = reinterpret_cast<double*>(lhs);
 	    int64_t* ptrRhs = reinterpret_cast<int64_t*>(rhs);
-	    int64_t result = (*ptrLhs - *ptrRhs);
-	    return result;
+		return CompareTypeWithType(*ptrLhs, *ptrRhs);
     }
 
-    uint64_t MathOperation::CompareDoubleSingle(byte* lhs, byte* rhs)
+    int64_t MathOperation::CompareDoubleSingle(byte* lhs, byte* rhs)
     {
 	    double* ptrLhs = reinterpret_cast<double*>(lhs);
 	    float* ptrRhs = reinterpret_cast<float*>(rhs);
-	    int64_t result = (*ptrLhs - *ptrRhs);
-	    return result;
+		return CompareTypeWithType(*ptrLhs, *ptrRhs);
     }
 
-    uint64_t MathOperation::CompareDoubleDouble(byte* lhs, byte* rhs)
+    int64_t MathOperation::CompareDoubleDouble(byte* lhs, byte* rhs)
     {
 	    double* ptrLhs = reinterpret_cast<double*>(lhs);
 	    double* ptrRhs = reinterpret_cast<double*>(rhs);
-	    int64_t result = (*ptrLhs - *ptrRhs);
-	    return result;
+		return CompareTypeWithType(*ptrLhs, *ptrRhs);
     }
 
 

@@ -66,8 +66,6 @@ namespace StackVM
         float value = stack->pop_float();
         float result = sin(value);
         stack->push_float(result);
-
-        //std::cout << "Called StandardLibrary::Sin with input value " << value << " and return result " << result << std::endl;
     }
 
     void StandardLibrary::Sign(Stack<byte>* stack)

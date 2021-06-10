@@ -6,19 +6,19 @@ namespace StackVM
     {
         CompilerUtility::Initialize();
 
-        functionMap["abs"]          = reinterpret_cast<uint64_t>(StandardLibrary::Abs);
-        functionMap["clamp"]        = reinterpret_cast<uint64_t>(StandardLibrary::Clamp);
-        functionMap["cos"]          = reinterpret_cast<uint64_t>(StandardLibrary::Cos);
-        functionMap["lerp"]         = reinterpret_cast<uint64_t>(StandardLibrary::Lerp);
-        functionMap["pow"]          = reinterpret_cast<uint64_t>(StandardLibrary::Pow);
-        functionMap["sin"]          = reinterpret_cast<uint64_t>(StandardLibrary::Sin);
-        functionMap["sign"]         = reinterpret_cast<uint64_t>(StandardLibrary::Sign);
-        functionMap["sqrt"]         = reinterpret_cast<uint64_t>(StandardLibrary::Sqrt);
-        functionMap["getTimeStamp"] = reinterpret_cast<uint64_t>(StandardLibrary::GetTimeStamp);
-        functionMap["print"]        = reinterpret_cast<uint64_t>(StandardLibrary::Print);
-        functionMap["printline"]    = reinterpret_cast<uint64_t>(StandardLibrary::PrintLine);
-        functionMap["printnum"]     = reinterpret_cast<uint64_t>(StandardLibrary::PrintNum);
-        functionMap["endline"]      = reinterpret_cast<uint64_t>(StandardLibrary::EndLine);
+        RegisterFunction("abs", StandardLibrary::Abs);
+        RegisterFunction("clamp", StandardLibrary::Clamp);
+        RegisterFunction("cos", StandardLibrary::Cos);
+        RegisterFunction("lerp", StandardLibrary::Lerp);
+        RegisterFunction("pow", StandardLibrary::Pow);
+        RegisterFunction("sin", StandardLibrary::Sin);
+        RegisterFunction("sign", StandardLibrary::Sign);
+        RegisterFunction("sqrt", StandardLibrary::Sqrt);
+        RegisterFunction("getTimeStamp", StandardLibrary::GetTimeStamp);
+        RegisterFunction("print", StandardLibrary::Print);
+        RegisterFunction("printline", StandardLibrary::PrintLine);
+        RegisterFunction("printnum", StandardLibrary::PrintNum);
+        RegisterFunction("endline", StandardLibrary::EndLine);
     }
 
     bool Compiler::RegisterFunction(const std::string& name, StackVMFunction fn_ptr)

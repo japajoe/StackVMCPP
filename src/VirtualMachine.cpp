@@ -659,7 +659,10 @@ namespace StackVM
         entryInstruction = nullptr;
         assembly = nullptr;
         memset(&registers[0], 0, 13 * sizeof(byte) * 8);
-        elapsedTime = 0;
+        
+        for(size_t i = 0; i < 13; i++)
+            registerDataType[i] = Type::Int64;
+        
         stack.clear();
         startTime = high_resolution_clock::now();
     }

@@ -3,11 +3,12 @@
 
 #include "Specification.hpp"
 #include <cstdint>
+#include <iostream>
 
 namespace StackVM
 {
     //WARNING: This class contains generated code, so it's not recommend to casually start changing things
-    typedef uint64_t (*CmpCallbackPtr)(byte* lhs, byte* rhs);
+    typedef int64_t  (*CmpCallbackPtr)(byte* lhs, byte* rhs);
     typedef void     (*AddCallbackPtr)(byte* lhs, byte* rhs);
     typedef void     (*SubCallbackPtr)(byte* lhs, byte* rhs);
     typedef void     (*MulCallbackPtr)(byte* lhs, byte* rhs);
@@ -34,111 +35,131 @@ namespace StackVM
         static DivCallbackPtr divFunctions[][10];
         static void SetFlags(int flagCompare, int flagZero);
 
+        template<typename T1, typename T2>
+        static int64_t CompareTypeWithType(T1 lhs, T2 rhs)
+        {
+            if(lhs > rhs)
+            {
+                //std::cout << "LHS is greater than RHS\n";
+                return 1;
+            }
+            else if(lhs < rhs)
+            {
+                //std::cout << "LHS is less than RHS\n";
+                return -1;
+            }
+            else
+            {
+                //std::cout << "LHS is equal to RHS\n";
+                return 0;
+            }
+        }
+
         //Compare--------------------------
         //---------------------------------
         //---------------------------------
         //---------------------------------
 
-        static uint64_t CompareUInt8UInt8(byte* lhs, byte* rhs);
-        static uint64_t CompareUInt8Int8(byte* lhs, byte* rhs);
-        static uint64_t CompareUInt8UInt16(byte* lhs, byte* rhs);
-        static uint64_t CompareUInt8Int16(byte* lhs, byte* rhs);
-        static uint64_t CompareUInt8UInt32(byte* lhs, byte* rhs);
-        static uint64_t CompareUInt8Int32(byte* lhs, byte* rhs);
-        static uint64_t CompareUInt8UInt64(byte* lhs, byte* rhs);
-        static uint64_t CompareUInt8Int64(byte* lhs, byte* rhs);
-        static uint64_t CompareUInt8Single(byte* lhs, byte* rhs);
-        static uint64_t CompareUInt8Double(byte* lhs, byte* rhs);
-        static uint64_t CompareInt8UInt8(byte* lhs, byte* rhs);
-        static uint64_t CompareInt8Int8(byte* lhs, byte* rhs);
-        static uint64_t CompareInt8UInt16(byte* lhs, byte* rhs);
-        static uint64_t CompareInt8Int16(byte* lhs, byte* rhs);
-        static uint64_t CompareInt8UInt32(byte* lhs, byte* rhs);
-        static uint64_t CompareInt8Int32(byte* lhs, byte* rhs);
-        static uint64_t CompareInt8UInt64(byte* lhs, byte* rhs);
-        static uint64_t CompareInt8Int64(byte* lhs, byte* rhs);
-        static uint64_t CompareInt8Single(byte* lhs, byte* rhs);
-        static uint64_t CompareInt8Double(byte* lhs, byte* rhs);
-        static uint64_t CompareUInt16UInt8(byte* lhs, byte* rhs);
-        static uint64_t CompareUInt16Int8(byte* lhs, byte* rhs);
-        static uint64_t CompareUInt16UInt16(byte* lhs, byte* rhs);
-        static uint64_t CompareUInt16Int16(byte* lhs, byte* rhs);
-        static uint64_t CompareUInt16UInt32(byte* lhs, byte* rhs);
-        static uint64_t CompareUInt16Int32(byte* lhs, byte* rhs);
-        static uint64_t CompareUInt16UInt64(byte* lhs, byte* rhs);
-        static uint64_t CompareUInt16Int64(byte* lhs, byte* rhs);
-        static uint64_t CompareUInt16Single(byte* lhs, byte* rhs);
-        static uint64_t CompareUInt16Double(byte* lhs, byte* rhs);
-        static uint64_t CompareInt16UInt8(byte* lhs, byte* rhs);
-        static uint64_t CompareInt16Int8(byte* lhs, byte* rhs);
-        static uint64_t CompareInt16UInt16(byte* lhs, byte* rhs);
-        static uint64_t CompareInt16Int16(byte* lhs, byte* rhs);
-        static uint64_t CompareInt16UInt32(byte* lhs, byte* rhs);
-        static uint64_t CompareInt16Int32(byte* lhs, byte* rhs);
-        static uint64_t CompareInt16UInt64(byte* lhs, byte* rhs);
-        static uint64_t CompareInt16Int64(byte* lhs, byte* rhs);
-        static uint64_t CompareInt16Single(byte* lhs, byte* rhs);
-        static uint64_t CompareInt16Double(byte* lhs, byte* rhs);
-        static uint64_t CompareUInt32UInt8(byte* lhs, byte* rhs);
-        static uint64_t CompareUInt32Int8(byte* lhs, byte* rhs);
-        static uint64_t CompareUInt32UInt16(byte* lhs, byte* rhs);
-        static uint64_t CompareUInt32Int16(byte* lhs, byte* rhs);
-        static uint64_t CompareUInt32UInt32(byte* lhs, byte* rhs);
-        static uint64_t CompareUInt32Int32(byte* lhs, byte* rhs);
-        static uint64_t CompareUInt32UInt64(byte* lhs, byte* rhs);
-        static uint64_t CompareUInt32Int64(byte* lhs, byte* rhs);
-        static uint64_t CompareUInt32Single(byte* lhs, byte* rhs);
-        static uint64_t CompareUInt32Double(byte* lhs, byte* rhs);
-        static uint64_t CompareInt32UInt8(byte* lhs, byte* rhs);
-        static uint64_t CompareInt32Int8(byte* lhs, byte* rhs);
-        static uint64_t CompareInt32UInt16(byte* lhs, byte* rhs);
-        static uint64_t CompareInt32Int16(byte* lhs, byte* rhs);
-        static uint64_t CompareInt32UInt32(byte* lhs, byte* rhs);
-        static uint64_t CompareInt32Int32(byte* lhs, byte* rhs);
-        static uint64_t CompareInt32UInt64(byte* lhs, byte* rhs);
-        static uint64_t CompareInt32Int64(byte* lhs, byte* rhs);
-        static uint64_t CompareInt32Single(byte* lhs, byte* rhs);
-        static uint64_t CompareInt32Double(byte* lhs, byte* rhs);
-        static uint64_t CompareUInt64UInt8(byte* lhs, byte* rhs);
-        static uint64_t CompareUInt64Int8(byte* lhs, byte* rhs);
-        static uint64_t CompareUInt64UInt16(byte* lhs, byte* rhs);
-        static uint64_t CompareUInt64Int16(byte* lhs, byte* rhs);
-        static uint64_t CompareUInt64UInt32(byte* lhs, byte* rhs);
-        static uint64_t CompareUInt64Int32(byte* lhs, byte* rhs);
-        static uint64_t CompareUInt64UInt64(byte* lhs, byte* rhs);
-        static uint64_t CompareUInt64Int64(byte* lhs, byte* rhs);
-        static uint64_t CompareUInt64Single(byte* lhs, byte* rhs);
-        static uint64_t CompareUInt64Double(byte* lhs, byte* rhs);
-        static uint64_t CompareInt64UInt8(byte* lhs, byte* rhs);
-        static uint64_t CompareInt64Int8(byte* lhs, byte* rhs);
-        static uint64_t CompareInt64UInt16(byte* lhs, byte* rhs);
-        static uint64_t CompareInt64Int16(byte* lhs, byte* rhs);
-        static uint64_t CompareInt64UInt32(byte* lhs, byte* rhs);
-        static uint64_t CompareInt64Int32(byte* lhs, byte* rhs);
-        static uint64_t CompareInt64UInt64(byte* lhs, byte* rhs);
-        static uint64_t CompareInt64Int64(byte* lhs, byte* rhs);
-        static uint64_t CompareInt64Single(byte* lhs, byte* rhs);
-        static uint64_t CompareInt64Double(byte* lhs, byte* rhs);
-        static uint64_t CompareSingleUInt8(byte* lhs, byte* rhs);
-        static uint64_t CompareSingleInt8(byte* lhs, byte* rhs);
-        static uint64_t CompareSingleUInt16(byte* lhs, byte* rhs);
-        static uint64_t CompareSingleInt16(byte* lhs, byte* rhs);
-        static uint64_t CompareSingleUInt32(byte* lhs, byte* rhs);
-        static uint64_t CompareSingleInt32(byte* lhs, byte* rhs);
-        static uint64_t CompareSingleUInt64(byte* lhs, byte* rhs);
-        static uint64_t CompareSingleInt64(byte* lhs, byte* rhs);
-        static uint64_t CompareSingleSingle(byte* lhs, byte* rhs);
-        static uint64_t CompareSingleDouble(byte* lhs, byte* rhs);
-        static uint64_t CompareDoubleUInt8(byte* lhs, byte* rhs);
-        static uint64_t CompareDoubleInt8(byte* lhs, byte* rhs);
-        static uint64_t CompareDoubleUInt16(byte* lhs, byte* rhs);
-        static uint64_t CompareDoubleInt16(byte* lhs, byte* rhs);
-        static uint64_t CompareDoubleUInt32(byte* lhs, byte* rhs);
-        static uint64_t CompareDoubleInt32(byte* lhs, byte* rhs);
-        static uint64_t CompareDoubleUInt64(byte* lhs, byte* rhs);
-        static uint64_t CompareDoubleInt64(byte* lhs, byte* rhs);
-        static uint64_t CompareDoubleSingle(byte* lhs, byte* rhs);
-        static uint64_t CompareDoubleDouble(byte* lhs, byte* rhs);
+        static int64_t CompareUInt8UInt8(byte* lhs, byte* rhs);
+        static int64_t CompareUInt8Int8(byte* lhs, byte* rhs);
+        static int64_t CompareUInt8UInt16(byte* lhs, byte* rhs);
+        static int64_t CompareUInt8Int16(byte* lhs, byte* rhs);
+        static int64_t CompareUInt8UInt32(byte* lhs, byte* rhs);
+        static int64_t CompareUInt8Int32(byte* lhs, byte* rhs);
+        static int64_t CompareUInt8UInt64(byte* lhs, byte* rhs);
+        static int64_t CompareUInt8Int64(byte* lhs, byte* rhs);
+        static int64_t CompareUInt8Single(byte* lhs, byte* rhs);
+        static int64_t CompareUInt8Double(byte* lhs, byte* rhs);
+        static int64_t CompareInt8UInt8(byte* lhs, byte* rhs);
+        static int64_t CompareInt8Int8(byte* lhs, byte* rhs);
+        static int64_t CompareInt8UInt16(byte* lhs, byte* rhs);
+        static int64_t CompareInt8Int16(byte* lhs, byte* rhs);
+        static int64_t CompareInt8UInt32(byte* lhs, byte* rhs);
+        static int64_t CompareInt8Int32(byte* lhs, byte* rhs);
+        static int64_t CompareInt8UInt64(byte* lhs, byte* rhs);
+        static int64_t CompareInt8Int64(byte* lhs, byte* rhs);
+        static int64_t CompareInt8Single(byte* lhs, byte* rhs);
+        static int64_t CompareInt8Double(byte* lhs, byte* rhs);
+        static int64_t CompareUInt16UInt8(byte* lhs, byte* rhs);
+        static int64_t CompareUInt16Int8(byte* lhs, byte* rhs);
+        static int64_t CompareUInt16UInt16(byte* lhs, byte* rhs);
+        static int64_t CompareUInt16Int16(byte* lhs, byte* rhs);
+        static int64_t CompareUInt16UInt32(byte* lhs, byte* rhs);
+        static int64_t CompareUInt16Int32(byte* lhs, byte* rhs);
+        static int64_t CompareUInt16UInt64(byte* lhs, byte* rhs);
+        static int64_t CompareUInt16Int64(byte* lhs, byte* rhs);
+        static int64_t CompareUInt16Single(byte* lhs, byte* rhs);
+        static int64_t CompareUInt16Double(byte* lhs, byte* rhs);
+        static int64_t CompareInt16UInt8(byte* lhs, byte* rhs);
+        static int64_t CompareInt16Int8(byte* lhs, byte* rhs);
+        static int64_t CompareInt16UInt16(byte* lhs, byte* rhs);
+        static int64_t CompareInt16Int16(byte* lhs, byte* rhs);
+        static int64_t CompareInt16UInt32(byte* lhs, byte* rhs);
+        static int64_t CompareInt16Int32(byte* lhs, byte* rhs);
+        static int64_t CompareInt16UInt64(byte* lhs, byte* rhs);
+        static int64_t CompareInt16Int64(byte* lhs, byte* rhs);
+        static int64_t CompareInt16Single(byte* lhs, byte* rhs);
+        static int64_t CompareInt16Double(byte* lhs, byte* rhs);
+        static int64_t CompareUInt32UInt8(byte* lhs, byte* rhs);
+        static int64_t CompareUInt32Int8(byte* lhs, byte* rhs);
+        static int64_t CompareUInt32UInt16(byte* lhs, byte* rhs);
+        static int64_t CompareUInt32Int16(byte* lhs, byte* rhs);
+        static int64_t CompareUInt32UInt32(byte* lhs, byte* rhs);
+        static int64_t CompareUInt32Int32(byte* lhs, byte* rhs);
+        static int64_t CompareUInt32UInt64(byte* lhs, byte* rhs);
+        static int64_t CompareUInt32Int64(byte* lhs, byte* rhs);
+        static int64_t CompareUInt32Single(byte* lhs, byte* rhs);
+        static int64_t CompareUInt32Double(byte* lhs, byte* rhs);
+        static int64_t CompareInt32UInt8(byte* lhs, byte* rhs);
+        static int64_t CompareInt32Int8(byte* lhs, byte* rhs);
+        static int64_t CompareInt32UInt16(byte* lhs, byte* rhs);
+        static int64_t CompareInt32Int16(byte* lhs, byte* rhs);
+        static int64_t CompareInt32UInt32(byte* lhs, byte* rhs);
+        static int64_t CompareInt32Int32(byte* lhs, byte* rhs);
+        static int64_t CompareInt32UInt64(byte* lhs, byte* rhs);
+        static int64_t CompareInt32Int64(byte* lhs, byte* rhs);
+        static int64_t CompareInt32Single(byte* lhs, byte* rhs);
+        static int64_t CompareInt32Double(byte* lhs, byte* rhs);
+        static int64_t CompareUInt64UInt8(byte* lhs, byte* rhs);
+        static int64_t CompareUInt64Int8(byte* lhs, byte* rhs);
+        static int64_t CompareUInt64UInt16(byte* lhs, byte* rhs);
+        static int64_t CompareUInt64Int16(byte* lhs, byte* rhs);
+        static int64_t CompareUInt64UInt32(byte* lhs, byte* rhs);
+        static int64_t CompareUInt64Int32(byte* lhs, byte* rhs);
+        static int64_t CompareUInt64UInt64(byte* lhs, byte* rhs);
+        static int64_t CompareUInt64Int64(byte* lhs, byte* rhs);
+        static int64_t CompareUInt64Single(byte* lhs, byte* rhs);
+        static int64_t CompareUInt64Double(byte* lhs, byte* rhs);
+        static int64_t CompareInt64UInt8(byte* lhs, byte* rhs);
+        static int64_t CompareInt64Int8(byte* lhs, byte* rhs);
+        static int64_t CompareInt64UInt16(byte* lhs, byte* rhs);
+        static int64_t CompareInt64Int16(byte* lhs, byte* rhs);
+        static int64_t CompareInt64UInt32(byte* lhs, byte* rhs);
+        static int64_t CompareInt64Int32(byte* lhs, byte* rhs);
+        static int64_t CompareInt64UInt64(byte* lhs, byte* rhs);
+        static int64_t CompareInt64Int64(byte* lhs, byte* rhs);
+        static int64_t CompareInt64Single(byte* lhs, byte* rhs);
+        static int64_t CompareInt64Double(byte* lhs, byte* rhs);
+        static int64_t CompareSingleUInt8(byte* lhs, byte* rhs);
+        static int64_t CompareSingleInt8(byte* lhs, byte* rhs);
+        static int64_t CompareSingleUInt16(byte* lhs, byte* rhs);
+        static int64_t CompareSingleInt16(byte* lhs, byte* rhs);
+        static int64_t CompareSingleUInt32(byte* lhs, byte* rhs);
+        static int64_t CompareSingleInt32(byte* lhs, byte* rhs);
+        static int64_t CompareSingleUInt64(byte* lhs, byte* rhs);
+        static int64_t CompareSingleInt64(byte* lhs, byte* rhs);
+        static int64_t CompareSingleSingle(byte* lhs, byte* rhs);
+        static int64_t CompareSingleDouble(byte* lhs, byte* rhs);
+        static int64_t CompareDoubleUInt8(byte* lhs, byte* rhs);
+        static int64_t CompareDoubleInt8(byte* lhs, byte* rhs);
+        static int64_t CompareDoubleUInt16(byte* lhs, byte* rhs);
+        static int64_t CompareDoubleInt16(byte* lhs, byte* rhs);
+        static int64_t CompareDoubleUInt32(byte* lhs, byte* rhs);
+        static int64_t CompareDoubleInt32(byte* lhs, byte* rhs);
+        static int64_t CompareDoubleUInt64(byte* lhs, byte* rhs);
+        static int64_t CompareDoubleInt64(byte* lhs, byte* rhs);
+        static int64_t CompareDoubleSingle(byte* lhs, byte* rhs);
+        static int64_t CompareDoubleDouble(byte* lhs, byte* rhs);
 
         //Add------------------------------
         //---------------------------------
