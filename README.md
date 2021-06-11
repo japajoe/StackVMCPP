@@ -9,13 +9,6 @@ Support for most common integer types like
 - float
 - double
 
-The instructionset resembles x86 assembly, although it's not a 1 to 1 mapping which means any code written wouldn't work with any other assembler. My goal is to get more familiar with low level programming, and hopefully be able to create a higher level language which compiles down to my own instructions. In the end it would be interesting if it could be embedded into programs as a blazingly fast scripting language.
-
-Keep in my mind that this is my hobby project, and it might contain code that hurts your eyes or worse. I do not follow any well layed out path so I'm learning as I go. 
-
-# How it works
-Feed the compiler a source file, load the output into the virtual machine and run it. 
-
 # Instructions
 **MOV**
 Move a value into a register or into a variable. Registers are able to store any type, variables are constrained to only contain the type they are defined as.
