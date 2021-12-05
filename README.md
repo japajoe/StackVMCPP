@@ -1,5 +1,5 @@
-# StackVMSharp
-A stack and register based virtual machine which can compile and run arbitrary code in runtime.
+# StackVMCPP
+A stack and register based virtual machine which can compile and execute arbitrary code in runtime.
 
 Support for most common integer types like
 - int8/uint8
@@ -8,6 +8,9 @@ Support for most common integer types like
 - int64/uint64
 - float
 - double
+
+# Dependencies
+- None
 
 # Instructions
 **MOV**
