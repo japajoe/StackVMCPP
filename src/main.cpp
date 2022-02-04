@@ -16,7 +16,7 @@ void CompileProgram();
 int main()
 {
     compiler = std::make_unique<Compiler>();
-    machine = std::make_unique< = std::make_unique<Compiler>();
+    machine = std::make_unique<VirtualMachine>();
     CompileProgram();
     return 0;
 }
