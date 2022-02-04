@@ -1,5 +1,6 @@
 #include <iostream>
 #include <string>
+#include <memory>
 #include "VirtualMachine.hpp"
 #include "Compiler.hpp"
 #include "IO.hpp"
@@ -7,13 +8,15 @@
 
 using namespace StackVM;
 
-Compiler compiler;
-VirtualMachine machine;
+std::unique_ptr<Compiler> compiler;
+std::unique_ptr<VirtualMachine> machine;
 
 void CompileProgram();
 
 int main()
 {
+    compiler = std::make_unique<Compiler>();
+    machine = std::make_unique< = std::make_unique<Compiler>();
     CompileProgram();
     return 0;
 }
@@ -28,15 +31,15 @@ void CompileProgram()
 
         Assembly assembly;
 
-        if(compiler.Compile(source, assembly)) 
+        if(compiler->Compile(source, assembly)) 
         {
-            if(machine.LoadProgram(&assembly))
+            if(machine->LoadProgram(&assembly))
             {
                 bool execute = true;
 
                 while(execute)
                 {
-                    execute = machine.Execute();
+                    execute = machine->Execute();
                 }
             }    
         }

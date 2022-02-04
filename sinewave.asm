@@ -8,15 +8,15 @@
 ; Following are some examples of using define directives
 
 ; letter		    DB	'y'         char
-; choice1		    DB	1           char
-; direction		    DB	-1          uchar
+; choice1		    DB	1           uchar
+; direction		    DB	-1          char
 ; number		    DW	12345       uint16
 ; neg_number	    DW	-12345      int16
-; big_number1	    DQ	123456789   int64
-; big_number1	    DQ	-123456789  uint64
+; big_number1	    DQ	123456789   uint64
+; big_number1	    DQ	-123456789  int64
 
-; real_number1	    DD	1024        int32
-; real_number2	    DD	-1024       uint32
+; real_number1	    DD	1024        uint32
+; real_number2	    DD	-1024       int32
 ; real_number3	    DD	1.234       float
 ; real_number4	    DQ	123.456     double
 
