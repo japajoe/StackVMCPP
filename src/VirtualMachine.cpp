@@ -703,16 +703,18 @@ namespace StackVM
         switch(instruction->rhsOperandType)
         {
             case OperandType::IntegerLiteral:
-                return &instruction->lhs[0];
+                return &instruction->rhs[0];
             case OperandType::IntegerLiteralLabel:
-                return &instruction->lhs[0];
+                return &instruction->rhs[0];
             case OperandType::IntegerLiteralExtern:
-                return &instruction->lhs[0];
+                return &instruction->rhs[0];
             case OperandType::Register:
                 return &registers[0] + (instruction->GetRightValue<int32_t>() * (sizeof(byte) * 8));
             case OperandType::Variable:
                 return assembly->GetDataAtIndex(instruction->GetRightValue<int32_t>());
         }
+
+        return nullptr;
     }
 
     Type VirtualMachine::GetLeftOperandDataType(Instruction* instruction) const
