@@ -483,13 +483,25 @@ namespace StackVM
             case OpCode::CALL:
             {
                 byte* dst = GetLeftOperandPointer(currentInstruction);
-                uint64_t offset;
-                memcpy(&offset, dst, sizeof(uint64_t));
 
-                uint64_t ip = (currentInstruction - entryInstruction) + 1;
-                stack.push_uint64(ip);
+                if(currentInstruction->lhsOperandType == OperandType::IntegerLiteralLabel)
+                {
+                    uint64_t offset;
+                    memcpy(&offset, dst, sizeof(uint64_t));
+                    uint64_t ip = (currentInstruction - entryInstruction) + 1;
+                    stack.push_uint64(ip);
+                    SetInstructionPointer(offset);
+                }
+                else if(currentInstruction->lhsOperandType == OperandType::IntegerLiteralExtern)
+                {
+                    uint64_t address;
+                    memcpy(&address, dst, sizeof(uint64_t));
+                    StackVMFunction func = reinterpret_cast<StackVMFunction>(address);
+                    func(&stack);
+                    IncrementInstructionPointer();
+                }
 
-                SetInstructionPointer(offset);
+
                 break;
             }
             case OpCode::CALLF:
@@ -673,6 +685,10 @@ namespace StackVM
         {
             case OperandType::IntegerLiteral:
                 return &instruction->lhs[0];
+            case OperandType::IntegerLiteralLabel:
+                return &instruction->lhs[0];
+            case OperandType::IntegerLiteralExtern:
+                return &instruction->lhs[0];
             case OperandType::Register:                
                 return &registers[0] + (instruction->GetLeftValue<int32_t>() * (sizeof(byte) * 8));
             case OperandType::Variable:
@@ -684,22 +700,19 @@ namespace StackVM
 
     byte* VirtualMachine::GetRightOperandPointer(Instruction* instruction)
     {
-        byte* ptr = nullptr;
-
         switch(instruction->rhsOperandType)
         {
             case OperandType::IntegerLiteral:
-                ptr = &instruction->rhs[0];
-                break;
+                return &instruction->lhs[0];
+            case OperandType::IntegerLiteralLabel:
+                return &instruction->lhs[0];
+            case OperandType::IntegerLiteralExtern:
+                return &instruction->lhs[0];
             case OperandType::Register:
-                ptr = &registers[0] + (instruction->GetRightValue<int32_t>() * (sizeof(byte) * 8));
-                break;
+                return &registers[0] + (instruction->GetRightValue<int32_t>() * (sizeof(byte) * 8));
             case OperandType::Variable:
-                ptr = assembly->GetDataAtIndex(instruction->GetRightValue<int32_t>());
-                break;
+                return assembly->GetDataAtIndex(instruction->GetRightValue<int32_t>());
         }
-        
-        return ptr;
     }
 
     Type VirtualMachine::GetLeftOperandDataType(Instruction* instruction) const

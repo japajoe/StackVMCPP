@@ -75,7 +75,9 @@ namespace StackVM
     {
         Register = 0,
         Variable = 1,
-        IntegerLiteral
+        IntegerLiteral = 2,
+        IntegerLiteralLabel = 3,
+        IntegerLiteralExtern = 4
     };
 
     enum class OperandTypeOption : uint8_t

@@ -12,6 +12,9 @@ Support for most common integer types like
 # Dependencies
 - None
 
+# Update as of 01/01/2023
+- The CALLF instruction has become obsolete, as the CALL function now is capable of either jumping to labels, or calling registered functions in your application. The CALLF opcode will remain usable but will eventually be removed.
+
 # Instructions
 **MOV**
 Move a value into a register or into a variable. Registers are able to store any type, variables are constrained to only contain the type they are defined as.
@@ -209,7 +212,7 @@ Makes a jump to a specific label defined by the user. A label can be defined abo
 - call doCalculation
 
 **CALLF**
-The CALLF instruction calls predefined functions inside the library and should not be confused with regular CALL. CALLF does not work on labels, and CALL does not work on functions which are part of the library. There are a number of these predefined functions which can either return a value on top of the stack, or just do something and return nothing. Some functions require that you push their arguments on the stack, then the function takes care of popping them off. For a better overview of which functions are available and what parameters to pass see StandardLibrary.hpp and StandardLibrary.cpp
+(Obsolete) The CALLF instruction calls predefined functions inside the library and should not be confused with regular CALL. CALLF does not work on labels. There are a number of these predefined functions which can either return a value on top of the stack, or just do something and return nothing. Some functions require that you push their arguments on the stack, then the function takes care of popping them off. For a better overview of which functions are available and what parameters to pass see StandardLibrary.hpp and StandardLibrary.cpp
 - callf sin
 - callf printf
 - callf getTimeStamp

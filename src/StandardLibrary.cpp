@@ -6,6 +6,11 @@
 
 namespace StackVM
 {
+    void StandardLibrary::TestFunction(Stack<byte>* stack)
+    {
+        std::cout << "Called TestFunction\n";
+    }
+
     void StandardLibrary::Abs(Stack<byte>* stack)
     {
         float value = stack->pop_float();

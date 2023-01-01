@@ -6,6 +6,7 @@ namespace StackVM
     {
         CompilerUtility::Initialize();
 
+        RegisterFunction("test_function", StandardLibrary::TestFunction);
         RegisterFunction("abs", StandardLibrary::Abs);
         RegisterFunction("clamp", StandardLibrary::Clamp);
         RegisterFunction("cos", StandardLibrary::Cos);
@@ -419,14 +420,14 @@ namespace StackVM
                 {
                     uint64_t value = labelMap[operandToken.text];
                     memcpy(operandValue, &value, sizeof(uint64_t));
-                    operandType = OperandType::IntegerLiteral;
+                    operandType = OperandType::IntegerLiteralLabel;
                     operandValueType = Type::UInt64;
                 }
                 else if(functionMap.count(operandToken.text) > 0)
                 {
                     uint64_t value = functionMap[operandToken.text];
                     memcpy(operandValue, &value, sizeof(uint64_t));
-                    operandType = OperandType::IntegerLiteral;
+                    operandType = OperandType::IntegerLiteralExtern;
                     operandValueType = Type::UInt64;
                 }
                 else
@@ -516,7 +517,7 @@ namespace StackVM
                 {
                     uint64_t value = labelMap[operandToken.text];
                     memcpy(operandValue, &value, sizeof(uint64_t));
-                    operandType = OperandType::IntegerLiteral;
+                    operandType = OperandType::IntegerLiteralLabel;
                     operandValueType = Type::UInt64;
                 }
                 else

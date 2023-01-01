@@ -10,6 +10,7 @@ namespace StackVM
     class StandardLibrary
     {
     public:
+        static void TestFunction(Stack<byte>* stack);
         static void Abs(Stack<byte>* stack);
         static void Clamp(Stack<byte>* stack);
         static void Cos(Stack<byte>* stack);
