@@ -6,161 +6,72 @@
 
 namespace StackVM
 {
-    void StandardLibrary::TestFunction(Stack<byte>* stack)
+    int StandardLibrary::Print(Stack<byte>* stack)
     {
-        std::cout << "Called TestFunction\n";
-    }
-
-    void StandardLibrary::Abs(Stack<byte>* stack)
-    {
-        float value = stack->pop_float();
-        float result = value >= 0 ? value : (-1.0f * value);
-        stack->push_float(result);
-    }
-
-    //float value, float min, float max
-    void StandardLibrary::Clamp(Stack<byte>* stack)
-    {
-        float max = stack->pop_float();
-        float min = stack->pop_float();
-        float result = stack->pop_float();
-
-        if(result > max)
-            result = max;
-        if(result < min)
-            result = min;        
-    
-        stack->push_float(result);
-    }
-
-    void StandardLibrary::Cos(Stack<byte>* stack)
-    {
-        float value = stack->pop_float();
-        float result = cos(value);
-        stack->push_float(result);
-    }
-
-    //float a, float b, float t
-    void StandardLibrary::Lerp(Stack<byte>* stack)
-    {
-        float t = stack->pop_float();
-        float b = stack->pop_float();
-        float a = stack->pop_float();
-
-        if(t > 1.0f)
-            t = 1.0f;
-        if(t < 0.0f)
-            t = 0.0f;
-
-        float result = a + ((b-a) * t);
-
-        stack->push_float(result);
-    }
-
-    //float x, float y
-    void StandardLibrary::Pow(Stack<byte>* stack)
-    {
-        float y = stack->pop_float();
-        float x = stack->pop_float();
-        float result = pow(x, y);
-        stack->push_float(result);
-    }
-
-    void StandardLibrary::Sin(Stack<byte>* stack)
-    {
-        float value = stack->pop_float();
-        float result = sin(value);
-        stack->push_float(result);
-    }
-
-    void StandardLibrary::Sign(Stack<byte>* stack)
-    {
-        float value = stack->pop_float();
-        float result = 0;
-
-        if(value == 0)
-            result = 0;
-        else if(value < 0)
-            result = -1;
-        else
-            result = 1;
-        stack->push_float(result);
-    }
-
-    void StandardLibrary::Sqrt(Stack<byte>* stack)  
-    {
-        float value = stack->pop_float();
-        float result = sqrt(value);
-        stack->push_float(result);
-    }
-
-    void StandardLibrary::GetTimeStamp(Stack<byte>* stack)
-    {
-        int64_t timestamp = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
-        stack->push_int64(timestamp);
-    }
-
-    void StandardLibrary::Print(Stack<byte>* stack)
-    {
-        int32_t numChars = stack->pop_int32();
+        int32_t numChars;
+       
+        if(!stack->pop_int32(numChars))
+            return -1;
 
         char characters[numChars];
         characters[numChars] = '\0';
         
         for(size_t i = 0; i < numChars; i++)
         {
-            characters[i] = stack->pop_char();
+            char c;
+            if(!stack->pop_char(c))
+                return -1;
+            characters[i] = c;
         }
 
-        std::cout << characters;     
+        std::cout << characters;    
+
+        return 0; 
     }
 
-    void StandardLibrary::PrintLine(Stack<byte>* stack)
+    int StandardLibrary::PrintLine(Stack<byte>* stack)
     {
-        int32_t numChars = stack->pop_int32();
+        int32_t numChars;
+       
+        if(!stack->pop_int32(numChars))
+            return -1;
 
         char characters[numChars];
         characters[numChars] = '\0';
         
         for(size_t i = 0; i < numChars; i++)
         {
-            characters[i] = stack->pop_char();
+            char c;
+            if(!stack->pop_char(c))
+                return -1;
+            characters[i] = c;
         }
 
         std::cout << characters << '\n';
+
+        return 0;
     }
 
-    void StandardLibrary::PrintNum(Stack<byte>* stack)
+    int StandardLibrary::PrintNum(Stack<byte>* stack)
     {
-        int32_t numberType = stack->pop_int32();
+        auto type = stack->get_top_type();
 
-        switch(numberType)
+        std::string value;
+
+        if(!stack->try_pop_as_string(value))
         {
-            case 0:
-            {
-                int32_t val = stack->pop_int32();
-                std::cout << val;
-                break;
-            }
-            case 1:
-            {
-                int64_t val = stack->pop_int64();
-                std::cout << val;
-                break;
-            }
-            case 2:
-            {
-                float val = stack->pop_float();
-                std::cout << val;
-                break;
-            }
-            default:
-                break;
+            return -1;
         }
+
+        std::cout << value;
+
+        return 0;
     }
 
-    void StandardLibrary::EndLine(Stack<byte>* stack)
+    int StandardLibrary::EndLine(Stack<byte>* stack)
     {
         std::cout << '\n';
+
+        return 0;
     }
 }

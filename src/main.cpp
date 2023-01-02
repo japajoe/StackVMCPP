@@ -23,7 +23,7 @@ int main()
 
 void CompileProgram()
 {
-    std::string filename = "helloworld.asm";
+    std::string filename = "fibonacci.asm";
 
     if(IO::FileExists(filename))
     {
@@ -35,11 +35,16 @@ void CompileProgram()
         {
             if(machine->LoadProgram(&assembly))
             {
-                bool execute = true;
+                ExecutionStatus status = ExecutionStatus::Ok;
 
-                while(execute)
+                while(status == ExecutionStatus::Ok)
                 {
-                    execute = machine->Execute();
+                    status = machine->Execute();
+                }
+
+                if(status != ExecutionStatus::Done)
+                {
+                    std::cout << "Program stopped with status: " << (int)status << std::endl;
                 }
             }    
         }

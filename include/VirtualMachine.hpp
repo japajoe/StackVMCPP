@@ -19,6 +19,19 @@ typedef high_resolution_clock::time_point TimePoint;
 
 namespace StackVM
 {
+    enum class ExecutionStatus : int
+    {
+        Ok = 0,
+        Done,
+        IllegalOperation,
+        IllegalJump,
+        StackOverflow,
+        StackUnderflow,
+        DivisionByZero,
+        NotImplemented,
+        Error
+    };
+
     class VirtualMachine
     {
     private:
@@ -46,7 +59,7 @@ namespace StackVM
     public:
         VirtualMachine();
         bool LoadProgram(Assembly* assembly);
-        bool Execute();
+        ExecutionStatus Execute();
         void Stop();
     };
 }

@@ -68,7 +68,9 @@ namespace StackVM
         UInt64 = 6,
         Int64 = 7,
         Single = 8,
-        Double = 9        
+        Double = 9,
+        String = 10,
+        Undefined = 11
     };
 
     enum class OperandType : uint8_t

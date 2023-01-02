@@ -29,25 +29,24 @@ section .data
 section .text
     
 start:    
-    pushi8 ' '
-    pushi8 '!'
-    pushi8 'd'
-    pushi8 'l'
-    pushi8 'r'
-    pushi8 'o'
-    pushi8 'w'
-    pushi8 ' '
-    pushi8 'o'
-    pushi8 'l'
-    pushi8 'l'
-    pushi8 'e'
-    pushi8 'H'
-    pushi32 13
-    callf print    
-    pushi32 iteration
-    pushi32 0
-    callf printnum
-    callf endline
+    push ' '
+    push '!'
+    push 'd'
+    push 'l'
+    push 'r'
+    push 'o'
+    push 'w'
+    push ' '
+    push 'o'
+    push 'l'
+    push 'l'
+    push 'e'
+    push 'H'
+    push 13
+    call print    
+    push iteration
+    call printnum
+    call endline
     inc iteration
     cmp iteration, iterations
     jne start

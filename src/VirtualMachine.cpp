@@ -43,10 +43,10 @@ namespace StackVM
         return true;
     }    
 
-    bool VirtualMachine::Execute()
+    ExecutionStatus VirtualMachine::Execute()
     {
         if(currentInstruction == nullptr)
-            return false;
+            return ExecutionStatus::Error;
 
         switch(currentInstruction->opcode)
         {
@@ -57,7 +57,7 @@ namespace StackVM
                 auto ms_int = duration_cast<milliseconds>(endTime - startTime);
                 elapsedTime = ms_int.count();                 
                 std::cout << "Execution finished in " << elapsedTime << " milliseconds" << std::endl;
-                return false;
+                return ExecutionStatus::Done;
             }
             case OpCode::NOP:
             {
@@ -99,77 +99,88 @@ namespace StackVM
             {
                 byte* src = GetLeftOperandPointer(currentInstruction);
                 Type type = GetLeftOperandDataType(currentInstruction);
-                stack.push(src, type);
+                if(!stack.push(src, type))
+                    return ExecutionStatus::StackOverflow;
                 IncrementInstructionPointer();
                 break;
             }
             case OpCode::PUSHI8:
             {
                 byte* src = GetLeftOperandPointer(currentInstruction);
-                stack.push_from_type<char>(src);
+                if(!stack.push(src, Type::Int8))
+                    return ExecutionStatus::StackOverflow;
                 IncrementInstructionPointer();
                 break;
             }
             case OpCode::PUSHU8:
             {
                 byte* src = GetLeftOperandPointer(currentInstruction);
-                stack.push_from_type<unsigned char>(src);
+                if(!stack.push(src, Type::UInt8))
+                    return ExecutionStatus::StackOverflow;
                 IncrementInstructionPointer();
                 break;
             }            
             case OpCode::PUSHF:
             {
                 byte* src = GetLeftOperandPointer(currentInstruction);
-                stack.push_from_type<float>(src);
+                if(!stack.push(src, Type::Single))
+                    return ExecutionStatus::StackOverflow;
                 IncrementInstructionPointer();
                 break;
             }
             case OpCode::PUSHD:
             {
                 byte* src = GetLeftOperandPointer(currentInstruction);
-                stack.push_from_type<double>(src);
+                if(!stack.push(src, Type::Double))
+                    return ExecutionStatus::StackOverflow;
                 IncrementInstructionPointer();
                 break;
             }                  
             case OpCode::PUSHI32:
             {
                 byte* src = GetLeftOperandPointer(currentInstruction);
-                stack.push_from_type<int32_t>(src);
+                if(!stack.push(src, Type::Int32))
+                    return ExecutionStatus::StackOverflow;
                 IncrementInstructionPointer();
                 break;
             }
             case OpCode::PUSHU32:
             {
                 byte* src = GetLeftOperandPointer(currentInstruction);
-                stack.push_from_type<uint32_t>(src);
+                if(!stack.push(src, Type::UInt32))
+                    return ExecutionStatus::StackOverflow;
                 IncrementInstructionPointer();
                 break;
             }            
             case OpCode::PUSHI16:
             {
                 byte* src = GetLeftOperandPointer(currentInstruction);
-                stack.push_from_type<int16_t>(src);
+                if(!stack.push(src, Type::Int16))
+                    return ExecutionStatus::StackOverflow;
                 IncrementInstructionPointer();
                 break;
             }    
             case OpCode::PUSHU16:
             {
                 byte* src = GetLeftOperandPointer(currentInstruction);
-                stack.push_from_type<uint16_t>(src);
+                if(!stack.push(src, Type::UInt16))
+                    return ExecutionStatus::StackOverflow;
                 IncrementInstructionPointer();
                 break;
             }                          
             case OpCode::PUSHI64:
             {
                 byte* src = GetLeftOperandPointer(currentInstruction);
-                stack.push_from_type<int64_t>(src);
+                if(!stack.push(src, Type::Int64))
+                    return ExecutionStatus::StackOverflow;
                 IncrementInstructionPointer();
                 break;
             }
             case OpCode::PUSHU64:
             {
                 byte* src = GetLeftOperandPointer(currentInstruction);
-                stack.push_from_type<uint64_t>(src);
+                if(!stack.push(src, Type::UInt64))
+                    return ExecutionStatus::StackOverflow;
                 IncrementInstructionPointer();
                 break;
             }                                    
@@ -178,12 +189,19 @@ namespace StackVM
                 if(currentInstruction->numOperands == 1)
                 {
                     byte* dst = GetLeftOperandPointer(currentInstruction);
-                    byte* src = stack.pop_bytes();
+                    byte* src;
+
+                    if(!stack.pop_bytes(src))
+                        return ExecutionStatus::StackUnderflow;
+                    // byte *src = stack.pop_bytes();
                     memcpy(dst, src, 8);
                 }
                 else
                 {
-                    stack.pop_bytes();
+                    byte* src;
+
+                    if(!stack.pop_bytes(src))
+                        return ExecutionStatus::StackUnderflow;
                 }
                 IncrementInstructionPointer();
                 break;
@@ -193,7 +211,9 @@ namespace StackVM
                 if(currentInstruction->numOperands == 1)
                 {
                     byte* dst = GetLeftOperandPointer(currentInstruction);
-                    char src = stack.pop_char();
+                    char src;
+                    if(!stack.pop_char(src))
+                        return ExecutionStatus::StackUnderflow;
                     memcpy(dst, &src, sizeof(char));
 
                     if(currentInstruction->lhsOperandType == OperandType::Register)
@@ -203,7 +223,8 @@ namespace StackVM
                 }
                 else
                 {
-                    stack.pop_char();
+                    if(!stack.pop())
+                        return ExecutionStatus::StackUnderflow;
                 }                
                 IncrementInstructionPointer();
                 break;
@@ -213,9 +234,11 @@ namespace StackVM
                 if(currentInstruction->numOperands == 1)
                 {
                     byte* dst = GetLeftOperandPointer(currentInstruction);
-                    unsigned char src = stack.pop_uchar();
+                    unsigned char src;
+                    if(!stack.pop_uchar(src))
+                        return ExecutionStatus::StackUnderflow;
                     memcpy(dst, &src, sizeof(unsigned char));
-                    
+
                     if(currentInstruction->lhsOperandType == OperandType::Register)
                     {
                         SetDestinationRegisterDataType(currentInstruction, Type::UInt8);
@@ -223,8 +246,9 @@ namespace StackVM
                 }
                 else
                 {
-                    stack.pop_uchar();
-                }                 
+                    if(!stack.pop())
+                        return ExecutionStatus::StackUnderflow;
+                }
                 IncrementInstructionPointer();
                 break;
             }
@@ -233,7 +257,9 @@ namespace StackVM
                 if(currentInstruction->numOperands == 1)
                 {
                     byte* dst = GetLeftOperandPointer(currentInstruction);
-                    float src = stack.pop_float();
+                    float src;
+                    if(!stack.pop_float(src))
+                        return ExecutionStatus::StackUnderflow;
                     memcpy(dst, &src, sizeof(float));
 
                     if(currentInstruction->lhsOperandType == OperandType::Register)
@@ -243,8 +269,9 @@ namespace StackVM
                 }
                 else
                 {
-                    stack.pop_float();
-                }                 
+                    if(!stack.pop())
+                        return ExecutionStatus::StackUnderflow;
+                }
                 IncrementInstructionPointer();
                 break;
             }
@@ -253,7 +280,9 @@ namespace StackVM
                 if(currentInstruction->numOperands == 1)
                 {
                     byte* dst = GetLeftOperandPointer(currentInstruction);
-                    double src = stack.pop_double();
+                    double src;
+                    if(!stack.pop_double(src))
+                        return ExecutionStatus::StackUnderflow;
                     memcpy(dst, &src, sizeof(double));
 
                     if(currentInstruction->lhsOperandType == OperandType::Register)
@@ -263,8 +292,9 @@ namespace StackVM
                 }
                 else
                 {
-                    stack.pop_double();
-                }                 
+                    if(!stack.pop())
+                        return ExecutionStatus::StackUnderflow;
+                }
                 IncrementInstructionPointer();
                 break;
             }
@@ -273,7 +303,9 @@ namespace StackVM
                 if(currentInstruction->numOperands == 1)
                 {
                     byte* dst = GetLeftOperandPointer(currentInstruction);
-                    int32_t src = stack.pop_int32();
+                    int32_t src;
+                    if(!stack.pop_int32(src))
+                        return ExecutionStatus::StackUnderflow;
                     memcpy(dst, &src, sizeof(int32_t));
 
                     if(currentInstruction->lhsOperandType == OperandType::Register)
@@ -283,8 +315,9 @@ namespace StackVM
                 }
                 else
                 {
-                    stack.pop_int32();
-                }                
+                    if(!stack.pop())
+                        return ExecutionStatus::StackUnderflow;
+                }
                 IncrementInstructionPointer();
                 break;
             }
@@ -293,7 +326,9 @@ namespace StackVM
                 if(currentInstruction->numOperands == 1)
                 {
                     byte* dst = GetLeftOperandPointer(currentInstruction);
-                    uint32_t src = stack.pop_uint32();
+                    uint32_t src;
+                    if(!stack.pop_uint32(src))
+                        return ExecutionStatus::StackUnderflow;
                     memcpy(dst, &src, sizeof(uint32_t));
 
                     if(currentInstruction->lhsOperandType == OperandType::Register)
@@ -303,8 +338,9 @@ namespace StackVM
                 }
                 else
                 {
-                    stack.pop_uint32();
-                }                
+                    if(!stack.pop())
+                        return ExecutionStatus::StackUnderflow;
+                }
                 IncrementInstructionPointer();
                 break;
             }
@@ -313,7 +349,9 @@ namespace StackVM
                 if(currentInstruction->numOperands == 1)
                 {
                     byte* dst = GetLeftOperandPointer(currentInstruction);
-                    int16_t src = stack.pop_int16();
+                    int16_t src;
+                    if(!stack.pop_int16(src))
+                        return ExecutionStatus::StackUnderflow;
                     memcpy(dst, &src, sizeof(int16_t));
 
                     if(currentInstruction->lhsOperandType == OperandType::Register)
@@ -323,7 +361,8 @@ namespace StackVM
                 }
                 else
                 {
-                    stack.pop_int16();
+                    if(!stack.pop())
+                        return ExecutionStatus::StackUnderflow;
                 }                 
                 IncrementInstructionPointer();
                 break;
@@ -333,7 +372,9 @@ namespace StackVM
                 if(currentInstruction->numOperands == 1)
                 {
                     byte* dst = GetLeftOperandPointer(currentInstruction);
-                    uint16_t src = stack.pop_uint16();
+                    uint16_t src;
+                    if(!stack.pop_uint16(src))
+                        return ExecutionStatus::StackUnderflow;
                     memcpy(dst, &src, sizeof(uint16_t));
 
                     if(currentInstruction->lhsOperandType == OperandType::Register)
@@ -343,8 +384,9 @@ namespace StackVM
                 }
                 else
                 {
-                    stack.pop_uint16();
-                }                
+                    if(!stack.pop())
+                        return ExecutionStatus::StackUnderflow;
+                }
                 IncrementInstructionPointer();
                 break;
             }
@@ -353,7 +395,9 @@ namespace StackVM
                 if(currentInstruction->numOperands == 1)
                 {
                     byte* dst = GetLeftOperandPointer(currentInstruction);
-                    int64_t src = stack.pop_int64();
+                    int64_t src;
+                    if(!stack.pop_int64(src))
+                        return ExecutionStatus::StackUnderflow;
                     memcpy(dst, &src, sizeof(int64_t));
 
                     if(currentInstruction->lhsOperandType == OperandType::Register)
@@ -363,7 +407,8 @@ namespace StackVM
                 }
                 else
                 {
-                    stack.pop_int64();
+                    if(!stack.pop())
+                        return ExecutionStatus::StackUnderflow;
                 }                   
                 IncrementInstructionPointer();
                 break;
@@ -373,7 +418,9 @@ namespace StackVM
                 if(currentInstruction->numOperands == 1)
                 {
                     byte* dst = GetLeftOperandPointer(currentInstruction);
-                    uint64_t src = stack.pop_uint64();
+                    uint64_t src;
+                    if(!stack.pop_uint64(src))
+                        return ExecutionStatus::StackUnderflow;
                     memcpy(dst, &src, sizeof(uint64_t));
 
                     if(currentInstruction->lhsOperandType == OperandType::Register)
@@ -383,8 +430,9 @@ namespace StackVM
                 }
                 else
                 {
-                    stack.pop_uint64();
-                }                
+                    if(!stack.pop())
+                        return ExecutionStatus::StackUnderflow;
+                }
                 IncrementInstructionPointer();
                 break;
             }
@@ -486,6 +534,7 @@ namespace StackVM
 
                 if(currentInstruction->lhsOperandType == OperandType::IntegerLiteralLabel)
                 {
+                    //Todo: store return address somewhere else instead of the stack
                     uint64_t offset;
                     memcpy(&offset, dst, sizeof(uint64_t));
                     uint64_t ip = (currentInstruction - entryInstruction) + 1;
@@ -497,10 +546,13 @@ namespace StackVM
                     uint64_t address;
                     memcpy(&address, dst, sizeof(uint64_t));
                     StackVMFunction func = reinterpret_cast<StackVMFunction>(address);
-                    func(&stack);
-                    IncrementInstructionPointer();
-                }
+                    int result = func(&stack);
 
+                    if(result >= 0)
+                        IncrementInstructionPointer();
+                    else
+                        return ExecutionStatus::Error;
+                }
 
                 break;
             }
@@ -518,7 +570,10 @@ namespace StackVM
             }
             case OpCode::RET:
             {
-                uint64_t ip = stack.pop_uint64();
+                //Todo: obtain return address from somewhere else instead of the stack
+                uint64_t ip;
+                if(!stack.pop_uint64(ip))
+                    return ExecutionStatus::StackUnderflow;
                 SetInstructionPointer(ip);
                 break;
             }
@@ -657,7 +712,7 @@ namespace StackVM
             }
         }      
 
-        return true;   
+        return ExecutionStatus::Ok;   
     }
 
     void VirtualMachine::Stop()

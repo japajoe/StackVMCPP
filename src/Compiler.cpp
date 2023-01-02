@@ -6,16 +6,6 @@ namespace StackVM
     {
         CompilerUtility::Initialize();
 
-        RegisterFunction("test_function", StandardLibrary::TestFunction);
-        RegisterFunction("abs", StandardLibrary::Abs);
-        RegisterFunction("clamp", StandardLibrary::Clamp);
-        RegisterFunction("cos", StandardLibrary::Cos);
-        RegisterFunction("lerp", StandardLibrary::Lerp);
-        RegisterFunction("pow", StandardLibrary::Pow);
-        RegisterFunction("sin", StandardLibrary::Sin);
-        RegisterFunction("sign", StandardLibrary::Sign);
-        RegisterFunction("sqrt", StandardLibrary::Sqrt);
-        RegisterFunction("getTimeStamp", StandardLibrary::GetTimeStamp);
         RegisterFunction("print", StandardLibrary::Print);
         RegisterFunction("printline", StandardLibrary::PrintLine);
         RegisterFunction("printnum", StandardLibrary::PrintNum);

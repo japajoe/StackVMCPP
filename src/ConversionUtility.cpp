@@ -47,6 +47,10 @@ namespace StackVM
             {
                 return "Single";
             }
+            default:
+            {
+                return "Undefined";
+            }
         }
     }
 
