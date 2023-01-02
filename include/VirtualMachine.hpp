@@ -36,7 +36,7 @@ namespace StackVM
     {
     private:
         Stack<byte> stack;
-        std::vector<byte> registers;
+        byte registers[13 * 8];
         Type registerDataType[13];
         Assembly* assembly;
         Instruction* currentInstruction;
@@ -58,7 +58,8 @@ namespace StackVM
         void LogMessage(const std::string& message);
     public:
         VirtualMachine();
-        bool LoadProgram(Assembly* assembly);
+        ~VirtualMachine();
+        bool LoadProgram(Assembly *assembly);
         ExecutionStatus Execute();
         void Stop();
     };

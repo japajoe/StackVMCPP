@@ -20,9 +20,12 @@ namespace StackVM
 
     VirtualMachine::VirtualMachine()
     {
-        registers.reserve(13 * 8);
-        registers.resize(13 * 8);
+        memset(registers, 0, 13 * 8);
         ResetState();
+    }
+
+    VirtualMachine::~VirtualMachine()
+    {
     }
 
     bool VirtualMachine::LoadProgram(Assembly* assembly)
