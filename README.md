@@ -13,7 +13,11 @@ Support for most common integer types like
 - None
 
 # Update as of 01/01/2023
+- There are some major differences, so please review them carefully if you intend to pull in changes.
 - The CALLF instruction has become obsolete, as the CALL function now is capable of either jumping to labels, or calling registered functions in your application. The CALLF opcode will remain usable but will eventually be removed.
+- The stack has been rewritten entirely, which should make it more useful and safer.
+- StackVM functions now require to return an integer which signals either an error or success.
+- The Compiler::Execute function returns an ExecutionStatus
 
 # Instructions
 **MOV**
